@@ -3,6 +3,9 @@ import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
 import store from './store'
+import VeeValidate from 'vee-validate';
+ 
+Vue.use(VeeValidate);
 
 Vue.config.productionTip = false
 
