@@ -1,136 +1,45 @@
 <template>
-	<div class="form">
-		<div class="form-container outer">
-			<div class="form-form">
-				<div class="form-form-wrap">
-					<div class="form-container">
-						<div class="form-content">
-							<h1 class="">Sign In</h1>
-							<p class="">Log in to your account to continue.</p>
+	<div class="login flex">
+		<div class="login__left flex-center">
+			<img src="/assets/img/login-img.svg" alt="" />
+		</div>
+		<div class="login__right flex-center">
+			<div>
+				<h1 class="login__h1">Welcome Back</h1>
+				<p class="login__p">Login to your account</p>
 
-							<form class="text-left" @submit.prevent="onSubmit">
-								<div class="form">
-									<div id="username-field" class="field-wrapper input">
-										<label for="username">USERNAME</label>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="24"
-											height="24"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											class="feather feather-user"
-										>
-											<path
-												d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-											></path>
-											<circle cx="12" cy="7" r="4"></circle>
-										</svg>
-										<input
-											id="username"
-											name="username"
-											type="text"
-											class="form-control"
-											placeholder="Username"
-											v-model="username"
-											v-validate="'required'"
-											:class="{
-												'is-invalid': errors.has('username'),
-											}"
-										/>
-									</div>
-
-									<div
-										id="password-field"
-										class="field-wrapper input mb-2"
-									>
-										<div class="d-flex justify-content-between">
-											<label for="password">PASSWORD</label>
-											<a
-												href="auth_pass_recovery_boxed.html"
-												class="forgot-pass-link"
-												>Forgot Password?</a
-											>
-										</div>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="24"
-											height="24"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											class="feather feather-lock"
-										>
-											<rect
-												x="3"
-												y="11"
-												width="18"
-												height="11"
-												rx="2"
-												ry="2"
-											></rect>
-											<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-										</svg>
-										<input
-											id="password"
-											name="password"
-											type="password"
-											class="form-control"
-											placeholder="Password"
-											v-model="password"
-											v-validate="'required'"
-											:class="{
-												'is-invalid': errors.has('password'),
-											}"
-										/>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="24"
-											height="24"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											id="toggle-password"
-											class="feather feather-eye"
-										>
-											<path
-												d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-											></path>
-											<circle cx="12" cy="12" r="3"></circle>
-										</svg>
-									</div>
-									<div class="d-sm-flex justify-content-between">
-										<div class="field-wrapper">
-											<button
-												type="submit"
-												class="btn btn-primary"
-												value=""
-											>
-												Log In
-											</button>
-										</div>
-									</div>
-
-									<p class="signup-link">
-										Not registered ?
-										<a href="auth_register_boxed.html"
-											>Request an account</a
-										>
-									</p>
-								</div>
-							</form>
-						</div>
+				<form @submit.prevent="onSubmit">
+					<div class="login__item">
+						<label for="">Email Address</label>
+						<input
+							type="text"
+							v-model="username"
+							v-validate="'required'"
+							:class="{ 'is-invalid': submitted && errors.has('username') }"
+							name="username"
+							placeholder="Example: jane@doe.com"
+						/>
 					</div>
-				</div>
+					<div class="login__item">
+						<label for="">Password</label>
+						<input
+							:class="{ 'is-invalid': submitted && errors.has('password') }"
+							type="password"
+							v-model="password"
+							v-validate="'required'"
+							name="password"
+							placeholder="Enter your password"
+						/>
+					</div>
+					<div class="login__extra flex">
+						<div class="flex-align-center">
+							<input v-model="remember" id="forgot" type="checkbox" />
+							<label for="forgot">Remember me</label>
+						</div>
+						<a href="#">Forgot your password?</a>
+					</div>
+					<button type="submit" class="login__submit">Login</button>
+				</form>
 			</div>
 		</div>
 	</div>
@@ -144,43 +53,136 @@
 			return {
 				username: '',
 				password: '',
+				remember: false,
+				submitted: false,
 			};
 		},
+		computed: {
+			remembered() {
+				return this.$store.getters['account/remembered'];
+			},
+		},
 		mounted() {
-			this.config();
+			this.logout();
+			this.remember = Object.values(this.remembered).length;
+			this.username = this.remembered.username;
+			this.password = this.remembered.password;
 		},
 		methods: {
-			...mapActions('account', ['login']),
+			...mapActions('account', [
+				'login',
+				'remembering',
+				'removeRemember',
+				'logout',
+			]),
 			onSubmit() {
+				this.submitted = true;
 				this.$validator.validate().then((valid) => {
 					if (valid) {
+						if (this.remember) {
+							this.remembering({
+								username: this.username,
+								password: this.password,
+							});
+						} else {
+							this.removeRemember();
+						}
 						this.login({ username: this.username, password: this.password });
 					}
 				});
-			},
-			config() {
-				var togglePassword = document.getElementById('toggle-password');
-				var formContent = document.getElementsByClassName('form-content')[0];
-				var getFormContentHeight = formContent.clientHeight;
-
-				var formImage = document.getElementsByClassName('form-image')[0];
-				if (formImage) {
-					var setFormImageHeight = (formImage.style.height =
-						getFormContentHeight + 'px');
-				}
-				if (togglePassword) {
-					togglePassword.addEventListener('click', function () {
-						var x = document.getElementById('password');
-						if (x.type === 'password') {
-							x.type = 'text';
-						} else {
-							x.type = 'password';
-						}
-					});
-				}
 			},
 		},
 	};
 </script>
 
-<style></style>
+<style lang="scss">
+	body {
+		overflow: hidden;
+	}
+	.login {
+		background: #1a1c48;
+		min-height: 100vh;
+
+		&__left {
+			flex: 2;
+			img {
+				height: 98%;
+				width: 100%;
+			}
+		}
+
+		&__right {
+			flex: 1;
+			color: #ffffff;
+		}
+
+		&__h1 {
+			font-weight: 400;
+			font-style: normal;
+			font-size: 40px;
+			line-height: 54px;
+			margin: 6px 0;
+			padding: 0;
+		}
+		&__p {
+			font-weight: normal;
+			font-size: 16px;
+			line-height: 22px;
+			margin: 0 0 32px;
+		}
+
+		&__item {
+			margin-bottom: 15px;
+			label {
+				display: flex;
+				font-weight: normal;
+				font-size: 12px;
+				line-height: 16px;
+				margin-bottom: 10px;
+			}
+
+			input {
+				border: 0.5px solid #b4b4b4;
+				border-radius: 5px;
+				height: 50px;
+				width: 348px;
+				padding-left: 16px;
+				outline-color: #ffffff;
+				font-size: 14px;
+				line-height: 19px;
+			}
+		}
+
+		&__extra {
+			font-weight: 400;
+			font-size: 14px;
+			line-height: 19px;
+			margin-top: 2px;
+			justify-content: space-between;
+
+			a {
+				color: #ffffff;
+			}
+
+			input {
+				width: 16px;
+				height: 16px;
+			}
+		}
+
+		&__submit {
+			background: #456be6;
+			width: 348px;
+			height: 50px;
+			margin-top: 51px;
+			border: none;
+			border-radius: 5px;
+			font-weight: 700;
+			font-size: 16px;
+			line-height: 22px;
+			color: #ffffff;
+			cursor: pointer;
+			outline-color: #456be6;
+		}
+	}
+</style>

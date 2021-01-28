@@ -11,7 +11,6 @@ export const userService = {
 	},
 	logout () {
 		localStorage.removeItem('user');
-		window.location.href = '/';
 	},
 	register(user) {
 		const requestOptions = {

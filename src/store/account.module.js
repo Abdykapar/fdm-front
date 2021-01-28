@@ -2,9 +2,11 @@ import {userService} from '@/_services/user.service'
 import router from '@/router'
 
 const user = JSON.parse(localStorage.getItem('user'))
+const rememberedUser = JSON.parse(localStorage.getItem('remembered'))
 
 const state = {
 	user: user ? user : {},
+	remembered: rememberedUser || {}
 }
 
 const actions = {
@@ -18,6 +20,14 @@ const actions = {
 	logout({commit}) {
 		userService.logout();
 		commit('REMOVE_USER');
+	},
+	remembering ({ commit }, data) {
+		localStorage.setItem('remembered', JSON.stringify(data))
+		commit('REMEMBER_USER', data)
+	},
+	removeRemember ({ commit }) {
+		localStorage.removeItem('remembered')
+		commit('REMEMBER_USER', {})
 	}
 }
 
@@ -28,11 +38,21 @@ const mutations = {
 	REMOVE_USER(state) {
 		state.user = null;
 	},
+	REMEMBER_USER (state, data) {
+		state.remembered = data
+	}
+}
+
+const getters = {
+	remembered ({ remembered }) {
+		return remembered
+	}
 }
 
 export const account = {
 	namespaced: true,
 	state,
 	actions,
-	mutations
+	mutations,
+	getters
 }

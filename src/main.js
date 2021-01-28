@@ -4,6 +4,7 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 import VeeValidate from 'vee-validate';
+import '@/assets/style/main.scss'
  
 Vue.use(VeeValidate);
 
