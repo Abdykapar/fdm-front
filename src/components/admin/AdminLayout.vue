@@ -2,27 +2,20 @@
 	<div class="home">
 		<sidebar></sidebar>
 		<div class="home__main">
-			<home-header></home-header>
+			<admin-header></admin-header>
+			<router-view></router-view>
 		</div>
 	</div>
 </template>
 
 <script>
-	import Sidebar from '@/components/Sidebar';
-	import HomeHeader from '@/components/Header';
+	import AdminHeader from '../Header.vue';
+	import Sidebar from '../Sidebar.vue';
 	export default {
-		name: 'Home',
-		components: {
-			Sidebar,
-			HomeHeader,
-		},
-		data() {
-			return {};
-		},
-		mounted() {},
-		methods: {},
+		components: { Sidebar, AdminHeader },
 	};
 </script>
+
 <style lang="scss">
 	.home {
 		display: flex;
@@ -30,6 +23,7 @@
 
 		&__main {
 			flex: 1;
+			margin-left: 240px;
 		}
 	}
 </style>
