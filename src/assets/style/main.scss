@@ -6,6 +6,10 @@
 	box-sizing: border-box;
 }
 
+button {
+	border: none;
+}
+
 html,
 body {
 	margin: 0;
@@ -28,6 +32,11 @@ body {
 	justify-content: center;
 }
 
+.flex-justify-between {
+	display: flex;
+	justify-content: space-between;
+}
+
 .flex-align-center {
 	display: flex;
 	align-items: center;
@@ -36,4 +45,115 @@ body {
 .is-invalid {
 	border: 2px solid #dc3545 !important;
 	outline-color: #dc3545 !important;
+}
+
+.home {
+	&__body {
+		margin: 0 40px;
+
+		&__head {
+			font-size: 20px;
+			line-height: 27px;
+			letter-spacing: 0.2px;
+			color: #ffffff;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			button {
+				border: 1px solid #ffffff;
+				width: 190px;
+				height: 36px;
+				background: $black-back;
+				font-size: 14px;
+				line-height: 19px;
+				cursor: pointer;
+				color: #ffffff;
+
+				img {
+					margin-right: 24px;
+					margin-left: 12px;
+				}
+			}
+		}
+		&__main {
+			margin-top: 30px;
+			margin-bottom: 30px;
+		}
+	}
+}
+
+.create {
+	&__head {
+		font-size: 20px;
+		line-height: 27px;
+		font-weight: 400;
+		color: #ffffff;
+		margin-bottom: 48px;
+	}
+}
+
+.form {
+	&__row {
+		margin-bottom: 22px;
+		label,
+		span {
+			font-size: 13px;
+			line-height: 19px;
+			color: #298bfe;
+			display: block;
+			mix-blend-mode: normal;
+			margin-bottom: 10px;
+		}
+		input {
+			width: 286px;
+			height: 48px;
+			border: 1px solid #33393f;
+			border-radius: 2px;
+			font-size: 14px;
+			line-height: 19px;
+			color: #ffffff;
+			mix-blend-mode: normal;
+			background: inherit;
+			padding-left: 15px;
+		}
+
+		&.error {
+			position: relative;
+			input {
+				border: 1px solid #ff3654;
+			}
+			label,
+			span {
+				color: #ff3654;
+			}
+
+			img {
+				position: absolute;
+				right: 18px;
+				top: 48%;
+			}
+		}
+	}
+
+	&__submit {
+		button {
+			min-width: 106px;
+			height: 36px;
+			font-size: 14px;
+			line-height: 19px;
+			color: #ffffff;
+			background: #298bfe;
+			border-radius: 2px;
+
+			&.black {
+				background: #2a3546;
+				border: 1px solid #313d4f;
+			}
+		}
+	}
+}
+
+.pointer {
+	cursor: pointer;
 }

@@ -39,8 +39,13 @@
 				text-align: left;
 
 				&:first-child {
+					padding-left: 40px;
+				}
+
+				&.id {
 					text-align: center;
 					width: 50px;
+					padding-left: 0;
 				}
 			}
 
@@ -52,7 +57,16 @@
 				color: #7882a2;
 
 				&:first-child {
+					padding-left: 40px;
+				}
+
+				&:last-child {
+					padding-right: 10px;
+				}
+
+				&.id {
 					text-align: center;
+					padding-left: 0;
 				}
 			}
 		}

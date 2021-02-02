@@ -1,42 +1,76 @@
 <template>
-	<div class="sidebar">
+	<div class="sidebar" :class="{ small: type === 'small' }">
 		<div class="sidebar__top">
-			<div class="sidebar__logo">
+			<div v-if="type === 'big'" class="sidebar__logo">
 				<span>FlightData</span>
 				<span class="sidebar__circle"></span>
 			</div>
+			<div class="sidebar__space" v-else></div>
 			<div class="sidebar__menu">
-				<div class="sidebar__menu__item">
-					<img src="../assets/icons/bar-chart.svg" alt="" /> Dashboard
-				</div>
-				<div class="sidebar__menu__item">
-					<img src="../assets/icons/folder.svg" alt="" /> Data List
-				</div>
-				<div class="sidebar__menu__item">
-					<img src="../assets/icons/monitor.svg" alt="" /> Data Insights
-				</div>
-				<div class="sidebar__menu__item active">
-					<img src="../assets/icons/user.svg" alt="" /> Technician Users
+				<div
+					v-for="item in menus"
+					:key="item.href"
+					class="sidebar__menu__item"
+					:class="{
+						small: type === 'small',
+						active: item.href === $route.path,
+					}"
+					@click="$router.push(item.href)"
+				>
+					<img :src="item.icon" alt="" />
+					{{ type === 'big' ? item.title : '' }}
 				</div>
 			</div>
 		</div>
 		<div class="sidebar__bottom">
-			<div class="sidebar__menu__item">
-				<img src="../assets/icons/settings.svg" alt="" /> Settings
-			</div>
-			<div class="sidebar__menu__item">
-				<img src="../assets/icons/help.svg" alt="" /> Help
-			</div>
-			<div class="sidebar__menu__item">
-				<img src="../assets/icons/logout.svg" alt="" /> Logout
+			<div
+				v-for="item in bottomMenus"
+				:key="item.icon"
+				class="sidebar__menu__item"
+				:class="{ small: type === 'small' }"
+			>
+				<img :src="item.icon" alt="" /> {{ type === 'big' ? item.title : '' }}
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+	import sidebars from '@/_helpers/sidebars';
 	export default {
 		name: 'Sidebar',
+		data() {
+			return {
+				// menus: [
+				// 	{
+				// 		title: 'Dashboard',
+				// 		icon: require('../assets/icons/bar-chart.svg'),
+				// 		href: '/',
+				// 	},
+				// 	{
+				// 		title: 'Data List',
+				// 		icon: require('../assets/icons/folder.svg'),
+				// 		href: '/data-list',
+				// 	},
+				// 	{
+				// 		title: 'Data Insights',
+				// 		icon: require('../assets/icons/monitor.svg'),
+				// 	},
+				// 	{
+				// 		title: 'Technician Users',
+				// 		icon: require('../assets/icons/user.svg'),
+				// 		href: '/technician',
+				// 	},
+				// ],
+				menus: sidebars.superAdminSidebars,
+				bottomMenus: sidebars.bottomMenus,
+			};
+		},
+		computed: {
+			type() {
+				return this.$route.path === '/' ? 'small' : 'big';
+			},
+		},
 	};
 </script>
 
@@ -51,6 +85,19 @@
 		top: 0;
 		bottom: 0;
 		left: 0;
+		animation: width 2s ease;
+
+		&.small {
+			width: 81px;
+		}
+
+		&__space {
+			margin-top: 92px;
+		}
+
+		&__bottom {
+			margin-bottom: 30px;
+		}
 
 		&__logo {
 			font-weight: 400;
@@ -82,6 +129,10 @@
 				color: #ffffff;
 				padding: 15px 0 15px 43px;
 				cursor: pointer;
+
+				&.small {
+					padding-left: 27px;
+				}
 
 				&:hover {
 					background: rgba($color: #ffffff, $alpha: 0.05);

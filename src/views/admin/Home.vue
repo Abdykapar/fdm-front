@@ -1,94 +1,96 @@
 <template>
-	<div class="home__body">
-		<div class="home__body__head">
-			<span>Technician Users</span>
-			<button class="flex-align-center">
-				<img src="../../assets/icons/add.svg" alt="" /> Add new user
-			</button>
+	<div class="home">
+		<div class="home__left">
+			<div class="home__left__first">
+				<div>
+					<img src="../../assets/img/temporary/chart-1.svg" alt="" />
+				</div>
+				<div>
+					<div>
+						<img src="../../assets/img/temporary/circle-1.svg" alt="" />
+						<img src="../../assets/img/temporary/circle-2.svg" alt="" />
+					</div>
+					<div>
+						<img src="../../assets/img/temporary/circle-3.svg" alt="" />
+						<img src="../../assets/img/temporary/circle-4.svg" alt="" />
+					</div>
+				</div>
+				<div>
+					<img src="../../assets/img/airliner.png" alt="" />
+				</div>
+			</div>
+			<div class="home__left__second">
+				<div>
+					<img src="../../assets/img/temporary/chart-2.svg" alt="" />
+				</div>
+				<div>
+					<img src="../../assets/img/temporary/chart-3.svg" alt="" />
+				</div>
+			</div>
 		</div>
-		<div class="home__body__users">
-			<fdm-table>
-				<template slot="head">
-					<tr>
-						<th>ID</th>
-						<th>Name Surname</th>
-						<th>Role</th>
-						<th>Telephone</th>
-						<th>Login</th>
-						<th>Password</th>
-						<th></th>
-						<th></th>
-					</tr>
-				</template>
-				<template slot="body">
-					<tr v-for="item in 10" :key="item">
-						<td>{{ item }}</td>
-						<td>Anna Karimova</td>
-						<td>Graphic Design</td>
-						<td>0777114676</td>
-						<td>tr56177ytu</td>
-						<td>tr56177ytu</td>
-						<td>
-							<img src="../../assets/icons/edit.svg" alt="" />
-						</td>
-						<td>
-							<img src="../../assets/icons/delete.svg" alt="" />
-						</td>
-					</tr>
-				</template>
-			</fdm-table>
-		</div>
+		<!-- <div class="home__right">
+			<div>
+				<p>All Aircrafts</p>
+				<img src="../../assets/img/temporary/aircraft-1.svg" alt="" />
+			</div>
+			<div>
+				<p>Boeing 230</p>
+				<img src="../../assets/img/temporary/aircraft-2.svg" alt="" />
+			</div>
+			<div>
+				<p>Boeing 230</p>
+				<img src="../../assets/img/temporary/aircraft-3.svg" alt="" />
+			</div>
+			<div>
+				<p>Boeing 230</p>
+				<img src="../../assets/img/temporary/aircraft-4.svg" alt="" />
+			</div>
+		</div> -->
 	</div>
 </template>
 
 <script>
-	import FdmTable from '@/components/FdmTable';
-	export default {
-		name: 'Home',
-		components: {
-			FdmTable,
-		},
-		data() {
-			return {};
-		},
-		mounted() {},
-		methods: {},
-	};
+	export default {};
 </script>
+
 <style lang="scss">
 	.home {
-		&__body {
-			margin: 0 40px;
+		display: flex;
+		margin-left: 36px;
 
-			&__head {
-				font-size: 20px;
-				line-height: 27px;
-				letter-spacing: 0.2px;
-				color: #ffffff;
+		&__left {
+			&__first {
 				display: flex;
-				justify-content: space-between;
-				align-items: center;
 
-				button {
-					border: 1px solid #ffffff;
-					width: 190px;
-					height: 36px;
-					background: $black-back;
-					font-size: 14px;
-					line-height: 19px;
-					cursor: pointer;
-					color: #ffffff;
+				> div {
+					&:first-child {
+						flex: 1;
+					}
+					&:nth-child(2) {
+						flex: 1;
+						width: 372px;
 
-					img {
-						margin-right: 24px;
-						margin-left: 12px;
+						img {
+							height: 30%;
+							margin: 10px;
+						}
+					}
+					&:last-child {
+						height: 450px;
+						img {
+							height: 90%;
+						}
 					}
 				}
 			}
+			&__second {
+				display: flex;
 
-			&__users {
-				margin-top: 16px;
-				margin-bottom: 40px;
+				div {
+					&:first-child {
+						margin-right: 10px;
+					}
+				}
 			}
 		}
 	}

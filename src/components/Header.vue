@@ -1,7 +1,7 @@
 <template>
 	<div class="header">
 		<div class="header__left"></div>
-		<div class="header__center">
+		<div class="header__center" v-if="isTechnician">
 			<img src="../assets/icons/search.svg" alt="" />
 			<input type="text" placeholder="Search here" />
 		</div>
@@ -31,6 +31,11 @@
 <script>
 	export default {
 		name: 'Header',
+		computed: {
+			isTechnician() {
+				return this.$route.path === '/technician';
+			},
+		},
 	};
 </script>
 
