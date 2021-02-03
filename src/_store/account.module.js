@@ -1,5 +1,5 @@
 import {userService} from '@/_services/user.service'
-import router from '@/router'
+import router from '@/_router'
 
 const user = JSON.parse(localStorage.getItem('user'))
 const rememberedUser = JSON.parse(localStorage.getItem('remembered'))

@@ -60,9 +60,10 @@
 	import CountryCreate from '../../components/super-admin/CountryCreate.vue';
 	import { countriesService } from '@/_services/countries.service';
 	import ModalDelete from '../../components/ModalDelete.vue';
+	import {mapActions} from "vuex";
 
 	export default {
-		components: { FdmTable, CountryCreate, ModalDelete },
+		components: {FdmTable, CountryCreate, ModalDelete },
 		name: 'Country',
 		data() {
 			return {
@@ -78,13 +79,17 @@
 			this.fetchCountries();
 		},
 		methods: {
+			...mapActions('loader', ['setLoading']),
 			fetchCountries() {
+				this.setLoading(true)
 				countriesService
 					.getAll()
 					.then((res) => {
+						this.setLoading(false)
 						this.countries = res;
 					})
 					.catch((err) => {
+						this.setLoading(false)
 						console.log(err);
 					});
 			},
@@ -102,13 +107,17 @@
 				this.deleteId = id;
 			},
 			deleteCountry() {
+				this.setLoading(true)
 				countriesService
 					.delete(this.deleteId)
-					.then((res) => {
+					.then(() => {
+						this.setLoading(false)
 						this.fetchCountries();
 						this.isDelete = false;
+						this.$toastr.s("SUCCESS MESSAGE");
 					})
 					.catch((err) => {
+						this.setLoading(false)
 						console.log(err);
 					});
 			},
