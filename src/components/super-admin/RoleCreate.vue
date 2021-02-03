@@ -1,7 +1,7 @@
 <template>
 	<fdm-modal @close="$emit('close')">
 		<div slot="content" class="create">
-			<div class="create__head">{{ isEdit ? 'Edit country' : 'Add new country' }}</div>
+			<div class="create__head">{{ isEdit ? 'Edit role' : 'Add new role' }}</div>
 			<div class="create__body">
 				<form class="form" @submit.prevent="onSubmit">
 					<div class="form__row" :class="{ error: errors.has('title') }">
@@ -11,21 +11,7 @@
 							name="title"
 							v-validate="'required'"
 							id="title"
-							v-model="country.title"
-						/>
-						<template v-if="errors.length">
-							<img src="../../assets/icons/error.svg" alt="" />
-							<span>Required field</span>
-						</template>
-					</div>
-					<div class="form__row" :class="{ error: errors.has('short') }">
-						<label for="shortTitle">Short title</label>
-						<input
-							name="short"
-							v-validate="'required'"
-							type="text"
-							id="shortTitle"
-							v-model="country.short_title"
+							v-model="role.title"
 						/>
 						<template v-if="errors.length">
 							<img src="../../assets/icons/error.svg" alt="" />
@@ -46,30 +32,30 @@
 
 <script>
 	import FdmModal from '../FdmModal.vue';
-	import { countriesService } from '@/_services/countries.service';
+	import { roleService } from '@/_services/role.service';
 
 	export default {
-		name: 'CountryCreate',
+		name: 'RoleCreate',
 		components: { FdmModal },
 		props: {
 			isEdit: { type: Boolean, default: false },
-			editCountry: { type: Object, default: () => ({}) },
+			editRole: { type: Object, default: () => ({}) },
 		},
 		data() {
 			return {
-				country: {},
+				role: {},
 			};
 		},
 		mounted() {
-			if (this.isEdit) this.country = {...this.editCountry};
+			if (this.isEdit) this.role = {...this.editRole};
 		},
 		methods: {
 			onSubmit() {
 				this.$validator.validate().then((valid) => {
 					if (valid) {
 						if (this.isEdit) {
-							countriesService
-								.update(this.country)
+							roleService
+								.update(this.role)
 								.then(() => {
 									this.$toastr.s(this.$t('successMessageEdit'))
 									this.$emit('fetch');
@@ -80,8 +66,8 @@
 									console.log(err);
 								});
 						} else {
-							countriesService
-								.create(this.country)
+							roleService
+								.create(this.role)
 								.then(() => {
 									this.$emit('fetch');
 									this.$emit('close');

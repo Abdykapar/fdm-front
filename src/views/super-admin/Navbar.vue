@@ -1,9 +1,9 @@
 <template>
-	<div class="city home__body">
+	<div class="navbar home__body">
 		<div class="home__body__head">
-			<span>Cities</span>
+			<span>Navbars</span>
 			<button @click="onCreate" class="flex-align-center">
-				<img src="../../assets/icons/add.svg" alt="" /> Add new city
+				<img src="../../assets/icons/add.svg" alt="" /> Add new navbar
 			</button>
 		</div>
 		<div class="home__body__main">
@@ -12,16 +12,18 @@
 					<tr>
 						<th class="id">ID</th>
 						<th>Title</th>
-						<th>Short title</th>
+						<th>Code</th>
+						<th>Href</th>
 						<th></th>
 						<th></th>
 					</tr>
 				</template>
 				<template slot="body">
-					<tr v-for="(item, index) in cities" :key="item.id">
+					<tr v-for="(item, index) in navbars" :key="item.id">
 						<td class="id">{{ index + 1 }}</td>
 						<td>{{ item.title }}</td>
-						<td>{{ item.short_title }}</td>
+						<td>{{ item.code }}</td>
+						<td>{{ item.href }}</td>
 						<td>
 							<img
 								@click="onEdit(item)"
@@ -42,51 +44,51 @@
 				</template>
 			</fdm-table>
 		</div>
-		<city-create
+		<navbar-create
 			v-if="isCreate"
 			:isEdit="isEdit"
-			:editCity="city"
+			:edit-navbar="navbar"
 			@close="isCreate = false"
-			@fetch="fetchCity"
-		></city-create>
+			@fetch="fetchNavbars"
+		></navbar-create>
 
-		<modal-delete v-if="isDelete" @close="isDelete = false" @delete="deleteCity">
+		<modal-delete v-if="isDelete" @close="isDelete = false" @delete="deleteNavbar">
 		</modal-delete>
 	</div>
 </template>
 
 <script>
 import FdmTable from '../../components/FdmTable.vue';
-import { cityService } from '@/_services/city.service';
+import { navbarService } from '@/_services/navbar.service';
 import ModalDelete from '../../components/ModalDelete.vue';
 import {mapActions} from "vuex";
-import CityCreate from "../../components/super-admin/CityCreate";
+import NavbarCreate from "../../components/super-admin/NavbarCreate";
 
 export default {
-	components: {CityCreate, FdmTable, ModalDelete },
-	name: 'City',
+	components: {NavbarCreate, FdmTable, ModalDelete },
+	name: 'Navbar',
 	data() {
 		return {
 			isCreate: false,
-			cities: [],
-			city: {},
+			navbars: [],
+			navbar: {},
 			isEdit: false,
 			isDelete: false,
 			deleteId: 0,
 		};
 	},
 	mounted() {
-		this.fetchCity();
+		this.fetchNavbars();
 	},
 	methods: {
 		...mapActions('loader', ['setLoading']),
-		fetchCity() {
+		fetchNavbars() {
 			this.setLoading(true)
-			cityService
+			navbarService
 				.getAll()
 				.then((res) => {
 					this.setLoading(false)
-					this.cities = res;
+					this.navbars = res;
 				})
 				.catch((err) => {
 					this.setLoading(false)
@@ -100,19 +102,19 @@ export default {
 		onEdit(item) {
 			this.isCreate = true;
 			this.isEdit = true;
-			this.city = item;
+			this.navbar = item;
 		},
 		onDelete(id) {
 			this.isDelete = true;
 			this.deleteId = id;
 		},
-		deleteCity() {
+		deleteNavbar() {
 			this.setLoading(true)
-			cityService
+			navbarService
 				.delete(this.deleteId)
 				.then(() => {
 					this.setLoading(false)
-					this.fetchCity();
+					this.fetchNavbars();
 					this.isDelete = false;
 					this.$toastr.s(this.$t('successMessageDelete'))
 				})

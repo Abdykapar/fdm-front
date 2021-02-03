@@ -8,6 +8,7 @@
 
 button {
 	border: none;
+	cursor: pointer;
 }
 
 html,
@@ -62,13 +63,14 @@ body {
 
 			button {
 				border: 1px solid #ffffff;
-				width: 190px;
+				min-width: 190px;
 				height: 36px;
 				background: $black-back;
 				font-size: 14px;
 				line-height: 19px;
 				cursor: pointer;
 				color: #ffffff;
+				padding: 0 24px 0 0;
 
 				img {
 					margin-right: 24px;

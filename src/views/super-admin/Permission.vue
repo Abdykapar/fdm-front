@@ -1,9 +1,9 @@
 <template>
 	<div class="country home__body">
 		<div class="home__body__head">
-			<span>Countries</span>
+			<span>Permissions</span>
 			<button @click="onCreate" class="flex-align-center">
-				<img src="../../assets/icons/add.svg" alt="" /> Add new country
+				<img src="../../assets/icons/add.svg" alt="" /> Add new permission
 			</button>
 		</div>
 		<div class="home__body__main">
@@ -12,16 +12,14 @@
 					<tr>
 						<th class="id">ID</th>
 						<th>Title</th>
-						<th>Short title</th>
 						<th></th>
 						<th></th>
 					</tr>
 				</template>
 				<template slot="body">
-					<tr v-for="(item, index) in countries" :key="item.id">
+					<tr v-for="(item, index) in permissions" :key="item.id">
 						<td class="id">{{ index + 1 }}</td>
 						<td>{{ item.title }}</td>
-						<td>{{ item.short_title }}</td>
 						<td>
 							<img
 								@click="onEdit(item)"
@@ -42,51 +40,51 @@
 				</template>
 			</fdm-table>
 		</div>
-		<country-create
+		<permission-create
 			v-if="isCreate"
 			:isEdit="isEdit"
-			:editCountry="country"
+			:editPermission="permission"
 			@close="isCreate = false"
-			@fetch="fetchCountries"
-		></country-create>
+			@fetch="fetchPermissions"
+		></permission-create>
 
-		<modal-delete v-if="isDelete" @close="isDelete = false" @delete="deleteCountry">
+		<modal-delete v-if="isDelete" @close="isDelete = false" @delete="deletePermission">
 		</modal-delete>
 	</div>
 </template>
 
 <script>
 	import FdmTable from '../../components/FdmTable.vue';
-	import CountryCreate from '../../components/super-admin/CountryCreate.vue';
-	import { countriesService } from '@/_services/countries.service';
+	import { permissionService } from '@/_services/permission.service';
 	import ModalDelete from '../../components/ModalDelete.vue';
 	import {mapActions} from "vuex";
+	import PermissionCreate from "../../components/super-admin/PermissionCreate";
 
 	export default {
-		components: {FdmTable, CountryCreate, ModalDelete },
+		components: {PermissionCreate, FdmTable, ModalDelete },
 		name: 'Country',
 		data() {
 			return {
 				isCreate: false,
-				countries: [],
-				country: {},
+				permissions: [],
+				permission: {},
 				isEdit: false,
 				isDelete: false,
 				deleteId: 0,
 			};
 		},
 		mounted() {
-			this.fetchCountries();
+			this.fetchPermissions();
 		},
 		methods: {
 			...mapActions('loader', ['setLoading']),
-			fetchCountries() {
+			fetchPermissions() {
 				this.setLoading(true)
-				countriesService
+				permissionService
 					.getAll()
 					.then((res) => {
 						this.setLoading(false)
-						this.countries = res;
+						this.permissions = res;
 					})
 					.catch((err) => {
 						this.setLoading(false)
@@ -100,19 +98,19 @@
 			onEdit(item) {
 				this.isCreate = true;
 				this.isEdit = true;
-				this.country = item;
+				this.permission = item;
 			},
 			onDelete(id) {
 				this.isDelete = true;
 				this.deleteId = id;
 			},
-			deleteCountry() {
+			deletePermission() {
 				this.setLoading(true)
-				countriesService
+				permissionService
 					.delete(this.deleteId)
 					.then(() => {
 						this.setLoading(false)
-						this.fetchCountries();
+						this.fetchPermissions();
 						this.isDelete = false;
 						this.$toastr.s(this.$t('successMessageDelete'))
 					})

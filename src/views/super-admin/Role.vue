@@ -1,9 +1,9 @@
 <template>
 	<div class="country home__body">
 		<div class="home__body__head">
-			<span>Countries</span>
+			<span>Role</span>
 			<button @click="onCreate" class="flex-align-center">
-				<img src="../../assets/icons/add.svg" alt="" /> Add new country
+				<img src="../../assets/icons/add.svg" alt="" /> Add new role
 			</button>
 		</div>
 		<div class="home__body__main">
@@ -12,16 +12,14 @@
 					<tr>
 						<th class="id">ID</th>
 						<th>Title</th>
-						<th>Short title</th>
 						<th></th>
 						<th></th>
 					</tr>
 				</template>
 				<template slot="body">
-					<tr v-for="(item, index) in countries" :key="item.id">
+					<tr v-for="(item, index) in roles" :key="item.id">
 						<td class="id">{{ index + 1 }}</td>
 						<td>{{ item.title }}</td>
-						<td>{{ item.short_title }}</td>
 						<td>
 							<img
 								@click="onEdit(item)"
@@ -42,51 +40,51 @@
 				</template>
 			</fdm-table>
 		</div>
-		<country-create
+		<role-create
 			v-if="isCreate"
 			:isEdit="isEdit"
-			:editCountry="country"
+			:edit-role="role"
 			@close="isCreate = false"
-			@fetch="fetchCountries"
-		></country-create>
+			@fetch="fetchRoles"
+		></role-create>
 
-		<modal-delete v-if="isDelete" @close="isDelete = false" @delete="deleteCountry">
+		<modal-delete v-if="isDelete" @close="isDelete = false" @delete="deleteRole">
 		</modal-delete>
 	</div>
 </template>
 
 <script>
 	import FdmTable from '../../components/FdmTable.vue';
-	import CountryCreate from '../../components/super-admin/CountryCreate.vue';
-	import { countriesService } from '@/_services/countries.service';
+	import { roleService } from '@/_services/role.service';
 	import ModalDelete from '../../components/ModalDelete.vue';
 	import {mapActions} from "vuex";
+	import RoleCreate from "../../components/super-admin/RoleCreate";
 
 	export default {
-		components: {FdmTable, CountryCreate, ModalDelete },
+		components: {RoleCreate, FdmTable, ModalDelete },
 		name: 'Country',
 		data() {
 			return {
 				isCreate: false,
-				countries: [],
-				country: {},
+				roles: [],
+				role: {},
 				isEdit: false,
 				isDelete: false,
 				deleteId: 0,
 			};
 		},
 		mounted() {
-			this.fetchCountries();
+			this.fetchRoles();
 		},
 		methods: {
 			...mapActions('loader', ['setLoading']),
-			fetchCountries() {
+			fetchRoles() {
 				this.setLoading(true)
-				countriesService
+				roleService
 					.getAll()
 					.then((res) => {
 						this.setLoading(false)
-						this.countries = res;
+						this.roles = res;
 					})
 					.catch((err) => {
 						this.setLoading(false)
@@ -100,19 +98,19 @@
 			onEdit(item) {
 				this.isCreate = true;
 				this.isEdit = true;
-				this.country = item;
+				this.role = item;
 			},
 			onDelete(id) {
 				this.isDelete = true;
 				this.deleteId = id;
 			},
-			deleteCountry() {
+			deleteRole() {
 				this.setLoading(true)
-				countriesService
+				roleService
 					.delete(this.deleteId)
 					.then(() => {
 						this.setLoading(false)
-						this.fetchCountries();
+						this.fetchRoles();
 						this.isDelete = false;
 						this.$toastr.s(this.$t('successMessageDelete'))
 					})

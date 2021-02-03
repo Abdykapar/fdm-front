@@ -45,6 +45,21 @@ const routes = [
         path: '/city',
         name: 'City',
         component: () => import('@/views/super-admin/City.vue')
+      },
+      {
+        path: '/navbar',
+        name: 'Navbar',
+        component: () => import('@/views/super-admin/Navbar.vue')
+      },
+      {
+        path: '/permission',
+        name: 'Permission',
+        component: () => import('@/views/super-admin/Permission.vue')
+      },
+      {
+        path: '/role',
+        name: 'Role',
+        component: () => import('@/views/super-admin/Role.vue')
       }
     ]
   },

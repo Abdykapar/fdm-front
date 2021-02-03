@@ -1,7 +1,7 @@
 <template>
 	<fdm-modal @close="$emit('close')">
 		<div slot="content" class="create">
-			<div class="create__head">{{ isEdit ? 'Edit city' : 'Add new city' }}</div>
+			<div class="create__head">{{ isEdit ? 'Edit navbar' : 'Add new navber' }}</div>
 			<div class="create__body">
 				<form class="form" @submit.prevent="onSubmit">
 					<div class="form__row" :class="{ error: errors.has('title') }">
@@ -11,34 +11,40 @@
 							name="title"
 							v-validate="'required'"
 							id="title"
-							v-model="city.title"
+							v-model="navbar.title"
 						/>
 						<template v-if="errors.length">
 							<img src="../../assets/icons/error.svg" alt="" />
 							<span>Required field</span>
 						</template>
 					</div>
-					<div class="form__row" :class="{ error: errors.has('short') }">
-						<label for="shortTitle">Short title</label>
+					<div class="form__row" :class="{ error: errors.has('code') }">
+						<label for="code">Code</label>
 						<input
-							name="short"
+							name="code"
 							v-validate="'required'"
 							type="text"
-							id="shortTitle"
-							v-model="city.short_title"
+							id="code"
+							v-model="navbar.code"
 						/>
 						<template v-if="errors.length">
 							<img src="../../assets/icons/error.svg" alt="" />
 							<span>Required field</span>
 						</template>
 					</div>
-					<div class="form__row" :class="{ error: errors.has('country') }">
-						<label for="country">Country</label>
-						<select name="country" v-validate="'required'" id="country" v-model="city.country_id">
-							<option v-for="country in countries" :key="country.id" :value="country.id">
-								{{ country.title }}
-							</option>
-						</select>
+					<div class="form__row" :class="{ error: errors.has('href') }">
+						<label for="href">Href</label>
+						<input
+							name="href"
+							v-validate="'required'"
+							type="text"
+							id="href"
+							v-model="navbar.href"
+						/>
+						<template v-if="errors.length">
+							<img src="../../assets/icons/error.svg" alt="" />
+							<span>Required field</span>
+						</template>
 					</div>
 					<div class="form__submit flex-justify-between">
 						<button type="submit">ADD</button>
@@ -54,45 +60,32 @@
 
 <script>
 import FdmModal from '../FdmModal.vue';
-import { cityService } from '@/_services/city.service';
-import { countriesService } from "../../_services/countries.service";
+import { navbarService } from '@/_services/navbar.service';
 import {mapActions} from "vuex";
 
 export default {
-	name: 'CityCreate',
+	name: 'NavbarCreate',
 	components: {FdmModal },
 	props: {
 		isEdit: { type: Boolean, default: false },
-		editCity: { type: Object, default: () => ({}) },
+		editNavbar: { type: Object, default: () => ({}) },
 	},
 	data() {
 		return {
-			city: {},
-			countries: []
+			navbar: {}
 		};
 	},
 	mounted() {
-		if (this.isEdit) this.city = {...this.editCity};
-		this.fetchCountries()
+		if (this.isEdit) this.navbar = {...this.editNavbar};
 	},
 	methods: {
 		...mapActions('loader', ['setLoading']),
-		fetchCountries() {
-			this.setLoading(true)
-			countriesService.getAll().then(res => {
-				this.countries = res
-				this.setLoading(false)
-			}).catch(err => {
-				this.setLoading(false)
-				console.log(err)
-			})
-		},
 		onSubmit() {
 			this.$validator.validate().then((valid) => {
 				if (valid) {
 					if (this.isEdit) {
-						cityService
-							.update(this.city)
+						navbarService
+							.update(this.navbar)
 							.then(() => {
 								this.$toastr.s(this.$t('successMessageEdit'))
 								this.$emit('fetch');
@@ -103,8 +96,8 @@ export default {
 								console.log(err);
 							});
 					} else {
-						cityService
-							.create(this.city)
+						navbarService
+							.create(this.navbar)
 							.then(() => {
 								this.$emit('fetch');
 								this.$emit('close');

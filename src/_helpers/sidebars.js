@@ -6,13 +6,28 @@ const superAdminSidebars = [
     },
     {
         title: 'Country',
-        icon: require('../assets/icons/bar-chart.svg'),
+        icon: require('../assets/icons/folder.svg'),
         href: '/country'
     },
     {
         title: 'City',
-        icon: require('../assets/icons/bar-chart.svg'),
+        icon: require('../assets/icons/folder.svg'),
         href: '/city'
+    },
+    {
+        title: 'Navbar',
+        icon: require('../assets/icons/folder.svg'),
+        href: '/navbar'
+    },
+    {
+        title: 'Permission',
+        icon: require('../assets/icons/folder.svg'),
+        href: '/permission'
+    },
+    {
+        title: 'Role',
+        icon: require('../assets/icons/folder.svg'),
+        href: '/role'
     }
 ]
 
