@@ -13,6 +13,10 @@
 							id="title"
 							v-model="country.title"
 						/>
+						<template v-if="errors.length">
+							<img src="../../assets/icons/error.svg" alt="" />
+							<span>Required field</span>
+						</template>
 					</div>
 					<div class="form__row" :class="{ error: errors.has('short') }">
 						<label for="shortTitle">Short title</label>
@@ -25,7 +29,7 @@
 						/>
 						<template v-if="errors.length">
 							<img src="../../assets/icons/error.svg" alt="" />
-							<span>Wrong Email address</span>
+							<span>Required field</span>
 						</template>
 					</div>
 					<div class="form__submit flex-justify-between">
@@ -67,10 +71,12 @@
 							countriesService
 								.update(this.country)
 								.then(() => {
+									this.$toastr.s(this.$t('successMessageEdit'))
 									this.$emit('fetch');
 									this.$emit('close');
 								})
 								.catch((err) => {
+									this.$toastr.s(err)
 									console.log(err);
 								});
 						} else {
@@ -79,9 +85,11 @@
 								.then(() => {
 									this.$emit('fetch');
 									this.$emit('close');
+									this.$toastr.s(this.$t('successMessageCreate'))
 								})
 								.catch((err) => {
 									console.log(err);
+									this.$toastr.s(err)
 								});
 						}
 					}

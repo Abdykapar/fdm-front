@@ -40,6 +40,11 @@ const routes = [
         path: '/country',
         name: 'Country',
         component: () => import('@/views/super-admin/Country.vue')
+      },
+      {
+        path: '/city',
+        name: 'City',
+        component: () => import('@/views/super-admin/City.vue')
       }
     ]
   },

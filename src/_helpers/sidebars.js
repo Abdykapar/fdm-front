@@ -8,6 +8,11 @@ const superAdminSidebars = [
         title: 'Country',
         icon: require('../assets/icons/bar-chart.svg'),
         href: '/country'
+    },
+    {
+        title: 'City',
+        icon: require('../assets/icons/bar-chart.svg'),
+        href: '/city'
     }
 ]
 

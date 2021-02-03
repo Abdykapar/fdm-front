@@ -114,10 +114,11 @@
 						this.setLoading(false)
 						this.fetchCountries();
 						this.isDelete = false;
-						this.$toastr.s("SUCCESS MESSAGE");
+						this.$toastr.s(this.$t('successMessageDelete'))
 					})
 					.catch((err) => {
 						this.setLoading(false)
+						this.$toastr.s(err)
 						console.log(err);
 					});
 			},

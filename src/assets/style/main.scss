@@ -105,7 +105,7 @@ body {
 			mix-blend-mode: normal;
 			margin-bottom: 10px;
 		}
-		input {
+		input, select {
 			width: 286px;
 			height: 48px;
 			border: 1px solid #33393f;
@@ -116,11 +116,15 @@ body {
 			mix-blend-mode: normal;
 			background: inherit;
 			padding-left: 15px;
+
+			option {
+				background: $black-back;
+			}
 		}
 
 		&.error {
 			position: relative;
-			input {
+			input, select {
 				border: 1px solid #ff3654;
 			}
 			label,
