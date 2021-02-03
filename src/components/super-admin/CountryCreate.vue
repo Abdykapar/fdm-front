@@ -66,7 +66,7 @@
 						if (this.isEdit) {
 							countriesService
 								.update(this.country)
-								.then((res) => {
+								.then(() => {
 									this.$emit('fetch');
 									this.$emit('close');
 								})
@@ -76,7 +76,7 @@
 						} else {
 							countriesService
 								.create(this.country)
-								.then((res) => {
+								.then(() => {
 									this.$emit('fetch');
 									this.$emit('close');
 								})
