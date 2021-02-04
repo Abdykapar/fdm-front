@@ -33,8 +33,14 @@ const routes = [
     children: [
       {
         path: '/',
-        name: 'SuperAdminHome',
-        component: () => import('@/views/super-admin/SuperAdmin.vue')
+        redirect: '/airline'
+        // name: 'SuperAdminHome',
+        // component: () => import('@/views/super-admin/SuperAdmin.vue')
+      },
+      {
+        path: '/airline',
+        name: 'Airline',
+        component: () => import('@/views/super-admin/Airline.vue')
       },
       {
         path: '/country',
@@ -62,9 +68,9 @@ const routes = [
         component: () => import('@/views/super-admin/Role.vue')
       },
       {
-        path: '/airline',
-        name: 'Airline',
-        component: () => import('@/views/super-admin/Airline.vue')
+        path: '/aircraft-model',
+        name: 'AircraftModel',
+        component: () => import('@/views/super-admin/AircraftModel.vue')
       }
     ]
   },

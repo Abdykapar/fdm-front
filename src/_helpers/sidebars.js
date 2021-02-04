@@ -1,8 +1,13 @@
 const superAdminSidebars = [
+    // {
+    //     title: 'Dashboard',
+    //     icon: require('../assets/icons/bar-chart.svg'),
+    //     href: '/',
+    // },
     {
-        title: 'Dashboard',
-        icon: require('../assets/icons/bar-chart.svg'),
-        href: '/',
+        title: 'Airline',
+        icon: require('../assets/icons/folder.svg'),
+        href: '/airline'
     },
     {
         title: 'Country',
@@ -30,9 +35,9 @@ const superAdminSidebars = [
         href: '/role'
     },
     {
-        title: 'Airline',
+        title: 'Aircraft models',
         icon: require('../assets/icons/folder.svg'),
-        href: '/airline'
+        href: '/aircraft-model'
     }
 ]
 

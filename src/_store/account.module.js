@@ -1,6 +1,13 @@
 import {userService} from '@/_services/user.service'
 import router from '@/_router'
 
+const roles = [
+	{
+		code: 'ROLE_SUPER_ADMIN',
+		href: '/super-admin'
+	}
+]
+
 const user = JSON.parse(localStorage.getItem('user'))
 const rememberedUser = JSON.parse(localStorage.getItem('remembered'))
 
@@ -14,7 +21,7 @@ const actions = {
 		userService.login(data).then(res => {
 			localStorage.setItem('user', JSON.stringify(res));
 			commit('SET_USER', res);
-			router.push('/');
+			router.push('/super-admin');
 		}).catch(err => console.log(err));
 	},
 	logout({commit}) {
