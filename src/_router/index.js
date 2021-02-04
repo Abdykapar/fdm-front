@@ -76,6 +76,11 @@ const routes = [
         path: '/aircraft',
         name: 'Aircraft',
         component: () => import('@/views/super-admin/Aircraft.vue')
+      },
+      {
+        path: '/airport',
+        name: 'Airport',
+        component: () => import('@/views/super-admin/Airport.vue')
       }
     ]
   },
