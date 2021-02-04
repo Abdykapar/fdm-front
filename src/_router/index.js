@@ -71,6 +71,11 @@ const routes = [
         path: '/aircraft-model',
         name: 'AircraftModel',
         component: () => import('@/views/super-admin/AircraftModel.vue')
+      },
+      {
+        path: '/aircraft',
+        name: 'Aircraft',
+        component: () => import('@/views/super-admin/Aircraft.vue')
       }
     ]
   },
