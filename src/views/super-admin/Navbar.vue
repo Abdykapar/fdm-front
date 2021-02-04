@@ -14,6 +14,7 @@
 						<th>Title</th>
 						<th>Code</th>
 						<th>Href</th>
+						<th>Icon</th>
 						<th></th>
 						<th></th>
 					</tr>
@@ -24,6 +25,7 @@
 						<td>{{ item.title }}</td>
 						<td>{{ item.code }}</td>
 						<td>{{ item.href }}</td>
+						<td>{{ item.icon }}</td>
 						<td>
 							<img
 								@click="onEdit(item)"

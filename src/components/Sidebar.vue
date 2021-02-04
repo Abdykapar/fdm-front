@@ -86,6 +86,19 @@
 		bottom: 0;
 		left: 0;
 		animation: width 2s ease;
+		overflow-y: auto;
+
+		&::-webkit-scrollbar {
+			width: 5px;
+		}
+		&::-webkit-scrollbar-track {
+			-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+		}
+		&::-webkit-scrollbar-thumb {
+			background: #7882A2;
+			opacity: 0.7;
+			border-radius: 9.54286px;
+		}
 
 		&.small {
 			width: 81px;
@@ -118,7 +131,14 @@
 			margin-left: 4px;
 		}
 
+		&__top {
+			display: flex;
+			flex-direction: column;
+		}
+
 		&__menu {
+			flex: 1;
+			overflow-y: auto;
 			&__item {
 				display: flex;
 				align-items: center;

@@ -60,6 +60,11 @@ const routes = [
         path: '/role',
         name: 'Role',
         component: () => import('@/views/super-admin/Role.vue')
+      },
+      {
+        path: '/airline',
+        name: 'Airline',
+        component: () => import('@/views/super-admin/Airline.vue')
       }
     ]
   },

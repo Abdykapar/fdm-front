@@ -106,7 +106,7 @@
 		&__left {
 			flex: 2;
 			img {
-				height: 98%;
+				height: 96%;
 				width: 100%;
 			}
 		}

@@ -28,6 +28,11 @@ const superAdminSidebars = [
         title: 'Role',
         icon: require('../assets/icons/folder.svg'),
         href: '/role'
+    },
+    {
+        title: 'Airline',
+        icon: require('../assets/icons/folder.svg'),
+        href: '/airline'
     }
 ]
 

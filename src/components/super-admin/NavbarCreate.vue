@@ -46,6 +46,20 @@
 							<span>Required field</span>
 						</template>
 					</div>
+					<div class="form__row" :class="{ error: errors.has('icon') }">
+						<label for="code">Icon</label>
+						<input
+							name="icon"
+							v-validate="'required'"
+							type="text"
+							id="icon"
+							v-model="navbar.icon"
+						/>
+						<template v-if="errors.length">
+							<img src="../../assets/icons/error.svg" alt="" />
+							<span>Required field</span>
+						</template>
+					</div>
 					<div class="form__submit flex-justify-between">
 						<button type="submit">ADD</button>
 						<button type="cancel" class="black" @click="$emit('close')">
