@@ -2,6 +2,6 @@
   "successMessage": "Success!",
   "successMessageCreate": "Successfully created!",
   "successMessageDelete": "Successfully deleted!",
-  "successMessageEdit": "Successfully edited!",
+  "successMessageEdit": "Successfully updated!",
   "errorMessage": "Something went wrong!"
 }

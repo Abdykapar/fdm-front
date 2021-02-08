@@ -1,21 +1,33 @@
 <template>
-	<fdm-modal>
-		<div slot="content" class="delete">
-			<div class="delete__title">Are you sure?</div>
+	<fdm-modal type="delete">
+		<div
+			slot="content"
+			class="delete"
+		>
+			<div class="delete__title">
+				Are you sure?
+			</div>
 			<div class="delete__buttons">
-				<button @click="$emit('close')">Cancel</button>
-				<button class="black" @click="$emit('delete')">Delete</button>
+				<button @click="$emit('close')">
+					Cancel
+				</button>
+				<button
+					class="black"
+					@click="$emit('delete')"
+				>
+					Delete
+				</button>
 			</div>
 		</div>
 	</fdm-modal>
 </template>
 
 <script>
-	import FdmModal from './FdmModal.vue';
-	export default {
-		components: { FdmModal },
-		name: 'ModalDelete',
-	};
+import FdmModal from './FdmModal.vue'
+export default {
+	name: 'ModalDelete',
+	components: { FdmModal },
+}
 </script>
 
 <style lang="scss">
