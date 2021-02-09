@@ -7,8 +7,8 @@ class RolePermissionService extends BaseApiService {
 		super()
 	}
 
-	getAll () {
-		const url = `${baseUrl}/role-permissions`
+	getAll (roleId='') {
+		const url = `${baseUrl}/role-permissions${roleId ? '?role='+roleId : ''}`
 		return this.sendGetRequest(url)
 	}
 

@@ -48,6 +48,7 @@ export default {
 		left: 0;
 		right: 0;
 		background: rgba($color: #7f7d96, $alpha: 0.5);
+		z-index: 2;
 
 		&__content {
 			background: #1f2327;

@@ -42,6 +42,8 @@ export default {
 	props: {
 		options: { type: Array, default: () => [] },
 		isMultiple: { type: Boolean, default: false },
+		multipleSelectedIds: { type: Array, default: () => [] },
+		selectedId: { type: Number, default: 0 }
 	},
 	data () {
 		return {
@@ -63,6 +65,12 @@ export default {
 	watch: {
 		options (items) {
 			this.filteredOptions = items
+		},
+		multipleSelectedIds (values) {
+			this.multipleSelected = this.options.filter(i => values.includes(i.id))
+		},
+		selectedId (value) {
+			this.selected = this.options.find(i => i.id === value)
 		}
 	},
 	mounted () {

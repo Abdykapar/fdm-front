@@ -7,8 +7,8 @@ class RoleNavbarService extends BaseApiService {
 		super()
 	}
 
-	getAll () {
-		const url = `${baseUrl}/role-navbars`
+	getAll (roleId='') {
+		const url = `${baseUrl}/role-navbars${roleId ? '?role='+roleId : ''}`
 		return this.sendGetRequest(url)
 	}
 

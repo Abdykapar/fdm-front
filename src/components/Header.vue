@@ -1,13 +1,34 @@
 <template>
 	<div class="header">
-		<div class="header__left"></div>
-		<div class="header__center" v-if="isTechnician">
-			<img src="../assets/icons/search.svg" alt="" />
-			<input type="text" placeholder="Search here" />
+		<div class="header__left" />
+		<div
+			v-if="isTechnician"
+			class="header__center"
+		>
+			<img
+				src="../assets/icons/search.svg"
+				alt=""
+			>
+			<input
+				type="text"
+				placeholder="Search here"
+			>
 		</div>
 		<div class="header__right">
-			<div class="header__right__alert">
-				<img src="../assets/icons/alert.svg" alt="" />
+			<div
+				v-if="isNotif"
+				id="overflow"
+				class="overflow"
+			/>
+			<div
+				class="header__right__alert"
+				@click="onShowAlert"
+			>
+				<img
+					class="pointer alert"
+					src="../assets/icons/alert.svg"
+					alt=""
+				>
 				<svg
 					class="alert"
 					width="6"
@@ -16,27 +37,68 @@
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
 				>
-					<circle cx="3" cy="3" r="3" fill="#FA5F1C" />
+					<circle
+						cx="3"
+						cy="3"
+						r="3"
+						fill="#FA5F1C"
+					/>
 				</svg>
+				<div
+					v-if="isNotif"
+					class="alert__content"
+				>
+					<notifications />
+				</div>
 			</div>
 			<div class="header__right__profile flex-align-center">
-				<img src="../assets/img/img.png" alt="" />
+				<img
+					src="../assets/img/img.png"
+					alt=""
+				>
 				<span class="header__right__name">Begimay Maslinova</span>
-				<img src="../assets/icons/chevron-down.svg" alt="" />
+				<img
+					src="../assets/icons/chevron-down.svg"
+					alt=""
+				>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-	export default {
-		name: 'Header',
-		computed: {
-			isTechnician() {
-				return this.$route.path === '/technician';
-			},
+import Notifications from './Notifications'
+export default {
+	name: 'Header',
+	components: { Notifications },
+	data () {
+		return {
+			isNotif: false
+		}
+	},
+	computed: {
+		isTechnician () {
+			return this.$route.path === '/technician'
 		},
-	};
+	},
+	mounted () {
+		document.addEventListener('click', this.onOutsideClick)
+	},
+	beforeDestroy () {
+		document.removeEventListener('click', this.onOutsideClick)
+	},
+	methods: {
+		onShowAlert () {
+			this.isNotif = !this.isNotif
+		},
+		onOutsideClick (e) {
+			const overflow = document.getElementById('overflow')
+			if (e.target === overflow) {
+				this.isNotif = false
+			}
+		},
+	}
+}
 </script>
 
 <style lang="scss">
@@ -76,6 +138,7 @@
 				margin-right: 42px;
 				cursor: pointer;
 				position: relative;
+				z-index: 2;
 
 				.alert {
 					position: absolute;
@@ -97,5 +160,25 @@
 				padding: 0 13px 0 16px;
 			}
 		}
+	}
+	.alert {
+		position: relative;
+
+		&__content {
+			position: absolute;
+			top: 31px;
+			right: 0;
+			z-index: 12;
+		}
+	}
+
+	.overflow {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(#7F7D96, 0.6);
+		z-index: 1;
 	}
 </style>

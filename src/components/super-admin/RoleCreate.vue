@@ -61,6 +61,7 @@
 							id="permission"
 							:is-multiple="true"
 							:options="permissions"
+							:multiple-selected-ids="permissionIds"
 							@multipleSelect="onPermission"
 						/>
 					</div>
@@ -72,6 +73,7 @@
 						<fdm-select
 							id="sidebar"
 							:options="sidebars"
+							:multiple-selected-ids="sidebarIds"
 							:is-multiple="true"
 							@multipleSelect="onSidebars"
 						/>
@@ -110,6 +112,8 @@ export default {
 	props: {
 		isEdit: { type: Boolean, default: false },
 		editRole: { type: Object, default: () => ({}) },
+		rolePermissions: { type: Array, default: () => ([]) },
+		roleSidebars: { type: Array, default: () => ([]) },
 	},
 	data () {
 		return {
@@ -121,7 +125,11 @@ export default {
 		}
 	},
 	mounted () {
-		if (this.isEdit) this.role = { ...this.editRole }
+		if (this.isEdit) {
+			this.role = { ...this.editRole }
+			this.sidebarIds = this.roleSidebars.map(i => i.navbar)
+			this.permissionIds = this.rolePermissions.map(i => i.permission)
+		}
 		this.fetchData()
 	},
 	methods: {
@@ -159,11 +167,11 @@ export default {
 							.create(this.role)
 							.then(async res => {
 								for (const permissionId of this.permissionIds) {
-									const data = { role_id: res.id, permission_id: permissionId }
+									const data = { role: res.id, permission: permissionId }
 									await rolePermissionService.create(data)
 								}
 								for (const sidebarId of this.sidebarIds) {
-									const data = { role_id: res.id, navbar_id: sidebarId }
+									const data = { role: res.id, navbar: sidebarId }
 									await roleNavbarService.create(data)
 								}
 							})
