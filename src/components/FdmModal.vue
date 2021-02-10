@@ -14,7 +14,7 @@
 
 <script>
 export default {
-	name: 'Modal',
+	name: 'FdmModal',
 	props: {
 		type: { type: String, default: '' }
 	},

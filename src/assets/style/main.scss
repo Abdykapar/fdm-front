@@ -45,7 +45,7 @@ body {
 }
 
 .is-invalid {
-	border: 2px solid #dc3545 !important;
+	border: 1px solid #dc3545 !important;
 	outline-color: #dc3545 !important;
 }
 
@@ -108,7 +108,7 @@ body {
 			mix-blend-mode: normal;
 			margin-bottom: 10px;
 		}
-		input, select {
+		input, select, &__file {
 			width: 286px;
 			height: 48px;
 			border: 1px solid #33393f;
@@ -123,6 +123,15 @@ body {
 			option {
 				background: $black-back;
 			}
+		}
+
+		&__file {
+			margin-top: -48px;
+			background-image: url("../../assets/icons/upload.svg");
+			background-position: left 20px center;
+			background-repeat: no-repeat;
+			padding-left: 25px;
+			white-space:nowrap;
 		}
 
 		&.error {
@@ -141,6 +150,10 @@ body {
 				top: 48%;
 			}
 		}
+	}
+
+	&__file-input {
+		opacity: 0;
 	}
 
 	&__submit {

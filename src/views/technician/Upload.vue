@@ -70,7 +70,10 @@
 			</fmd-table>
 
 			<div class="upload__btn">
-				<button class="flex-center">
+				<button
+					class="flex-center"
+					@click="onUpload"
+				>
 					<img
 						src="../../assets/icons/upload.svg"
 						alt=""
@@ -79,14 +82,26 @@
 				</button>
 			</div>
 		</div>
+		<technician-upload v-if="isUpload" />
 	</div>
 </template>
 
 <script>
 import FmdTable from '../../components/FdmTable'
+import TechnicianUpload from '../../components/technician/TechnicianUpload'
 export default {
 	name: 'Upload',
-	components: { FmdTable }
+	components: { TechnicianUpload, FmdTable },
+	data () {
+		return {
+			isUpload: false
+		}
+	},
+	methods: {
+		onUpload () {
+			this.isUpload = true
+		}
+	}
 }
 </script>
 
