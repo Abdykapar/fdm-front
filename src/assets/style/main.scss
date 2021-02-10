@@ -164,3 +164,65 @@ body {
 .pointer {
 	cursor: pointer;
 }
+
+.filter {
+	input {
+		height: 37px;
+		width: 100%;
+		border: 0.768041px solid #33393f;
+		border-radius: 3.07217px;
+		background: inherit;
+		font-size: 14px;
+		line-height: 19px;
+		letter-spacing: 0.02em;
+		padding-left: 30px;
+		color: #7882a2;
+	}
+	td {
+		padding-right: 10px;
+		position: relative;
+
+		img {
+			position: absolute;
+			left: 13px;
+			top: 18px;
+		}
+
+		&:first-child {
+			img {
+				left: 53px;
+			}
+		}
+	}
+}
+.detail {
+	font-size: 10px;
+	line-height: 14px;
+	text-transform: capitalize;
+	height: 20px;
+	min-width: 71px;
+	border: 1px solid #298bfe;
+	border-radius: 3px;
+	background: inherit;
+	color: #298bfe;
+	cursor: pointer;
+}
+
+.fdm-page {
+	margin: 0 40px;
+	&__head {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 20px;
+		line-height: 27px;
+		letter-spacing: 0.2px;
+
+		color: #ffffff;
+	}
+
+	&__body {
+		margin-top: 18px;
+		margin-bottom: 30px;
+	}
+}

@@ -4,13 +4,22 @@
 			<div>Data Lists</div>
 			<div class="data-list__buttons">
 				<button class="data-list__button active">
-					FILES <img src="../../assets/icons/file.svg" alt="" />
+					FILES <img
+						src="../../assets/icons/file.svg"
+						alt=""
+					>
 				</button>
 				<button class="data-list__button">
-					FLIGHTS <img src="../../assets/icons/flight.svg" alt="" />
+					FLIGHTS <img
+						src="../../assets/icons/flight.svg"
+						alt=""
+					>
 				</button>
 				<button class="data-list__button">
-					EVENTS <img src="../../assets/icons/event.svg" alt="" />
+					EVENTS <img
+						src="../../assets/icons/event.svg"
+						alt=""
+					>
 				</button>
 			</div>
 		</div>
@@ -23,47 +32,58 @@
 						<th>File Size (MB)</th>
 						<th>Data Quality (%)</th>
 						<th>Comments</th>
-						<th></th>
+						<th />
 					</tr>
 				</template>
 				<template slot="body">
 					<tr class="filter">
 						<td>
-							<input type="text" />
-							<img src="../../assets/icons/search-mini.svg" alt="" />
-						</td>
-						<td>
-							<input type="text" />
-							<img src="../../assets/icons/calendar.svg" alt="" />
-						</td>
-						<td>
-							<input type="text" /><img
+							<input type="text">
+							<img
 								src="../../assets/icons/search-mini.svg"
 								alt=""
-							/>
+							>
 						</td>
 						<td>
-							<input type="text" /><img
-								src="../../assets/icons/search-mini.svg"
+							<input type="text">
+							<img
+								src="../../assets/icons/calendar.svg"
 								alt=""
-							/>
+							>
 						</td>
 						<td>
-							<input type="text" /><img
+							<input type="text"><img
 								src="../../assets/icons/search-mini.svg"
 								alt=""
-							/>
+							>
 						</td>
-						<td></td>
+						<td>
+							<input type="text"><img
+								src="../../assets/icons/search-mini.svg"
+								alt=""
+							>
+						</td>
+						<td>
+							<input type="text"><img
+								src="../../assets/icons/search-mini.svg"
+								alt=""
+							>
+						</td>
+						<td />
 					</tr>
-					<tr v-for="item in 10" :key="item">
+					<tr
+						v-for="item in 10"
+						:key="item"
+					>
 						<td>Anna Karimova</td>
 						<td>Graphic Design</td>
 						<td>0777114676</td>
 						<td>tr56177ytu</td>
 						<td>comments</td>
 						<td>
-							<button class="detail">Details</button>
+							<button class="detail">
+								Details
+							</button>
 						</td>
 					</tr>
 				</template>
@@ -73,12 +93,12 @@
 </template>
 
 <script>
-	import FdmTable from '../../components/FdmTable.vue';
+import FdmTable from '../../components/FdmTable.vue'
 
-	export default {
-		name: 'DataList',
-		components: { FdmTable },
-	};
+export default {
+	name: 'DataList',
+	components: { FdmTable },
+}
 </script>
 
 <style lang="scss">
@@ -128,46 +148,5 @@
 			margin-top: 18px;
 			margin-bottom: 30px;
 		}
-	}
-	.filter {
-		input {
-			height: 37px;
-			width: 100%;
-			border: 0.768041px solid #33393f;
-			border-radius: 3.07217px;
-			background: inherit;
-			font-size: 14px;
-			line-height: 19px;
-			letter-spacing: 0.02em;
-			padding-left: 30px;
-			color: #7882a2;
-		}
-		td {
-			padding-right: 10px;
-			position: relative;
-
-			img {
-				position: absolute;
-				left: 13px;
-				top: 18px;
-			}
-
-			&:first-child {
-				img {
-					left: 53px;
-				}
-			}
-		}
-	}
-	.detail {
-		font-size: 10px;
-		line-height: 14px;
-		text-transform: capitalize;
-		height: 20px;
-		border: 1px solid #298bfe;
-		border-radius: 3px;
-		background: inherit;
-		color: #298bfe;
-		cursor: pointer;
 	}
 </style>
