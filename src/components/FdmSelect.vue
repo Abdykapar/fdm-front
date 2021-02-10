@@ -9,6 +9,7 @@
 				v-model="inputValue"
 				type="text"
 				:disabled="disabled"
+				:class="{ 'is-invalid' : hasError }"
 				:placeholder="inputPlaceholder"
 				@focusout="onFocusOut"
 				@input="onSearch"
@@ -43,7 +44,8 @@ export default {
 		options: { type: Array, default: () => [] },
 		isMultiple: { type: Boolean, default: false },
 		multipleSelectedIds: { type: Array, default: () => [] },
-		selectedId: { type: Number, default: 0 }
+		selectedId: { type: Number, default: 0 },
+		hasError: { type: Boolean, default: false }
 	},
 	data () {
 		return {
@@ -65,13 +67,17 @@ export default {
 	watch: {
 		options (items) {
 			this.filteredOptions = items
+			this.multipleSelected = this.options.filter(i => this.multipleSelectedIds.includes(i.id))
+			this.inputValue = this.multipleSelected.map(i => i.title).join(', ')
 		},
-		multipleSelectedIds (values) {
-			this.multipleSelected = this.options.filter(i => values.includes(i.id))
-		},
-		selectedId (value) {
-			this.selected = this.options.find(i => i.id === value)
-		}
+		// multipleSelectedIds (values) {
+		// 	this.multipleSelected = this.options.filter(i => values.includes(i.id))
+		// 	this.inputValue = this.multipleSelected.map(i => i.title).join(', ')
+		// },
+		// selectedId (value) {
+		// 	this.selected = this.options.find(i => i.id === value)
+		// 	this.inputValue = this.selected.title
+		// }
 	},
 	mounted () {
 		window.addEventListener('click', this.onOutsideClick)

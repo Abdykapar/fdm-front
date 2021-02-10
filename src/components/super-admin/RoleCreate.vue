@@ -60,6 +60,7 @@
 						<fdm-select
 							id="permission"
 							:is-multiple="true"
+							:has-error="isPermissionEmpty"
 							:options="permissions"
 							:multiple-selected-ids="permissionIds"
 							@multipleSelect="onPermission"
@@ -73,6 +74,7 @@
 						<fdm-select
 							id="sidebar"
 							:options="sidebars"
+							:has-error="isSidebarEmpty"
 							:multiple-selected-ids="sidebarIds"
 							:is-multiple="true"
 							@multipleSelect="onSidebars"
@@ -121,7 +123,9 @@ export default {
 			permissions: [],
 			sidebars: [],
 			permissionIds: [],
-			sidebarIds: []
+			sidebarIds: [],
+			isPermissionEmpty: false,
+			isSidebarEmpty: false
 		}
 	},
 	mounted () {
@@ -149,11 +153,30 @@ export default {
 		},
 		onSubmit () {
 			this.$validator.validate().then(valid => {
-				if (valid) {
+				if (valid && this.permissionIds.length && this.permissionIds.length) {
 					if (this.isEdit) {
 						roleService
 							.update(this.role)
-							.then(() => {
+							.then(async res => {
+								const deleteRolePermissions = this.rolePermissions.filter(i => !this.permissionIds.includes(i.permission)).map(i => i.id)
+								const createRolePermissions = this.permissionIds.filter(i => !this.rolePermissions.map(j => j.permission).includes(i))
+								for (const permissionId of deleteRolePermissions) {
+									await rolePermissionService.delete(permissionId)
+								}
+								for (const permissionId of createRolePermissions) {
+									const data = { role: res.id, permission: permissionId }
+									await rolePermissionService.create(data)
+								}
+								const deleteRoleSidebars = this.roleSidebars.filter(i => !this.sidebarIds.includes(i.navbar)).map(i => i.id)
+								const createRoleSidebars = this.sidebarIds.filter(i => !this.roleSidebars.map(j => j.navbar).includes(i))
+								for (const sidebarId of deleteRoleSidebars) {
+									await roleNavbarService.delete(sidebarId)
+								}
+								for (const sidebarId of createRoleSidebars) {
+									const data = { role: res.id, navbar: sidebarId }
+									await roleNavbarService.create(data)
+								}
+							}).then(() => {
 								this.$toastr.s(this.$t('successMessageEdit'))
 								this.$emit('fetch')
 								this.$emit('close')
@@ -190,9 +213,11 @@ export default {
 		},
 		onPermission (ids) {
 			this.permissionIds = ids
+			this.isPermissionEmpty = !this.permissionIds.length
 		},
 		onSidebars (ids) {
 			this.sidebarIds = ids
+			this.isSidebarEmpty = !this.sidebarIds.length
 		}
 	},
 }
