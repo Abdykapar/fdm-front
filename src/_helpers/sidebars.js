@@ -53,6 +53,11 @@ const superAdminSidebars = [
 		title: 'Routes',
 		icon: require('../assets/icons/folder.svg'),
 		href: '/route'
+	},
+	{
+		title: 'Admin',
+		icon: require('../assets/icons/folder.svg'),
+		href: '/admin'
 	}
 ]
 

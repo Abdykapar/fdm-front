@@ -91,6 +91,11 @@ const routes = [
 				path: '/route',
 				name: 'Route',
 				component: () => import('@/views/super-admin/Route.vue')
+			},
+			{
+				path: '/admin',
+				name: 'Admin',
+				component: () => import('@/views/super-admin/Admin.vue')
 			}
 		]
 	},
