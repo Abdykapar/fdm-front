@@ -5,7 +5,7 @@
 			class="create"
 		>
 			<div class="create__head">
-				{{ isEdit ? 'Edit admin' : 'Add new admin' }}
+				{{ isEdit ? 'Edit technician' : 'Add new technician' }}
 			</div>
 			<div class="create__body">
 				<form
@@ -178,7 +178,7 @@ import { roleService } from '../../_services/role.service'
 import { userService } from '../../_services/user.service'
 
 export default {
-	name: 'AdminCreate',
+	name: 'TechnicianCreate',
 	components: { FdmModal },
 	props: {
 		isEdit: { type: Boolean, default: false },
@@ -227,10 +227,10 @@ export default {
 						// 		console.log(err)
 						// 	})
 					} else {
-						const roleAdmin = this.roles.find(i => i.code === 'ROLE_ADMIN')
-						if (roleAdmin) this.user.role = roleAdmin.id
+						const roleTechnician = this.roles.find(i => i.code === 'ROLE_TECHNICIAN')
+						if (roleTechnician) this.user.role = roleTechnician.id
 						else {
-							this.$toastr.e('Please add ROLE_ADMIN')
+							this.$toastr.e('Please add ROLE_TECHNICIAN')
 							return
 						}
 						userService

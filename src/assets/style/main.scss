@@ -239,3 +239,13 @@ body {
 		margin-bottom: 30px;
 	}
 }
+
+.overflow {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(#7F7D96, 0.6);
+	z-index: 2;
+}

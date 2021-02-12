@@ -51,16 +51,53 @@
 					<notifications />
 				</div>
 			</div>
-			<div class="header__right__profile flex-align-center">
-				<img
-					src="../assets/img/img.png"
-					alt=""
+			<div
+				class="header__right__profile"
+			>
+				<div
+					v-if="isShowProfile"
+					id="overflow"
+					class="overflow"
+				/>
+				<div
+					class="pointer flex-align-center header__right__profile__content"
+					:class="{ 'up' : isShowProfile }"
+					@click="isShowProfile = !isShowProfile"
 				>
-				<span class="header__right__name">Begimay Maslinova</span>
-				<img
-					src="../assets/icons/chevron-down.svg"
-					alt=""
+					<img
+						src="../assets/img/img.png"
+						alt=""
+					>
+					<span class="header__right__name">Begimay Maslinova</span>
+					<img
+						src="../assets/icons/chevron-down.svg"
+						alt=""
+					>
+				</div>
+
+				<div
+					v-if="isShowProfile"
+					class="profile"
 				>
+					<div
+						class="profile__item"
+						:style="`background-image: url(${require('../assets/icons/profile.svg')})`"
+					>
+						My Profile
+					</div>
+					<div
+						class="profile__item"
+						:style="`background-image: url(${require('../assets/icons/password.svg')})`"
+					>
+						Password
+					</div>
+					<div
+						class="profile__item"
+						:style="`background-image: url(${require('../assets/icons/alert-2.svg')})`"
+					>
+						Alerts
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -73,7 +110,8 @@ export default {
 	components: { Notifications },
 	data () {
 		return {
-			isNotif: false
+			isNotif: false,
+			isShowProfile: false
 		}
 	},
 	computed: {
@@ -95,6 +133,7 @@ export default {
 			const overflow = document.getElementById('overflow')
 			if (e.target === overflow) {
 				this.isNotif = false
+				this.isShowProfile = false
 			}
 		},
 	}
@@ -154,6 +193,16 @@ export default {
 				letter-spacing: 0.02em;
 				color: #ffffff;
 				margin-right: 40px;
+				position: relative;
+
+				&__content {
+					position: relative;
+					z-index: 1;
+
+					&.up {
+						z-index: 2;
+					}
+				}
 			}
 
 			&__name {
@@ -172,13 +221,33 @@ export default {
 		}
 	}
 
-	.overflow {
-		position: fixed;
-		top: 0;
-		left: 0;
+	.profile {
+		position: absolute;
 		right: 0;
-		bottom: 0;
-		background: rgba(#7F7D96, 0.6);
-		z-index: 1;
+		top: 62px;
+		width: 320px;
+		padding: 25px 0;
+		background: #1F2327;
+		box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.16);
+		border-radius: 2px;
+		z-index: 3;
+
+		&__item {
+			height: 66px;
+			font-size: 20px;
+			font-weight: 400;
+			line-height: 24px;
+			color: #FFFFFF;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background-repeat: no-repeat;
+			background-position: left 32px center;
+			cursor: pointer;
+
+			&:hover {
+				background-color: rgba(#FFFFFF, 0.2);
+			}
+		}
 	}
 </style>

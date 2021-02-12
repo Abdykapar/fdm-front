@@ -62,17 +62,18 @@ const superAdminSidebars = [
 ]
 
 const bottomMenus = [
-	{
-		title: 'Settings',
-		icon: require('../assets/icons/settings.svg'),
-	},
-	{
-		title: 'Help',
-		icon: require('../assets/icons/help.svg'),
-	},
+	// {
+	// 	title: 'Settings',
+	// 	icon: require('../assets/icons/settings.svg'),
+	// },
+	// {
+	// 	title: 'Help',
+	// 	icon: require('../assets/icons/help.svg'),
+	// },
 	{
 		title: 'Logout',
 		icon: require('../assets/icons/logout.svg'),
+		href: '/login'
 	},
 ]
 

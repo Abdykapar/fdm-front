@@ -19,7 +19,9 @@
 						<th class="id">
 							ID
 						</th>
-						<th>Title</th>
+						<th>Airline</th>
+						<th>From</th>
+						<th>To</th>
 						<th />
 						<th />
 					</tr>
@@ -32,7 +34,9 @@
 						<td class="id">
 							{{ index + 1 }}
 						</td>
-						<td>{{ item.title }}</td>
+						<td>{{ item.airline_title }}</td>
+						<td>{{ item.from_airport_title }}</td>
+						<td>{{ item.to_airport_title }}</td>
 						<td>
 							<img
 								class="pointer"

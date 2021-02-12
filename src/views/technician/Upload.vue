@@ -52,7 +52,7 @@
 						<td />
 					</tr>
 					<tr
-						v-for="item in 4"
+						v-for="item in files"
 						:key="item"
 					>
 						<td>Anna Karimova</td>
@@ -82,24 +82,46 @@
 				</button>
 			</div>
 		</div>
-		<technician-upload v-if="isUpload" />
+		<technician-upload
+			v-if="isUpload"
+			@close="isUpload = false"
+			@fetch="fetchFiles"
+		/>
 	</div>
 </template>
 
 <script>
 import FmdTable from '../../components/FdmTable'
 import TechnicianUpload from '../../components/technician/TechnicianUpload'
+import { fileService } from '../../_services/file.service'
+import { mapActions } from 'vuex'
 export default {
 	name: 'Upload',
 	components: { TechnicianUpload, FmdTable },
 	data () {
 		return {
-			isUpload: false
+			isUpload: false,
+			files: []
 		}
 	},
+	mounted () {
+		this.fetchFiles()
+	},
 	methods: {
+		...mapActions('loader', [ 'setLoading' ]),
 		onUpload () {
 			this.isUpload = true
+		},
+		fetchFiles () {
+			this.setLoading(true)
+			fileService.getAll().then(res => {
+				this.files = res
+				this.setLoading(false)
+			}).catch(err => {
+				this.setLoading(false)
+				this.$toastr.e(err)
+				console.log(err)
+			})
 		}
 	}
 }

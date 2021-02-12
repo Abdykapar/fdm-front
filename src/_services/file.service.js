@@ -14,7 +14,11 @@ class FileService extends BaseApiService {
 
 	create (data) {
 		const url = `${baseUrl}/files/`
-		return this.sendPostRequest(url, data)
+		const formData = new FormData()
+		Object.keys(data).forEach(i => {
+			formData.append(i, data[i])
+		})
+		return this.sendPostRequest(url, formData)
 	}
 
 	getById (id) {

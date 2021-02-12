@@ -1,5 +1,5 @@
 <template>
-	<fdm-modal>
+	<fdm-modal @close="$emit('close')">
 		<div
 			slot="content"
 			class="tech-upload create"
@@ -34,6 +34,26 @@
 					</div>
 					<div
 						class="form__row"
+						:class="{ error: errors.has('route') }"
+					>
+						<label for="route">Route</label>
+						<select
+							id="route"
+							v-model="file.route"
+							v-validate="'required'"
+							name="route"
+						>
+							<option
+								v-for="route in routes"
+								:key="route.id"
+								:value="route.id"
+							>
+								{{ route.from_airport_title + ' - ' + route.to_airport_title }} ({{ route.airline_title }})
+							</option>
+						</select>
+					</div>
+					<div
+						class="form__row"
 						:class="{ error: errors.has('file') }"
 					>
 						<label for="file">File</label>
@@ -60,15 +80,15 @@
 						</template>
 					</div>
 					<div class="form__submit flex-justify-between">
-						<button type="submit">
-							UPLOAD
-						</button>
 						<button
 							type="reset"
 							class="black"
 							@click="$emit('close')"
 						>
 							DECLINE
+						</button>
+						<button type="submit">
+							UPLOAD
 						</button>
 					</div>
 				</form>
@@ -81,6 +101,8 @@
 import FdmModal from '../FdmModal'
 import { fileService } from '../../_services/file.service'
 import { mapActions } from 'vuex'
+import { routeService } from '../../_services/route.service'
+import { aircraftService } from '../../_services/aircraft.service'
 export default {
 	name: 'TechnicianUpload',
 	components: { FdmModal },
@@ -88,18 +110,45 @@ export default {
 		return {
 			file: {},
 			selectedFile: '',
-			aircrafts: []
+			aircrafts: [],
+			routes: []
 		}
+	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
+	mounted () {
+		this.fetchRouteCraft()
 	},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
+
+		fetchRouteCraft () {
+			this.setLoading(true)
+			routeService.getAll().then(res => {
+				this.routes = res
+				return aircraftService.getAll()
+			}).then(res => {
+				this.aircrafts = res
+				this.setLoading(false)
+			}).catch(err => {
+				this.setLoading(false)
+				this.$toastr.e(err)
+				console.log(err)
+			})
+		},
 
 		onSubmit (e) {
 			this.$validator.validate().then(valid => {
 				if (valid) {
 					this.setLoading(true)
+					this.file.uploaded_file = this.selectedFile
+					this.file.technician = this.userProfile.user.id
 					fileService.create(this.file).then(res => {
-						console.log(res)
+						this.$emit('close')
+						this.$emit('fetch')
 						this.setLoading(false)
 					}).catch(err => {
 						this.setLoading(false)
@@ -111,7 +160,6 @@ export default {
 		},
 		onFileChange (e) {
 			this.selectedFile = e.target.files[0]
-			console.log(this.selectedFile)
 		},
 	}
 }

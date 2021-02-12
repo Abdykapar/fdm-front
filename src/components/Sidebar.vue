@@ -1,11 +1,20 @@
 <template>
-	<div class="sidebar" :class="{ small: type === 'small' }">
+	<div
+		class="sidebar"
+		:class="{ small: type === 'small' }"
+	>
 		<div class="sidebar__top">
-			<div v-if="type === 'big'" class="sidebar__logo">
+			<div
+				v-if="type === 'big'"
+				class="sidebar__logo"
+			>
 				<span>FlightData</span>
-				<span class="sidebar__circle"></span>
+				<span class="sidebar__circle" />
 			</div>
-			<div class="sidebar__space" v-else></div>
+			<div
+				v-else
+				class="sidebar__space"
+			/>
 			<div class="sidebar__menu">
 				<div
 					v-for="item in menus"
@@ -15,9 +24,12 @@
 						small: type === 'small',
 						active: item.href === $route.path,
 					}"
-					@click="$router.push(item.href)"
+					@click="onRoute(item.href)"
 				>
-					<img :src="item.icon" alt="" />
+					<img
+						:src="item.icon"
+						alt=""
+					>
 					{{ type === 'big' ? item.title : '' }}
 				</div>
 			</div>
@@ -28,50 +40,59 @@
 				:key="item.icon"
 				class="sidebar__menu__item"
 				:class="{ small: type === 'small' }"
+				@click="onRoute(item.href)"
 			>
-				<img :src="item.icon" alt="" /> {{ type === 'big' ? item.title : '' }}
+				<img
+					:src="item.icon"
+					alt=""
+				> {{ type === 'big' ? item.title : '' }}
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-	import sidebars from '@/_helpers/sidebars';
-	export default {
-		name: 'Sidebar',
-		data() {
-			return {
-				// menus: [
-				// 	{
-				// 		title: 'Dashboard',
-				// 		icon: require('../assets/icons/bar-chart.svg'),
-				// 		href: '/',
-				// 	},
-				// 	{
-				// 		title: 'Data List',
-				// 		icon: require('../assets/icons/folder.svg'),
-				// 		href: '/data-list',
-				// 	},
-				// 	{
-				// 		title: 'Data Insights',
-				// 		icon: require('../assets/icons/monitor.svg'),
-				// 	},
-				// 	{
-				// 		title: 'Technician Users',
-				// 		icon: require('../assets/icons/user.svg'),
-				// 		href: '/technician',
-				// 	},
-				// ],
-				menus: sidebars.superAdminSidebars,
-				bottomMenus: sidebars.bottomMenus,
-			};
+import sidebars from '@/_helpers/sidebars'
+export default {
+	name: 'Sidebar',
+	data () {
+		return {
+			// menus: [
+			// 	{
+			// 		title: 'Dashboard',
+			// 		icon: require('../assets/icons/bar-chart.svg'),
+			// 		href: '/',
+			// 	},
+			// 	{
+			// 		title: 'Data List',
+			// 		icon: require('../assets/icons/folder.svg'),
+			// 		href: '/data-list',
+			// 	},
+			// 	{
+			// 		title: 'Data Insights',
+			// 		icon: require('../assets/icons/monitor.svg'),
+			// 	},
+			// 	{
+			// 		title: 'Technician Users',
+			// 		icon: require('../assets/icons/user.svg'),
+			// 		href: '/technician',
+			// 	},
+			// ],
+			menus: sidebars.superAdminSidebars,
+			bottomMenus: sidebars.bottomMenus,
+		}
+	},
+	computed: {
+		type () {
+			return this.$route.path === '/' ? 'small' : 'big'
 		},
-		computed: {
-			type() {
-				return this.$route.path === '/' ? 'small' : 'big';
-			},
-		},
-	};
+	},
+	methods: {
+		onRoute (href) {
+			if (href !== this.$route.path) this.$router.push(href)
+		}
+	}
+}
 </script>
 
 <style lang="scss">
