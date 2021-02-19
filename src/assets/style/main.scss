@@ -127,7 +127,7 @@ body {
 			mix-blend-mode: normal;
 			margin-bottom: 10px;
 		}
-		input, select, &__file {
+		input:not(input[type='checkbox']), select, &__file {
 			width: 286px;
 			height: 48px;
 			border: 1px solid #33393f;

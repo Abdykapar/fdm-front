@@ -110,6 +110,11 @@ const routes = [
 				path: '/trigger',
 				name: 'Trigger',
 				component: () => import('@/views/super-admin/Trigger.vue')
+			},
+			{
+				path: '/aircraft-model-trigger',
+				name: 'AircraftModelTrigger',
+				component: () => import('@/views/super-admin/AircraftModelTrigger.vue')
 			}
 		],
 		beforeEnter: (to, from, next) => {

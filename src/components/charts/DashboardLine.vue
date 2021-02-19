@@ -1,5 +1,6 @@
 <template>
 	<vue-apex-charts
+		v-if="isShow"
 		type="line"
 		height="350"
 		:options="chartOptions"
@@ -15,6 +16,7 @@ export default {
 	components: { VueApexCharts },
 	data () {
 		return {
+			isShow: false,
 			series: [ {
 				name: 'Events',
 				data: [ 10, 41, 35, 51, 49, 62, 69, 91, 148 ]
@@ -92,10 +94,16 @@ export default {
 			},
 		}
 	},
+	mounted () {
+		this.fetchData()
+	},
 	methods: {
 		fetchData () {
 			otherService.flightsByMonth().then(res => {
-
+				this.chartOptions.xaxis.categories = res.map(i => i.month)
+				this.series[0].data = res.map(i => i.events)
+				this.series[1].data = res.map(i => i.flights)
+				this.isShow = true
 			}).catch(err => {
 				console.log(err)
 				this.$toastr.e(err)

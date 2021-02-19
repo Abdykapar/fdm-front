@@ -63,6 +63,11 @@ const superAdminSidebars = [
 		title: 'Trigger',
 		icon: 'fab fa-tripadvisor',
 		href: '/trigger'
+	},
+	{
+		title: 'Aircraft models trigger',
+		icon: 'fas fa-shapes',
+		href: '/aircraft-model-trigger'
 	}
 ]
 
