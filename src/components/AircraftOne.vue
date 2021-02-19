@@ -148,21 +148,9 @@ export default {
 		active: {
 			type: Boolean, default: false
 		}
-	},
-	watch: {
-		active (val) {
-			console.log('change: ', val)
-		}
 	}
 }
 </script>
 
 <style scoped>
-	.test {
-		color: #595F64;
-		background: #B2C1C0;
-		background: #64676A;
-		background: #3E4347;
-		background: #DAE3EA;
-	}
 </style>

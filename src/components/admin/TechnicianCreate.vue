@@ -100,7 +100,7 @@
 						<input
 							id="password"
 							v-model="user.password"
-							v-validate="'required'"
+							v-validate="{'required' : !isEdit}"
 							type="password"
 							name="password"
 						>
@@ -112,46 +112,6 @@
 							<span>Required field</span>
 						</template>
 					</div>
-					<div
-						class="form__row"
-						:class="{ error: errors.has('airline') }"
-					>
-						<label for="airline">Airline</label>
-						<select
-							id="airline"
-							v-model="user.airline"
-							v-validate="'required'"
-							name="airline"
-						>
-							<option
-								v-for="airline in airlines"
-								:key="airline.id"
-								:value="airline.id"
-							>
-								{{ airline.title }}
-							</option>
-						</select>
-					</div>
-					<!--					<div-->
-					<!--						class="form__row"-->
-					<!--						:class="{ error: errors.has('role') }"-->
-					<!--					>-->
-					<!--						<label for="role">Role</label>-->
-					<!--						<select-->
-					<!--							id="role"-->
-					<!--							v-model="user.role"-->
-					<!--							v-validate="'required'"-->
-					<!--							name="role"-->
-					<!--						>-->
-					<!--							<option-->
-					<!--								v-for="item in roles"-->
-					<!--								:key="item.id"-->
-					<!--								:value="item.id"-->
-					<!--							>-->
-					<!--								{{ item.title }}-->
-					<!--							</option>-->
-					<!--						</select>-->
-					<!--					</div>-->
 					<div class="form__submit flex-justify-between">
 						<button type="submit">
 							ADD
@@ -176,6 +136,7 @@ import { airlinesService } from '../../_services/airlines.service'
 import { mapActions } from 'vuex'
 import { roleService } from '../../_services/role.service'
 import { userService } from '../../_services/user.service'
+import { usersService } from '../../_services/users.service'
 
 export default {
 	name: 'TechnicianCreate',
@@ -191,8 +152,13 @@ export default {
 			roles: []
 		}
 	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
 	mounted () {
-		if (this.isEdit) this.airlines = { ...this.editUser }
+		if (this.isEdit) this.user = { ...this.editUser }
 		this.fetchAirlines()
 	},
 	methods: {
@@ -214,18 +180,19 @@ export default {
 		onSubmit () {
 			this.$validator.validate().then(valid => {
 				if (valid) {
+					this.user.airline = this.userProfile.user.user_airline[0]
 					if (this.isEdit) {
-						// userService
-						// 	.register(this.user)
-						// 	.then(() => {
-						// 		this.$toastr.s(this.$t('successMessageEdit'))
-						// 		this.$emit('fetch')
-						// 		this.$emit('close')
-						// 	})
-						// 	.catch(err => {
-						// 		this.$toastr.e(err)
-						// 		console.log(err)
-						// 	})
+						usersService
+							.update(this.user)
+							.then(() => {
+								this.$toastr.s(this.$t('successMessageEdit'))
+								this.$emit('fetch')
+								this.$emit('close')
+							})
+							.catch(err => {
+								this.$toastr.e(err)
+								console.log(err)
+							})
 					} else {
 						const roleTechnician = this.roles.find(i => i.code === 'ROLE_TECHNICIAN')
 						if (roleTechnician) this.user.role = roleTechnician.id

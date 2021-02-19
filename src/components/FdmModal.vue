@@ -48,7 +48,7 @@ export default {
 		left: 0;
 		right: 0;
 		background: rgba($color: #7f7d96, $alpha: 0.5);
-		z-index: 2;
+		z-index: 3;
 
 		&__content {
 			background: #1f2327;
@@ -56,6 +56,7 @@ export default {
 			border-radius: 2px;
 			padding: 48px 30px 66px;
 			height: 90%;
+			max-width: 80vw;
 			overflow-y: auto;
 
 			&.delete {

@@ -82,6 +82,7 @@
 					<div
 						class="profile__item"
 						:style="`background-image: url(${require('../assets/icons/profile.svg')})`"
+						@click="isProfile = true"
 					>
 						My Profile
 					</div>
@@ -100,18 +101,24 @@
 				</div>
 			</div>
 		</div>
+		<profile
+			v-if="isProfile"
+			@close="isProfile = false"
+		/>
 	</div>
 </template>
 
 <script>
 import Notifications from './Notifications'
+import Profile from './Profile'
 export default {
 	name: 'Header',
-	components: { Notifications },
+	components: { Profile, Notifications },
 	data () {
 		return {
 			isNotif: false,
-			isShowProfile: false
+			isShowProfile: false,
+			isProfile: false
 		}
 	},
 	computed: {

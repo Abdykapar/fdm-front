@@ -1,44 +1,60 @@
 <template>
 	<div class="login flex">
 		<div class="login__left flex-center">
-			<img src="/assets/img/login-img.svg" alt="" />
+			<img
+				src="/assets/img/login-img.svg"
+				alt=""
+			>
 		</div>
 		<div class="login__right flex-center">
 			<div>
-				<h1 class="login__h1">Welcome Back</h1>
-				<p class="login__p">Login to your account</p>
+				<h1 class="login__h1">
+					Welcome Back
+				</h1>
+				<p class="login__p">
+					Login to your account
+				</p>
 
 				<form @submit.prevent="onSubmit">
 					<div class="login__item">
 						<label for="">Email Address</label>
 						<input
-							type="text"
 							v-model="username"
 							v-validate="'required'"
+							type="text"
 							:class="{ 'is-invalid': submitted && errors.has('username') }"
 							name="username"
 							placeholder="Example: jane@doe.com"
-						/>
+						>
 					</div>
 					<div class="login__item">
 						<label for="">Password</label>
 						<input
-							:class="{ 'is-invalid': submitted && errors.has('password') }"
-							type="password"
 							v-model="password"
 							v-validate="'required'"
+							:class="{ 'is-invalid': submitted && errors.has('password') }"
+							type="password"
 							name="password"
 							placeholder="Enter your password"
-						/>
+						>
 					</div>
 					<div class="login__extra flex">
 						<div class="flex-align-center">
-							<input v-model="remember" id="forgot" type="checkbox" />
+							<input
+								id="forgot"
+								v-model="remember"
+								type="checkbox"
+							>
 							<label for="forgot">Remember me</label>
 						</div>
 						<a href="#">Forgot your password?</a>
 					</div>
-					<button type="submit" class="login__submit">Login</button>
+					<button
+						type="submit"
+						class="login__submit"
+					>
+						Login
+					</button>
 				</form>
 			</div>
 		</div>
@@ -46,59 +62,57 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex';
-	export default {
-		name: 'Login',
-		data() {
-			return {
-				username: '',
-				password: '',
-				remember: false,
-				submitted: false,
-			};
+import { mapActions } from 'vuex'
+export default {
+	name: 'Login',
+	data () {
+		return {
+			username: '',
+			password: '',
+			remember: false,
+			submitted: false,
+		}
+	},
+	computed: {
+		remembered () {
+			return this.$store.getters['account/remembered']
 		},
-		computed: {
-			remembered() {
-				return this.$store.getters['account/remembered'];
-			},
-		},
-		mounted() {
-			this.logout();
-			this.remember = Object.values(this.remembered).length;
-			this.username = this.remembered.username;
-			this.password = this.remembered.password;
-		},
-		methods: {
-			...mapActions('account', [
-				'login',
-				'remembering',
-				'removeRemember',
-				'logout',
-			]),
-			onSubmit() {
-				this.submitted = true;
-				this.$validator.validate().then((valid) => {
-					if (valid) {
-						if (this.remember) {
-							this.remembering({
-								username: this.username,
-								password: this.password,
-							});
-						} else {
-							this.removeRemember();
-						}
-						this.login({ username: this.username, password: this.password });
+	},
+	mounted () {
+		this.logout()
+		this.remember = Object.values(this.remembered).length
+		this.username = this.remembered.username
+		this.password = this.remembered.password
+	},
+	methods: {
+		...mapActions('account', [
+			'login',
+			'remembering',
+			'removeRemember',
+			'logout',
+		]),
+		onSubmit () {
+			this.submitted = true
+			this.$validator.validate().then(valid => {
+				if (valid) {
+					if (this.remember) {
+						this.remembering({
+							username: this.username,
+							password: this.password,
+						})
+					} else {
+						this.removeRemember()
 					}
-				});
-			},
+					this.login({ username: this.username, password: this.password })
+				}
+			})
 		},
-	};
+	},
+}
 </script>
 
-<style lang="scss">
-	body {
-		overflow: hidden;
-	}
+<style lang="scss" scoped>
+
 	.login {
 		background: #1a1c48;
 		min-height: 100vh;

@@ -30,7 +30,7 @@
 				<template slot="body">
 					<tr
 						v-for="(item, i) in users"
-						:key="item"
+						:key="item.id"
 					>
 						<td class="id">
 							{{ i + 1 }}
@@ -41,14 +41,18 @@
 						<td>{{ item.email }}</td>
 						<td>
 							<img
+								class="pointer"
 								src="../../assets/icons/edit.svg"
 								alt=""
+								@click="onEdit(item)"
 							>
 						</td>
 						<td>
 							<img
+								class="pointer"
 								src="../../assets/icons/delete.svg"
 								alt=""
+								@click="onDelete(item.id)"
 							>
 						</td>
 					</tr>
@@ -76,6 +80,7 @@ import TechnicianCreate from '../../components/admin/TechnicianCreate'
 import ModalDelete from '../../components/ModalDelete'
 import { usersService } from '../../_services/users.service'
 import { roleService } from '../../_services/role.service'
+import { mapActions } from 'vuex'
 export default {
 	name: 'Home',
 	components: {
@@ -91,7 +96,8 @@ export default {
 			isEdit: false,
 			deleteId: 0,
 			isDelete: false,
-			roles: []
+			roles: [],
+			role: {}
 		}
 	},
 	computed: {
@@ -103,17 +109,18 @@ export default {
 		this.fetchRoles()
 	},
 	methods: {
+		...mapActions('loader', [ 'setLoading' ]),
 		fetchRoles () {
 			roleService.getAll().then(res => {
 				this.roles = res
-				const tech = this.roles.find(i => i.code === 'ROLE_TECHNICIAN')
-				this.fetchUsers(this.userProfile.user.airline[0], tech.id)
+				this.role = this.roles.find(i => i.code === 'ROLE_TECHNICIAN')
+				this.fetchUsers()
 			}).catch(err => {
 				console.log(err)
 			})
 		},
-		fetchUsers (airline, role) {
-			usersService.getAll(role,airline).then(res => {
+		fetchUsers () {
+			usersService.getAll(this.role.id,this.userProfile.user.airline[0]).then(res => {
 				this.users = res
 			}).catch(err => {
 				console.log(err)
@@ -133,7 +140,17 @@ export default {
 			this.deleteId = id
 		},
 		deleteUser () {
-			
+			this.setLoading(true)
+			usersService.delete(this.deleteId).then(_ => {
+				this.setLoading(false)
+				this.$toastr.s(this.$t('successMessageDelete'))
+				this.isDelete = false
+				this.fetchUsers()
+			}).catch(err => {
+				console.log(err)
+				this.setLoading(false)
+				this.$toastr.e(err)
+			})
 		}
 	},
 }
