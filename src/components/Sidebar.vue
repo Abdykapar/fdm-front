@@ -27,7 +27,7 @@
 					@click="onRoute(item.href)"
 				>
 					<img
-						:src="item.icon"
+						:src="folderIcon"
 						alt=""
 					>
 					{{ type === 'big' ? item.title : '' }}
@@ -57,35 +57,33 @@ export default {
 	name: 'Sidebar',
 	data () {
 		return {
-			// menus: [
-			// 	{
-			// 		title: 'Dashboard',
-			// 		icon: require('../assets/icons/bar-chart.svg'),
-			// 		href: '/',
-			// 	},
-			// 	{
-			// 		title: 'Data List',
-			// 		icon: require('../assets/icons/folder.svg'),
-			// 		href: '/data-list',
-			// 	},
-			// 	{
-			// 		title: 'Data Insights',
-			// 		icon: require('../assets/icons/monitor.svg'),
-			// 	},
-			// 	{
-			// 		title: 'Technician Users',
-			// 		icon: require('../assets/icons/user.svg'),
-			// 		href: '/technician',
-			// 	},
-			// ],
-			menus: sidebars.superAdminSidebars,
+			menus: [],
 			bottomMenus: sidebars.bottomMenus,
+			folderIcon: require('../assets/icons/folder.svg'),
 		}
 	},
 	computed: {
 		type () {
-			return this.$route.path === '/' ? 'small' : 'big'
+			return this.$route.path === '/dashboard' ? 'small' : 'big'
 		},
+		sidebars () {
+			return this.$store.getters['sidebars/sidebars']
+		},
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
+	watch: {
+		sidebars () {
+			if (this.userProfile.user.is_staff) {
+				this.menus = sidebars.superAdminSidebars
+			} else this.menus = this.sidebars
+		}
+	},
+	mounted () {
+		if (this.userProfile.user.is_staff) {
+			this.menus = sidebars.superAdminSidebars
+		} else this.menus = this.sidebars
 	},
 	methods: {
 		onRoute (href) {

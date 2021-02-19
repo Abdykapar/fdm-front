@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import protect from '../_helpers/protect-route'
 
 Vue.use(VueRouter)
 
@@ -12,6 +13,11 @@ const routes = [
 			{
 				path: '/',
 				name: 'AdminHome',
+				component: () => import('@/views/admin/Home.vue')
+			},
+			{
+				path: '/dashboard',
+				name: 'dashboard',
 				component: () => import('@/views/admin/Home.vue')
 			},
 			{
@@ -29,7 +35,10 @@ const routes = [
 				name: 'Upload',
 				component: () => import('@/views/technician/Upload.vue')
 			},
-		]
+		],
+		beforeEnter: (to, from, next) => {
+			protect.checkUser(next)
+		},
 	},
 	{
 		path: '/super-admin',
@@ -97,7 +106,10 @@ const routes = [
 				name: 'Admin',
 				component: () => import('@/views/super-admin/Admin.vue')
 			}
-		]
+		],
+		beforeEnter: (to, from, next) => {
+			protect.checkSuperAdmin(next)
+		},
 	},
 	{
 		path: '/login',

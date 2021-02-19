@@ -20,27 +20,25 @@
 							ID
 						</th>
 						<th>Name Surname</th>
-						<th>Role</th>
-						<th>Telephone</th>
-						<th>Login</th>
-						<th>Password</th>
+						<th>Username</th>
+						<!--						<th>Password</th>-->
+						<th>Email</th>
 						<th />
 						<th />
 					</tr>
 				</template>
 				<template slot="body">
 					<tr
-						v-for="item in 10"
+						v-for="(item, i) in users"
 						:key="item"
 					>
 						<td class="id">
-							{{ item }}
+							{{ i + 1 }}
 						</td>
-						<td>Anna Karimova</td>
-						<td>Graphic Design</td>
-						<td>0777114676</td>
-						<td>tr56177ytu</td>
-						<td>tr56177ytu</td>
+						<td>{{ item.first_name }} {{ item.last_name }}</td>
+						<td>{{ item.username }}</td>
+						<!--						<td>{{ item.password }}</td>-->
+						<td>{{ item.email }}</td>
 						<td>
 							<img
 								src="../../assets/icons/edit.svg"
@@ -76,6 +74,8 @@
 import FdmTable from '@/components/FdmTable'
 import TechnicianCreate from '../../components/admin/TechnicianCreate'
 import ModalDelete from '../../components/ModalDelete'
+import { usersService } from '../../_services/users.service'
+import { roleService } from '../../_services/role.service'
 export default {
 	name: 'Home',
 	components: {
@@ -90,13 +90,34 @@ export default {
 			isCreate: false,
 			isEdit: false,
 			deleteId: 0,
-			isDelete: false
+			isDelete: false,
+			roles: []
 		}
 	},
-	mounted () {},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
+	mounted () {
+		this.fetchRoles()
+	},
 	methods: {
-		fetchUsers () {
-
+		fetchRoles () {
+			roleService.getAll().then(res => {
+				this.roles = res
+				const tech = this.roles.find(i => i.code === 'ROLE_TECHNICIAN')
+				this.fetchUsers(this.userProfile.user.airline[0], tech.id)
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		fetchUsers (airline, role) {
+			usersService.getAll(role,airline).then(res => {
+				this.users = res
+			}).catch(err => {
+				console.log(err)
+			})
 		},
 		onCreate () {
 			this.isCreate = true

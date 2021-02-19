@@ -72,10 +72,10 @@
 						<td />
 					</tr>
 					<tr
-						v-for="item in 10"
+						v-for="item in files"
 						:key="item"
 					>
-						<td>Anna Karimova</td>
+						<td>{{ item.file_name.join(', ') }}</td>
 						<td>Graphic Design</td>
 						<td>0777114676</td>
 						<td>tr56177ytu</td>
@@ -94,10 +94,33 @@
 
 <script>
 import FdmTable from '../../components/FdmTable.vue'
+import { fileService } from '../../_services/file.service'
+import { mapActions } from 'vuex'
 
 export default {
 	name: 'DataList',
 	components: { FdmTable },
+	data () {
+		return {
+			files: []
+		}
+	},
+	mounted () {
+		this.fetchData()
+	},
+	methods: {
+		...mapActions('loader', [ 'setLoading' ]),
+		fetchData () {
+			this.setLoading(true)
+			fileService.getAll().then(res => {
+				this.files = res
+				this.setLoading(false)
+			}).catch(err => {
+				this.setLoading(false)
+				console.log(err)
+			})
+		}
+	}
 }
 </script>
 

@@ -1,18 +1,18 @@
 <template>
 	<table class="fdm-table">
 		<thead>
-			<slot name="head"></slot>
+			<slot name="head" />
 		</thead>
 		<tbody>
-			<slot name="body"></slot>
+			<slot name="body" />
 		</tbody>
 	</table>
 </template>
 
 <script>
-	export default {
-		name: 'FmdTable',
-	};
+export default {
+	name: 'FmdTable',
+}
 </script>
 
 <style lang="scss">
@@ -37,6 +37,7 @@
 				color: #ffffff;
 				font-weight: 400;
 				text-align: left;
+				padding-left: 10px;
 
 				&:first-child {
 					padding-left: 40px;
@@ -55,6 +56,7 @@
 				font-size: 14px;
 				line-height: 19px;
 				color: #7882a2;
+				padding-left: 10px;
 
 				&:first-child {
 					padding-left: 40px;

@@ -16,7 +16,7 @@
 						class="form__row"
 						:class="{ error: errors.has('lastname') }"
 					>
-						<label for="lastname">Username</label>
+						<label for="lastname">Surname</label>
 						<input
 							id="lastname"
 							v-model="user.last_name"

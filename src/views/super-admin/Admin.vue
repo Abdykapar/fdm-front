@@ -19,9 +19,11 @@
 						<th class="id">
 							ID
 						</th>
+						<th>Name</th>
+						<th>Surname</th>
 						<th>Username</th>
 						<th>Email</th>
-						<th>Password</th>
+						<!--						<th>Password</th>-->
 						<th />
 						<th />
 					</tr>
@@ -34,9 +36,11 @@
 						<td class="id">
 							{{ index + 1 }}
 						</td>
+						<td>{{ item.first_name }}</td>
+						<td>{{ item.last_name }}</td>
 						<td>{{ item.username }}</td>
 						<td>{{ item.email }}</td>
-						<td>{{ item.password }}</td>
+						<!--						<td>{{ item.password }}</td>-->
 						<td>
 							<img
 								class="pointer"
@@ -79,6 +83,7 @@ import ModalDelete from '../../components/ModalDelete.vue'
 import { mapActions } from 'vuex'
 import AdminCreate from '../../components/super-admin/AdminCreate'
 import { userService } from '../../_services/user.service'
+import { usersService } from '../../_services/users.service'
 
 export default {
 	name: 'Admin',
@@ -99,17 +104,17 @@ export default {
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
 		fetchUsers () {
-			// this.setLoading(true)
-			// userService
-			// 	.getAll()
-			// 	.then(res => {
-			// 		this.setLoading(false)
-			// 		this.airports = res
-			// 	})
-			// 	.catch(err => {
-			// 		this.setLoading(false)
-			// 		console.log(err)
-			// 	})
+			this.setLoading(true)
+			usersService
+				.getAll()
+				.then(res => {
+					this.users = res
+					this.setLoading(false)
+				})
+				.catch(err => {
+					this.setLoading(false)
+					console.log(err)
+				})
 		},
 		onCreate () {
 			this.isEdit = false
@@ -126,7 +131,7 @@ export default {
 		},
 		deleteUser () {
 			this.setLoading(true)
-			userService
+			usersService
 				.delete(this.deleteId)
 				.then(() => {
 					this.setLoading(false)

@@ -55,7 +55,7 @@
 						v-for="item in files"
 						:key="item"
 					>
-						<td>Anna Karimova</td>
+						<td>{{ item.file_name.join(', ') }}</td>
 						<td>Graphic Design</td>
 						<td>0777114676</td>
 						<td>tr56177ytu</td>

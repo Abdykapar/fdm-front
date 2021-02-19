@@ -16,7 +16,7 @@
 						class="form__row"
 						:class="{ error: errors.has('lastname') }"
 					>
-						<label for="lastname">Username</label>
+						<label for="lastname">Surname</label>
 						<input
 							id="lastname"
 							v-model="user.last_name"
@@ -100,7 +100,7 @@
 						<input
 							id="password"
 							v-model="user.password"
-							v-validate="'required'"
+							v-validate="{ 'required' : !isEdit }"
 							type="password"
 							name="password"
 						>
@@ -176,6 +176,7 @@ import { airlinesService } from '../../_services/airlines.service'
 import { mapActions } from 'vuex'
 import { roleService } from '../../_services/role.service'
 import { userService } from '../../_services/user.service'
+import { usersService } from '../../_services/users.service'
 
 export default {
 	name: 'AdminCreate',
@@ -192,11 +193,19 @@ export default {
 		}
 	},
 	mounted () {
-		if (this.isEdit) this.airlines = { ...this.editUser }
+		if (this.isEdit) this.fetchUser()
 		this.fetchAirlines()
 	},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
+		fetchUser () {
+			usersService.getById(this.editUser.id).then(res => {
+				this.user = res
+			}).catch(err => {
+				console.log(err)
+				this.$toastr.e(err)
+			})
+		},
 		fetchAirlines () {
 			this.setLoading(true)
 			airlinesService.getAll().then(res => {
@@ -214,20 +223,21 @@ export default {
 		onSubmit () {
 			this.$validator.validate().then(valid => {
 				if (valid) {
+					const roleAdmin = this.roles.find(i => i.code === 'ROLE_ADMIN')
+					if (roleAdmin) this.user.role = roleAdmin.id
 					if (this.isEdit) {
-						// userService
-						// 	.register(this.user)
-						// 	.then(() => {
-						// 		this.$toastr.s(this.$t('successMessageEdit'))
-						// 		this.$emit('fetch')
-						// 		this.$emit('close')
-						// 	})
-						// 	.catch(err => {
-						// 		this.$toastr.e(err)
-						// 		console.log(err)
-						// 	})
+						usersService
+							.update(this.user)
+							.then(() => {
+								this.$toastr.s(this.$t('successMessageEdit'))
+								this.$emit('fetch')
+								this.$emit('close')
+							})
+							.catch(err => {
+								this.$toastr.e(err)
+								console.log(err)
+							})
 					} else {
-						const roleAdmin = this.roles.find(i => i.code === 'ROLE_ADMIN')
 						if (roleAdmin) this.user.role = roleAdmin.id
 						else {
 							this.$toastr.e('Please add ROLE_ADMIN')

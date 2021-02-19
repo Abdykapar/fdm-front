@@ -68,7 +68,7 @@
 						src="../assets/img/img.png"
 						alt=""
 					>
-					<span class="header__right__name">Begimay Maslinova</span>
+					<span class="header__right__name">{{ userProfile.user.first_name }} {{ userProfile.user.last_name }}</span>
 					<img
 						src="../assets/icons/chevron-down.svg"
 						alt=""
@@ -118,6 +118,9 @@ export default {
 		isTechnician () {
 			return this.$route.path === '/technician'
 		},
+		userProfile () {
+			return this.$store.state.account.user
+		}
 	},
 	mounted () {
 		document.addEventListener('click', this.onOutsideClick)
