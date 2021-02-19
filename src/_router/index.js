@@ -105,6 +105,11 @@ const routes = [
 				path: '/admin',
 				name: 'Admin',
 				component: () => import('@/views/super-admin/Admin.vue')
+			},
+			{
+				path: '/trigger',
+				name: 'Trigger',
+				component: () => import('@/views/super-admin/Trigger.vue')
 			}
 		],
 		beforeEnter: (to, from, next) => {

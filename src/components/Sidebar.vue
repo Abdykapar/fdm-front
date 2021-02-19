@@ -26,7 +26,12 @@
 					}"
 					@click="onRoute(item.href)"
 				>
+					<i
+						v-if="item.icon"
+						:class="item.icon"
+					/>
 					<img
+						v-else
 						:src="folderIcon"
 						alt=""
 					>
@@ -177,7 +182,7 @@ export default {
 					background: rgba($color: #ffffff, $alpha: 0.05);
 				}
 
-				img {
+				img, i {
 					padding-right: 20px;
 				}
 

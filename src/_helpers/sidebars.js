@@ -6,58 +6,63 @@ const superAdminSidebars = [
 	// },
 	{
 		title: 'Airline',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'fas fa-plane-departure',
 		href: '/airline'
 	},
 	{
 		title: 'Country',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'fas fa-globe-asia',
 		href: '/country'
 	},
 	{
 		title: 'City',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'far fa-building',
 		href: '/city'
 	},
 	{
 		title: 'Navbar',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'fas fa-bars',
 		href: '/navbar'
 	},
 	{
 		title: 'Permission',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'fas fa-lock',
 		href: '/permission'
 	},
 	{
 		title: 'Role',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'fas fa-user-tag',
 		href: '/role'
 	},
 	{
 		title: 'Aircraft models',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'fas fa-place-of-worship',
 		href: '/aircraft-model'
 	},
 	{
 		title: 'Aircrafts',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'fas fa-plane',
 		href: '/aircraft'
 	},
 	{
 		title: 'Airports',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'fas fa-warehouse',
 		href: '/airport'
 	},
 	{
 		title: 'Routes',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'fas fa-route',
 		href: '/route'
 	},
 	{
 		title: 'Admin',
-		icon: require('../assets/icons/folder.svg'),
+		icon: 'fas fa-user',
 		href: '/admin'
+	},
+	{
+		title: 'Trigger',
+		icon: 'fab fa-tripadvisor',
+		href: '/trigger'
 	}
 ]
 

@@ -120,14 +120,14 @@
 					</div>
 					<div class="form__submit flex-center gap-20 mt20">
 						<button type="submit">
-							ADD
+							SAVE
 						</button>
 						<button
 							type="reset"
 							class="black"
 							@click="$emit('close')"
 						>
-							DECLINE
+							CANCEL
 						</button>
 					</div>
 				</form>

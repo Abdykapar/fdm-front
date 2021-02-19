@@ -132,26 +132,6 @@
 							</option>
 						</select>
 					</div>
-					<!--					<div-->
-					<!--						class="form__row"-->
-					<!--						:class="{ error: errors.has('role') }"-->
-					<!--					>-->
-					<!--						<label for="role">Role</label>-->
-					<!--						<select-->
-					<!--							id="role"-->
-					<!--							v-model="user.role"-->
-					<!--							v-validate="'required'"-->
-					<!--							name="role"-->
-					<!--						>-->
-					<!--							<option-->
-					<!--								v-for="item in roles"-->
-					<!--								:key="item.id"-->
-					<!--								:value="item.id"-->
-					<!--							>-->
-					<!--								{{ item.title }}-->
-					<!--							</option>-->
-					<!--						</select>-->
-					<!--					</div>-->
 					<div class="form__submit flex-justify-between">
 						<button type="submit">
 							ADD
@@ -201,6 +181,7 @@ export default {
 		fetchUser () {
 			usersService.getById(this.editUser.id).then(res => {
 				this.user = res
+				this.user.airline = res.airline[0]
 			}).catch(err => {
 				console.log(err)
 				this.$toastr.e(err)

@@ -11,6 +11,11 @@ class OtherService extends BaseApiService {
 		const url = `${baseUrl}/topevents`
 		return this.sendGetRequest(url)
 	}
+
+	flightsByMonth () {
+		const url = `${baseUrl}/flightsbymonth`
+		return this.sendGetRequest(url)
+	}
 }
 
 export const otherService = new OtherService()

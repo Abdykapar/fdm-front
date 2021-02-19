@@ -34,15 +34,15 @@
 					</div>
 					<div
 						class="form__row"
-						:class="{ error: errors.has('vin') }"
+						:class="{ error: errors.has('reg_number') }"
 					>
-						<label for="vin">Vin</label>
+						<label for="reg_number">Registration No</label>
 						<input
-							id="vin"
-							v-model="aircraft.vin"
+							id="reg_number"
+							v-model="aircraft.reg_number"
 							v-validate="'required'"
 							type="text"
-							name="vin"
+							name="reg_number"
 						>
 						<template v-if="errors.length">
 							<img

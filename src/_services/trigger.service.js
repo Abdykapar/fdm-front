@@ -2,35 +2,35 @@ import { BaseApiService } from '@/_services/baseApi.service'
 
 const baseUrl = process.env.VUE_APP_BASE_URL
 
-class UsersService extends BaseApiService {
+class TriggerService extends BaseApiService {
 	constructor () {
 		super()
 	}
 
-	getAll (role='', airline='') {
-		const url = `${baseUrl}/users/?role=${role}&airline=${airline}`
+	getAll () {
+		const url = `${baseUrl}/triggers/`
 		return this.sendGetRequest(url)
 	}
 
 	create (data) {
-		const url = `${baseUrl}/users/`
+		const url = `${baseUrl}/triggers/`
 		return this.sendPostRequest(url, data)
 	}
 
 	getById (id) {
-		const url = `${baseUrl}/users/${id}`
+		const url = `${baseUrl}/triggers/${id}`
 		return this.sendGetRequest(url)
 	}
 
 	update (data) {
-		const url = `${baseUrl}/users/${data.id}/`
+		const url = `${baseUrl}/triggers/${data.id}/`
 		return this.sendPutRequest(url, data)
 	}
 
 	delete (id) {
-		const url = `${baseUrl}/users/${id}`
+		const url = `${baseUrl}/triggers/${id}`
 		return this.sendDeleteRequest(url)
 	}
 }
 
-export const usersService = new UsersService()
+export const triggerService = new TriggerService()

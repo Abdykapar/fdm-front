@@ -5,7 +5,7 @@
 	>
 		<div
 			class="modal__content"
-			:class="{ 'delete' : type === 'delete' }"
+			:class="{ 'delete' : type === 'delete', 'auto-height' : autoHeight }"
 		>
 			<slot name="content" />
 		</div>
@@ -16,7 +16,8 @@
 export default {
 	name: 'FdmModal',
 	props: {
-		type: { type: String, default: '' }
+		type: { type: String, default: '' },
+		autoHeight: { type: Boolean, default: false },
 	},
 	data () {
 		return {
@@ -58,6 +59,10 @@ export default {
 			height: 90%;
 			max-width: 80vw;
 			overflow-y: auto;
+
+			&.auto-height {
+				height: auto;
+			}
 
 			&.delete {
 				height: auto;

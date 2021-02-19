@@ -1,7 +1,7 @@
 <template>
 	<div class="country home__body">
 		<div class="home__body__head">
-			<span>Admin</span>
+			<span>Trigger</span>
 			<button
 				class="flex-align-center"
 				@click="onCreate"
@@ -9,7 +9,7 @@
 				<img
 					src="../../assets/icons/add.svg"
 					alt=""
-				> Add new admin
+				> Add new trigger
 			</button>
 		</div>
 		<div class="home__body__main">
@@ -19,28 +19,20 @@
 						<th class="id">
 							ID
 						</th>
-						<th>Name</th>
-						<th>Surname</th>
-						<th>Username</th>
-						<th>Email</th>
-						<!--						<th>Password</th>-->
+						<th>Title</th>
 						<th />
 						<th />
 					</tr>
 				</template>
 				<template slot="body">
 					<tr
-						v-for="(item, index) in users"
+						v-for="(item, index) in triggers"
 						:key="item.id"
 					>
 						<td class="id">
 							{{ index + 1 }}
 						</td>
-						<td>{{ item.first_name }}</td>
-						<td>{{ item.last_name }}</td>
-						<td>{{ item.username }}</td>
-						<td>{{ item.email }}</td>
-						<!--						<td>{{ item.password }}</td>-->
+						<td>{{ item.title }}</td>
 						<td>
 							<img
 								class="pointer"
@@ -61,18 +53,18 @@
 				</template>
 			</fdm-table>
 		</div>
-		<admin-create
+		<trigger-create
 			v-if="isCreate"
 			:is-edit="isEdit"
-			:edit-user="user"
+			:edit-trigger="trigger"
 			@close="isCreate = false"
-			@fetch="fetchUsers"
+			@fetch="fetchTrigger"
 		/>
 
 		<modal-delete
 			v-if="isDelete"
 			@close="isDelete = false"
-			@delete="deleteUser"
+			@delete="deleteTrigger"
 		/>
 	</div>
 </template>
@@ -81,38 +73,34 @@
 import FdmTable from '../../components/FdmTable.vue'
 import ModalDelete from '../../components/ModalDelete.vue'
 import { mapActions } from 'vuex'
-import AdminCreate from '../../components/super-admin/AdminCreate'
-import { userService } from '../../_services/user.service'
-import { usersService } from '../../_services/users.service'
-import { roleService } from '../../_services/role.service'
+import TriggerCreate from '../../components/super-admin/TriggerCreate'
+import { triggerService } from '../../_services/trigger.service'
 
 export default {
-	name: 'Admin',
-	components: { AdminCreate, FdmTable, ModalDelete },
+	name: 'Trigger',
+	components: { TriggerCreate, FdmTable, ModalDelete },
 	data () {
 		return {
 			isCreate: false,
-			users: [],
-			user: {},
+			triggers: [],
+			trigger: {},
 			isEdit: false,
 			isDelete: false,
 			deleteId: 0,
 		}
 	},
 	mounted () {
-		this.fetchUsers()
+		this.fetchTrigger()
 	},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
-		async fetchUsers () {
+		fetchTrigger () {
 			this.setLoading(true)
-			const roles = await roleService.getAll()
-			const admin = roles.find(i => i.code === 'ROLE_ADMIN')
-			usersService
-				.getAll(admin.id)
+			triggerService
+				.getAll()
 				.then(res => {
-					this.users = res
 					this.setLoading(false)
+					this.triggers = res
 				})
 				.catch(err => {
 					this.setLoading(false)
@@ -126,19 +114,19 @@ export default {
 		onEdit (item) {
 			this.isCreate = true
 			this.isEdit = true
-			this.user = item
+			this.trigger = item
 		},
 		onDelete (id) {
 			this.isDelete = true
 			this.deleteId = id
 		},
-		deleteUser () {
+		deleteTrigger () {
 			this.setLoading(true)
-			usersService
+			triggerService
 				.delete(this.deleteId)
 				.then(() => {
 					this.setLoading(false)
-					this.fetchUsers()
+					this.fetchTrigger()
 					this.isDelete = false
 					this.$toastr.s(this.$t('successMessageDelete'))
 				})
