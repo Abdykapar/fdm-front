@@ -52,14 +52,14 @@
 						<td />
 					</tr>
 					<tr
-						v-for="item in files"
-						:key="item"
+						v-for="(item,k) in files"
+						:key="k"
 					>
 						<td>{{ item.file_name.join(', ') }}</td>
 						<td>Graphic Design</td>
-						<td>0777114676</td>
+						<td>{{ item.file_size }}</td>
 						<td>tr56177ytu</td>
-						<td>comments</td>
+						<td>{{ item.comment }}</td>
 						<td>
 							<button class="detail">
 								Details

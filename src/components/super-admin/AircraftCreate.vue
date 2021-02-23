@@ -54,6 +54,48 @@
 					</div>
 					<div
 						class="form__row"
+						:class="{ error: errors.has('serial_no') }"
+					>
+						<label for="serial_no">Win</label>
+						<input
+							id="serial_no"
+							v-model="aircraft.serial_no"
+							v-validate="'required'"
+							type="text"
+							name="serial_no"
+						>
+						<template v-if="errors.length">
+							<img
+								src="../../assets/icons/error.svg"
+								alt=""
+							>
+							<span>Required field</span>
+						</template>
+					</div>
+
+					<div
+						class="form__row"
+						:class="{ error: errors.has('engine') }"
+					>
+						<label for="engine">Engine</label>
+						<input
+							id="engine"
+							v-model="aircraft.engine"
+							v-validate="'required'"
+							type="text"
+							name="engine"
+						>
+						<template v-if="errors.length">
+							<img
+								src="../../assets/icons/error.svg"
+								alt=""
+							>
+							<span>Required field</span>
+						</template>
+					</div>
+
+					<div
+						class="form__row"
 						:class="{ error: errors.has('model') }"
 					>
 						<label for="model">Aircraft model</label>
@@ -76,7 +118,7 @@
 						class="form__row"
 						:class="{ error: errors.has('airline') }"
 					>
-						<label for="airline">Airline model</label>
+						<label for="airline">Airline</label>
 						<select
 							id="airline"
 							v-model="aircraft.airline"

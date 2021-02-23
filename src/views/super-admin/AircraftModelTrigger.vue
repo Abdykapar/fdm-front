@@ -36,7 +36,7 @@
 						<td class="id">
 							{{ index + 1 }}
 						</td>
-						<td>{{ item.title }}</td>
+						<td>{{ item.trigger_title }}</td>
 						<td>{{ item.low }}</td>
 						<td>{{ item.medium }}</td>
 						<td>{{ item.high }}</td>

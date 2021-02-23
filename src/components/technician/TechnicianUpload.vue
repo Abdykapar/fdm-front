@@ -16,7 +16,7 @@
 						class="form__row"
 						:class="{ error: errors.has('aircraft') }"
 					>
-						<label for="aircraft">Aircraft</label>
+						<label for="aircraft">Registration No</label>
 						<select
 							id="aircraft"
 							v-model="file.aircraft"
@@ -28,27 +28,7 @@
 								:key="aircraft.id"
 								:value="aircraft.id"
 							>
-								{{ aircraft.title }}
-							</option>
-						</select>
-					</div>
-					<div
-						class="form__row"
-						:class="{ error: errors.has('route') }"
-					>
-						<label for="route">Route</label>
-						<select
-							id="route"
-							v-model="file.route"
-							v-validate="'required'"
-							name="route"
-						>
-							<option
-								v-for="route in routes"
-								:key="route.id"
-								:value="route.id"
-							>
-								{{ route.from_airport_title + ' - ' + route.to_airport_title }} ({{ route.airline_title }})
+								{{ aircraft.reg_number }}
 							</option>
 						</select>
 					</div>

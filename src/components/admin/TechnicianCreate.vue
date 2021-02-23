@@ -180,7 +180,7 @@ export default {
 		onSubmit () {
 			this.$validator.validate().then(valid => {
 				if (valid) {
-					this.user.airline = this.userProfile.user.user_airline[0]
+					this.user.airline = this.userProfile.user.airline[0]
 					if (this.isEdit) {
 						usersService
 							.update(this.user)

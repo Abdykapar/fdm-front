@@ -14,6 +14,15 @@
 				placeholder="Search here"
 			>
 		</div>
+		<div class="header__date-picker">
+			<FunctionalCalendar
+				v-model="calendarData"
+				:is-dark="true"
+				:is-modal="true"
+				:is-date-range="true"
+				@selectedDaysCount="onClose"
+			/>
+		</div>
 		<div class="header__right">
 			<div
 				v-if="isNotif"
@@ -118,7 +127,8 @@ export default {
 		return {
 			isNotif: false,
 			isShowProfile: false,
-			isProfile: false
+			isProfile: false,
+			calendarData: {}
 		}
 	},
 	computed: {
@@ -146,6 +156,9 @@ export default {
 				this.isShowProfile = false
 			}
 		},
+		onClose (val) {
+			console.log(this.calendarData)
+		}
 	}
 }
 </script>

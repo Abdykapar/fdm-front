@@ -75,15 +75,15 @@
 
 					<div
 						class="form__row"
-						:class="{ error: errors.has('high') }"
+						:class="{ error: errors.has('medium') }"
 					>
-						<label for="high">High</label>
+						<label for="medium">Medium</label>
 						<input
-							id="high"
-							v-model="aircraftModelTrigger.high"
+							id="medium"
+							v-model="aircraftModelTrigger.medium"
 							v-validate="'required'"
 							type="text"
-							name="high"
+							name="medium"
 						>
 						<template v-if="errors.length">
 							<img
@@ -96,15 +96,15 @@
 
 					<div
 						class="form__row"
-						:class="{ error: errors.has('medium') }"
+						:class="{ error: errors.has('high') }"
 					>
-						<label for="medium">Medium</label>
+						<label for="high">High</label>
 						<input
-							id="medium"
-							v-model="aircraftModelTrigger.medium"
+							id="high"
+							v-model="aircraftModelTrigger.high"
 							v-validate="'required'"
 							type="text"
-							name="medium"
+							name="high"
 						>
 						<template v-if="errors.length">
 							<img

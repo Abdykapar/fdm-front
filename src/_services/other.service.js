@@ -7,13 +7,33 @@ class OtherService extends BaseApiService {
 		super()
 	}
 
-	topEvents () {
-		const url = `${baseUrl}/topevents`
+	topEvents (aircraft='', start_date='', end_date='') {
+		const query = this.queryFilter(
+			{ title: 'aircraft', value: aircraft },
+			{ title: 'start_date', value: start_date },
+			{ title: 'end_date', value: end_date }
+		)
+		const url = `${baseUrl}/topevents${query}`
 		return this.sendGetRequest(url)
 	}
 
-	flightsByMonth () {
-		const url = `${baseUrl}/flightsbymonth`
+	flightsByMonth (aircraft='', start_date='', end_date='') {
+		const query = this.queryFilter(
+			{ title: 'aircraft', value: aircraft },
+			{ title: 'start_date', value: start_date },
+			{ title: 'end_date', value: end_date }
+		)
+		const url = `${baseUrl}/flightsbymonth${query}`
+		return this.sendGetRequest(url)
+	}
+
+	averageStats (aircraft='', start_date='', end_date='') {
+		const query = this.queryFilter(
+			{ title: 'aircraft', value: aircraft },
+			{ title: 'start_date', value: start_date },
+			{ title: 'end_date', value: end_date }
+		)
+		const url = `${baseUrl}/averagestats${query}`
 		return this.sendGetRequest(url)
 	}
 }

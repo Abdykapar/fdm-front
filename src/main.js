@@ -7,7 +7,11 @@ import VeeValidate from 'vee-validate'
 import '@/assets/style/main.scss'
 import VueToastr from 'vue-toastr'
 import i18n from './i18n'
+import FunctionalCalendar from 'vue-functional-calendar'
 
+Vue.use(FunctionalCalendar, {
+	dayNames: [ 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su' ]
+})
 Vue.use(VeeValidate)
 Vue.use(VueToastr, {
 	defaultTimeout: 3000,

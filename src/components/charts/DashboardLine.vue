@@ -94,12 +94,23 @@ export default {
 			},
 		}
 	},
+	computed: {
+		currentAircraft () {
+			return this.$store.getters['aircraft/currentAircraft']
+		}
+	},
+	watch: {
+		currentAircraft (value) {
+			if (value.id !== 'all') this.fetchData(value.id)
+			else this.fetchData('')
+		}
+	},
 	mounted () {
 		this.fetchData()
 	},
 	methods: {
-		fetchData () {
-			otherService.flightsByMonth().then(res => {
+		fetchData (aircraft) {
+			otherService.flightsByMonth(aircraft).then(res => {
 				this.chartOptions.xaxis.categories = res.map(i => i.month)
 				this.series[0].data = res.map(i => i.events)
 				this.series[1].data = res.map(i => i.flights)

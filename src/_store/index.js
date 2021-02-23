@@ -4,6 +4,7 @@ import { account } from '@/_store/account.module'
 import { loader } from './loader.module'
 import { alert } from './alert.module'
 import { sidebars } from './navbar.module'
+import { aircraft } from './aircraft.module'
 
 Vue.use(Vuex)
 
@@ -18,6 +19,7 @@ export default new Vuex.Store({
 		account,
 		loader,
 		alert,
-		sidebars
+		sidebars,
+		aircraft
 	}
 })

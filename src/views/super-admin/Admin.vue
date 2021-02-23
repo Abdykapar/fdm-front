@@ -23,6 +23,7 @@
 						<th>Surname</th>
 						<th>Username</th>
 						<th>Email</th>
+						<th>Airline</th>
 						<!--						<th>Password</th>-->
 						<th />
 						<th />
@@ -40,6 +41,7 @@
 						<td>{{ item.last_name }}</td>
 						<td>{{ item.username }}</td>
 						<td>{{ item.email }}</td>
+						<td>{{ item.user_airline.join('') }}</td>
 						<!--						<td>{{ item.password }}</td>-->
 						<td>
 							<img

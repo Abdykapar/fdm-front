@@ -1,6 +1,5 @@
 <template>
 	<div class="main">
-		<header />
 		<div class="main__left">
 			<div class="main__top">
 				<div class="main__left__event">
@@ -11,103 +10,7 @@
 						<polar-area />
 					</div>
 				</div>
-				<div class="main__left__speedometer">
-					<div>
-						<div class="speedometer__item">
-							<div class="speedometer__flight flex-center">
-								<div class="speedometer__content">
-									<div class="speedometer__date">
-										Per Month
-									</div>
-									<div class="speedometer__count">
-										1246
-									</div>
-									<div class="speedometer__title">
-										Flights
-									</div>
-								</div>
-								<speedometer />
-								<canvas
-									id="arc"
-									class="arc"
-									width="150"
-									height="150"
-								/>
-							</div>
-						</div>
-						<div class="speedometer__item">
-							<div class="speedometer__flight flex-center">
-								<div class="speedometer__content">
-									<div class="speedometer__date">
-										Per 100 Flts
-									</div>
-									<div class="speedometer__count">
-										350
-									</div>
-									<div class="speedometer__title">
-										Events
-									</div>
-								</div>
-								<speedometer />
-								<canvas
-									id="per_event"
-									class="arc event"
-									width="150"
-									height="150"
-								/>
-							</div>
-						</div>
-					</div>
-					<div>
-						<div class="speedometer__item">
-							<div class="speedometer__flight flex-center">
-								<div class="speedometer__content">
-									<div class="speedometer__date">
-										Per Month
-									</div>
-									<div class="speedometer__count">
-										3234
-									</div>
-									<div class="speedometer__title">
-										Events
-									</div>
-								</div>
-								<speedometer color="#E73030" />
-								<canvas
-									id="event"
-									class="arc event"
-									width="150"
-									height="150"
-								/>
-							</div>
-						</div>
-						<div class="speedometer__item">
-							<div class="speedometer__flight flex-center">
-								<div class="speedometer__content">
-									<div class="speedometer__date">
-										Per Flight
-									</div>
-									<div class="speedometer__count">
-										380
-									</div>
-									<div class="speedometer__title">
-										Events
-									</div>
-									<!--									<div class="speedometer__sub-title">-->
-									<!--										Per Aircraft tp-->
-									<!--									</div>-->
-								</div>
-								<speedometer />
-								<canvas
-									id="per_aircraft"
-									class="arc event"
-									width="150"
-									height="150"
-								/>
-							</div>
-						</div>
-					</div>
-				</div>
+				<dashboard-speedometer />
 				<div class="main__left__aircraft">
 					<img
 						:src="selectedAircraft.mainImage"
@@ -135,9 +38,23 @@
 			</div>
 		</div>
 		<div class="main__right">
+			<div class="aircraft">
+				<div class="aircraft__title">
+					All Aircrafts
+				</div>
+				<div
+					class="aircraft__img"
+					@click="onAircraft(aircrafts[0])"
+				>
+					<component
+						:is="aircrafts[0].component"
+						:active="selectedAircraft.id === 'all'"
+					/>
+				</div>
+			</div>
 			<div
-				v-for="item in aircrafts"
-				:key="item.id"
+				v-for="(item, i) in aircraftData"
+				:key="i"
 				class="aircraft"
 			>
 				<div class="aircraft__title">
@@ -167,15 +84,18 @@ import AircraftFour from '../../components/AircraftFour'
 import PolarArea from '../../components/charts/PolarArea'
 import DashboardBar from '../../components/charts/DashboardBar'
 import DashboardLine from '../../components/charts/DashboardLine'
+import DashboardSpeedometer from '../../components/charts/DashboardSpeedometer'
+import { aircraftService } from '../../_services/aircraft.service'
+import { mapActions } from 'vuex'
 export default {
-	components: { DashboardLine, DashboardBar, PolarArea, AircraftFour, AircraftThree, AircraftTwo, AircraftOne, Speedometer, Header },
+	components: { DashboardSpeedometer, DashboardLine, DashboardBar, PolarArea, AircraftFour, AircraftThree, AircraftTwo, AircraftOne, Speedometer, Header },
 	data () {
 		return {
 			aircrafts: [
 				{
 					title: 'All Aircrafts',
 					component: 'AircraftOne',
-					id: 1,
+					id: 'all',
 					mainImage: require('../../assets/img/aircraft.png')
 				},
 				{
@@ -197,30 +117,38 @@ export default {
 					mainImage: require('../../assets/img/aircraft-4.svg')
 				}
 			],
+			aircraftData: [],
 			selectedAircraft: {}
 		}
 	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
 	mounted () {
-		this.draw('#arc','#FFD630', Math.PI)
-		this.draw('#per_event','#298BFE', 1.2 * Math.PI)
-		this.draw('#event','#E73030', 0.8 * Math.PI)
-		this.draw('#per_aircraft','#66C8D4', 0.95 * Math.PI)
+		this.fetchAircraft()
 		this.selectedAircraft = this.aircrafts[0]
 	},
 	methods: {
-		draw (doc, color, angle) {
-			const canvas = document.querySelector(doc)
-			const ctx = canvas.getContext('2d')
-
-			ctx.strokeStyle = color
-			ctx.lineWidth = 4
-			ctx.beginPath()
-			ctx.arc(100, 75, 62, 0.72 * Math.PI, angle, false)
-			ctx.stroke()
-			ctx.beginPath()
+		...mapActions('aircraft', [ 'setAircraft' ]),
+		fetchAircraft () {
+			aircraftService.getAll(this.userProfile.user.airline[0]).then(res => {
+				this.aircraftData = res.map((i, index) => {
+					const item = this.aircrafts[(index + 1) % 4]
+					return {
+						...i,
+						component: item.component,
+						mainImage: item.mainImage
+					}
+				})
+			}).catch(err => {
+				console.log(err)
+			})
 		},
 		onAircraft (item) {
 			this.selectedAircraft = item
+			this.setAircraft(item)
 		}
 	}
 }
@@ -246,23 +174,6 @@ export default {
 
 				&__title {
 					padding: 22px 0 0 20px;
-				}
-			}
-
-			&__speedometer {
-				display: flex;
-				gap: 20px;
-
-				> div {
-					.speedometer__item {
-						background: rgba(255, 255, 255, 0.02);
-						border-radius: 8.40864px;
-						padding: 20px 10px;
-
-						&:last-child {
-							margin-top: 37px;
-						}
-					}
 				}
 			}
 
@@ -311,47 +222,9 @@ export default {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			justify-content: space-around;
 			overflow-y: auto;
-		}
-	}
-
-	.speedometer {
-		&__flight {
-			position: relative;
-			.arc {
-				position: absolute;
-				top: -11px;
-				left: -36px;
-			}
-		}
-
-		&__date {
-			font-size: 12px;
-			line-height: 100%;
-			margin-top: 10px;
-		}
-
-		&__title {
-			font-size: 18px;
-			line-height: 100%;
-		}
-
-		&__count {
-			font-size: 27px;
-			line-height: 100%;
-			margin: 10px 0;
-		}
-
-		&__content {
-			position: absolute;
-			text-align: center;
-		}
-
-		&__sub-title {
-			margin-bottom: -15px;
-			padding-top: 12px;
-			font-size: 11px;
+			padding-top: 30px;
+			gap: 15px;
 		}
 	}
 

@@ -153,7 +153,7 @@ export default {
 		},
 		onSubmit () {
 			this.$validator.validate().then(valid => {
-				if (valid && this.permissionIds.length && this.permissionIds.length) {
+				if (valid && this.sidebarIds.length && this.sidebarIds.length) {
 					if (this.isEdit) {
 						roleService
 							.update(this.role)

@@ -1,20 +1,20 @@
 module.exports = {
-  lintOnSave: true,
+	lintOnSave: true,
 
-  css: {
-      loaderOptions: {
-        sass: {
-          prependData: `@import "@/assets/style/_variables.scss";`
-        }
-      }
-    },
+	css: {
+		loaderOptions: {
+			sass: {
+				additionalData: `@import "@/assets/style/_variables.scss";`
+			}
+		}
+	},
 
-  pluginOptions: {
-    i18n: {
-      locale: 'en',
-      fallbackLocale: 'en',
-      localeDir: 'locales',
-      enableInSFC: false
-    }
-  }
+	pluginOptions: {
+		i18n: {
+			locale: 'en',
+			fallbackLocale: 'en',
+			localeDir: 'locales',
+			enableInSFC: false
+		}
+	}
 }
