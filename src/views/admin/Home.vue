@@ -129,6 +129,7 @@ export default {
 	mounted () {
 		this.fetchAircraft()
 		this.selectedAircraft = this.aircrafts[0]
+		this.setAircraft(this.selectedAircraft)
 	},
 	methods: {
 		...mapActions('aircraft', [ 'setAircraft' ]),

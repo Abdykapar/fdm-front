@@ -5,6 +5,7 @@ import { loader } from './loader.module'
 import { alert } from './alert.module'
 import { sidebars } from './navbar.module'
 import { aircraft } from './aircraft.module'
+import { other } from './other.module'
 
 Vue.use(Vuex)
 
@@ -20,6 +21,7 @@ export default new Vuex.Store({
 		loader,
 		alert,
 		sidebars,
-		aircraft
+		aircraft,
+		other
 	}
 })

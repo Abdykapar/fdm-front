@@ -83,14 +83,34 @@ export default {
 			}
 		}
 	},
+	computed: {
+		currentAircraft () {
+			return this.$store.getters['aircraft/currentAircraft']
+		},
+		calendar () {
+			return this.$store.getters['other/calendar']
+		}
+	},
+	watch: {
+		currentAircraft (value) {
+			this.isShow = false
+			if (value.id !== 'all') this.fetchData(value.id, this.calendar.start, this.calendar.end)
+			else this.fetchData('', this.calendar.start, this.calendar.end)
+		},
+		calendar (value) {
+			this.isShow = false
+			const aircraft = this.currentAircraft.id === 'all' ? '' : this.currentAircraft.id
+			this.fetchData(aircraft, value.start, value.end)
+		}
+	},
 	mounted () {
 		this.fetchData()
 	},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
-		fetchData () {
+		fetchData (aircraft = '', start = '', end = '') {
 			this.setLoading(true)
-			otherService.topEvents().then(res => {
+			otherService.topEvents(aircraft, start, end).then(res => {
 				this.chartOptions.xaxis.categories = res.map(i => i.title)
 				this.series[0].data = res.map(i => i.low)
 				this.series[1].data = res.map(i => i.medium)

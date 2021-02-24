@@ -14,7 +14,10 @@
 				placeholder="Search here"
 			>
 		</div>
-		<div class="header__date-picker">
+		<div
+			v-if="isDashboard"
+			class="header__date-picker"
+		>
 			<FunctionalCalendar
 				v-model="calendarData"
 				:is-dark="true"
@@ -120,6 +123,8 @@
 <script>
 import Notifications from './Notifications'
 import Profile from './Profile'
+import { mapActions } from 'vuex'
+import moment from 'moment'
 export default {
 	name: 'Header',
 	components: { Profile, Notifications },
@@ -135,6 +140,9 @@ export default {
 		isTechnician () {
 			return this.$route.path === '/technician'
 		},
+		isDashboard () {
+			return this.$route.path === '/dashboard'
+		},
 		userProfile () {
 			return this.$store.state.account.user
 		}
@@ -146,6 +154,7 @@ export default {
 		document.removeEventListener('click', this.onOutsideClick)
 	},
 	methods: {
+		...mapActions('other', [ 'setCalendar' ]),
 		onShowAlert () {
 			this.isNotif = !this.isNotif
 		},
@@ -156,8 +165,11 @@ export default {
 				this.isShowProfile = false
 			}
 		},
-		onClose (val) {
-			console.log(this.calendarData)
+		onClose () {
+			this.setCalendar({
+				start: moment(this.calendarData.dateRange.start, 'DD/MM/YYYY').format('YYYY-MM-DD'),
+				end: moment(this.calendarData.dateRange.end, 'DD/MM/YYYY').format('YYYY-MM-DD')
+			})
 		}
 	}
 }

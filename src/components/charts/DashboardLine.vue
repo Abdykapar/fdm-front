@@ -97,20 +97,29 @@ export default {
 	computed: {
 		currentAircraft () {
 			return this.$store.getters['aircraft/currentAircraft']
+		},
+		calendar () {
+			return this.$store.getters['other/calendar']
 		}
 	},
 	watch: {
 		currentAircraft (value) {
-			if (value.id !== 'all') this.fetchData(value.id)
-			else this.fetchData('')
+			this.isShow = false
+			if (value.id !== 'all') this.fetchData(value.id, this.calendar.start, this.calendar.end)
+			else this.fetchData('', this.calendar.start, this.calendar.end)
+		},
+		calendar (value) {
+			this.isShow = false
+			const aircraft = this.currentAircraft.id === 'all' ? '' : this.currentAircraft.id
+			this.fetchData(aircraft, value.start, value.end)
 		}
 	},
 	mounted () {
 		this.fetchData()
 	},
 	methods: {
-		fetchData (aircraft) {
-			otherService.flightsByMonth(aircraft).then(res => {
+		fetchData (aircraft = '', start = '', end = '') {
+			otherService.flightsByMonth(aircraft, start, end).then(res => {
 				this.chartOptions.xaxis.categories = res.map(i => i.month)
 				this.series[0].data = res.map(i => i.events)
 				this.series[1].data = res.map(i => i.flights)
