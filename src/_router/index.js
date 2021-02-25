@@ -26,9 +26,9 @@ const routes = [
 				component: () => import('@/views/admin/Technician.vue')
 			},
 			{
-				path: '/data-list',
+				path: '/data-insight',
 				name: 'AdminDataList',
-				component: () => import('@/views/technician/DataList.vue')
+				component: () => import('@/views/admin/DataInsight.vue')
 			},
 			{
 				path: '/upload',

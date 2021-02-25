@@ -73,7 +73,7 @@
 					</tr>
 					<tr
 						v-for="item in files"
-						:key="item"
+						:key="item.file_name"
 					>
 						<td>{{ item.file_name.join(', ') }}</td>
 						<td>Graphic Design</td>

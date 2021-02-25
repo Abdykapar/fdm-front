@@ -70,6 +70,9 @@ export default {
 					text-align: center;
 					padding-left: 0;
 				}
+				&.center {
+					text-align: center;
+				}
 			}
 		}
 	}
