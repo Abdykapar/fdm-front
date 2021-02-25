@@ -8,9 +8,15 @@
 				<template slot="head">
 					<tr>
 						<th>File Name</th>
-						<th>Upload Date</th>
-						<th>File Size (MB)</th>
-						<th>Data Quality (%)</th>
+						<th class="pl20">
+							Upload Date
+						</th>
+						<th class="pl20">
+							File Size (MB)
+						</th>
+						<th class="pl20">
+							Data Quality (%)
+						</th>
 						<th>Comments</th>
 						<th />
 					</tr>
@@ -55,10 +61,16 @@
 						v-for="(item,k) in files"
 						:key="k"
 					>
-						<td>{{ item.file_name.join(', ') }}</td>
-						<td>Graphic Design</td>
-						<td>{{ item.file_size }}</td>
-						<td>tr56177ytu</td>
+						<td>{{ item.file_name }}</td>
+						<td class="pl20">
+							{{ item.date }}
+						</td>
+						<td class="pl20">
+							{{ item.file_size }}
+						</td>
+						<td class="pl20">
+							tr56177ytu
+						</td>
 						<td>{{ item.comment }}</td>
 						<td>
 							<button class="detail">
@@ -95,6 +107,7 @@ import FmdTable from '../../components/FdmTable'
 import TechnicianUpload from '../../components/technician/TechnicianUpload'
 import { fileService } from '../../_services/file.service'
 import { mapActions } from 'vuex'
+import moment from 'moment'
 export default {
 	name: 'Upload',
 	components: { TechnicianUpload, FmdTable },
@@ -115,7 +128,7 @@ export default {
 		fetchFiles () {
 			this.setLoading(true)
 			fileService.getAll().then(res => {
-				this.files = res
+				this.files = res.map(i => ({ ...i, date: moment(i.created_at).format('DD.MM.YYYY') }))
 				this.setLoading(false)
 			}).catch(err => {
 				this.setLoading(false)

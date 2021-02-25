@@ -48,6 +48,9 @@ export default {
 					width: 50px;
 					padding-left: 0;
 				}
+				&.pl20 {
+					padding-left: 20px;
+				}
 			}
 
 			td {
@@ -72,6 +75,9 @@ export default {
 				}
 				&.center {
 					text-align: center;
+				}
+				&.pl20 {
+					padding-left: 20px;
 				}
 			}
 		}
