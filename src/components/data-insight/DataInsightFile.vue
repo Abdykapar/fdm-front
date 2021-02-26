@@ -74,6 +74,7 @@
 		<data-insight-detail
 			v-if="isShowDetail"
 			:file-id="file.id"
+			:aircraft-id="file.aircraft"
 			:flight-id="file.flight"
 			@close="isShowDetail = false"
 		/>
