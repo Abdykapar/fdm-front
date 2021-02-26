@@ -14,20 +14,42 @@
 				<div class="detail__head__buttons">
 					<button
 						:class="{'active' : menu === 1}"
-						@click="menu = 1"
+						@click="onMenuChange(1)"
 					>
 						AIRCRAFT
 					</button>
 					<button
 						:class="{'active' : menu === 2}"
-						@click="menu = 2"
+						@click="onMenuChange(2)"
 					>
 						FILE
 					</button>
+					<button
+						:class="{'active' : menu === 3}"
+						@click="onMenuChange(3)"
+					>
+						FLIGHT
+					</button>
+					<button
+						:class="{'active' : menu === 4}"
+						@click="onMenuChange(4)"
+					>
+						EVENT
+					</button>
 				</div>
 			</div>
-			<data-insight-aircraft-detail v-if="menu === 1" />
-			<data-insight-file-detail v-if="menu === 2" />
+			<data-insight-aircraft-detail
+				v-if="menu === 1"
+				:aircraft="aircraft"
+			/>
+			<data-insight-file-detail
+				v-if="menu === 2"
+				:file="file"
+			/>
+			<data-insight-event-detail
+				v-if="menu === 4"
+				:event="event"
+			/>
 		</div>
 	</fdm-modal>
 </template>
@@ -36,16 +58,87 @@
 import FdmModal from '../FdmModal'
 import DataInsightAircraftDetail from './DataInsightAircraftDetail'
 import DataInsightFileDetail from './DataInsightFileDetail'
+import { aircraftService } from '../../_services/aircraft.service'
+import { flightService } from '../../_services/flight.service'
+import { eventService } from '../../_services/event.service'
+import { fileService } from '../../_services/file.service'
+import DataInsightEventDetail from './DataInsightEventDetail'
 export default {
 	name: 'DataInsightDetail',
-	components: { DataInsightFileDetail, DataInsightAircraftDetail, FdmModal },
+	components: { DataInsightEventDetail, DataInsightFileDetail, DataInsightAircraftDetail, FdmModal },
 	props: {
-		file: { type: Object, default: () => ({}) }
+		fileId: { type: Number, default: 0 },
+		flightId: { type: Number, default: 0 },
+		eventId: { type: Number, default: 0 },
+		aircraftId: { type: Number, default: 0 },
 	},
 	data () {
 		return {
-			menu: 1
+			menu: 1,
+			aircraft: {},
+			flight: {},
+			file: {},
+			event: {}
 		}
+	},
+	mounted () {
+		this.fetchAircraft(this.aircraftId)
+	},
+	methods: {
+		onMenuChange (id) {
+			this.menu = id
+			this.switchMenu(id)
+		},
+		switchMenu (id) {
+			switch (id) {
+			case 1:
+				this.fetchAircraft()
+				break
+			case 2:
+				this.fetchFile()
+				break
+			case 3:
+				this.fetchFlight()
+				break
+			case 4:
+				this.fetchEvent()
+				break
+			}
+		},
+		fetchAircraft () {
+			if (!this.aircraftId) return
+			aircraftService.getById(this.aircraftId).then(res => {
+				this.aircraft = res
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		fetchFlight () {
+			if (!this.flightId) return
+			flightService.getById(this.flightId).then(res => {
+				this.flight = res
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		fetchEvent () {
+			if (!this.eventId) return
+			eventService.getById(this.eventId).then(res => {
+				this.event = res
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+
+		fetchFile () {
+			if (!this.fileId) return
+			fileService.getById(this.fileId).then(res => {
+				this.file = res
+			}).catch(err => {
+				console.log(err)
+			})
+		}
+
 	}
 }
 </script>
@@ -76,6 +169,10 @@ export default {
 
 					&.active {
 						background: rgba(#298BFE, 0.4);
+					}
+
+					&:disabled {
+						opacity: 0.5;
 					}
 				}
 			}

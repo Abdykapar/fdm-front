@@ -118,6 +118,10 @@ body {
 .form {
 	&__row {
 		margin-bottom: 22px;
+
+		&.no-margin {
+			margin: 0;
+		}
 		label,
 		span {
 			font-size: 13px;

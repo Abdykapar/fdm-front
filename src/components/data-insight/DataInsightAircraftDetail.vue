@@ -2,10 +2,10 @@
 	<div class="detail__body">
 		<div class="detail__item">
 			<div class="detail__item__title">
-				Flight Number
+				Registration Number
 			</div>
 			<div class="detail__item__content">
-				EX-389437
+				{{ aircraft.reg_number }}
 			</div>
 		</div>
 		<div class="detail__item">
@@ -13,7 +13,7 @@
 				Type
 			</div>
 			<div class="detail__item__content">
-				BAFDFWF
+				{{ aircraft.title }}
 			</div>
 		</div>
 		<div class="detail__item">
@@ -21,24 +21,30 @@
 				Serial No
 			</div>
 			<div class="detail__item__content">
-				2342424
+				{{ aircraft.serial_no }}
 			</div>
 		</div>
 		<div class="detail__item">
 			<div class="detail__item__title">
-				Recorded part no.
+				Engine
 			</div>
 			<div class="detail__item__content">
-				EX-389437
+				{{ aircraft.engine }}
 			</div>
 		</div>
 		<div class="detail__item">
 			<div class="detail__item__title">
-				Recorded Serial
+				Recorder part no.
 			</div>
 			<div class="detail__item__content">
-				EX-389437
+				{{ aircraft.recorded_part_no }}
 			</div>
+		</div>
+		<div class="detail__item">
+			<div class="detail__item__title">
+				Recorder Serial no.
+			</div>
+			<div class="detail__item__content" />
 		</div>
 	</div>
 </template>
@@ -47,7 +53,7 @@
 export default {
 	name: 'DataInsightAircraftDetail',
 	props: {
-		file: { type: Object, default: () => ({}) }
+		aircraft: { type: Object, default: () => ({}) }
 	}
 }
 </script>

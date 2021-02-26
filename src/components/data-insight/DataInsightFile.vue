@@ -73,7 +73,8 @@
 		</fmd-table>
 		<data-insight-detail
 			v-if="isShowDetail"
-			:file="file"
+			:file-id="file.id"
+			:flight-id="file.flight"
 			@close="isShowDetail = false"
 		/>
 	</div>
@@ -110,8 +111,8 @@ export default {
 			})
 		},
 		onDetail (item ){
-			this.isShowDetail = true
 			this.file = item
+			this.isShowDetail = true
 		}
 	}
 }

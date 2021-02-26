@@ -1,31 +1,91 @@
 <template>
 	<div>
 		<div class="title">
-			File Name
+			{{ event.event_name }}
 		</div>
 		<div class="detail__body">
 			<div class="detail__item">
 				<div class="detail__item__title">
-					Updated Date
+					REVIEWED
 				</div>
 				<div class="detail__item__content">
-					BAFDFWF
+					{{ event.is_reviewed }}
+				</div>
+			</div>
+			<div class="form__row no-margin">
+				<label for="model">STATUS</label>
+				<select
+					id="model"
+					name="model"
+				>
+					<option
+						v-for="item in status"
+						:key="item"
+						:value="item"
+					>
+						{{ item }}
+					</option>
+				</select>
+			</div>
+			<div class="form__row no-margin">
+				<label for="severity">SEVERITY</label>
+				<select
+					id="severity"
+					name="severity"
+				>
+					<option
+						v-for="item in severities"
+						:key="item"
+						:value="item"
+					>
+						{{ item }}
+					</option>
+				</select>
+			</div>
+			<div class="detail__item">
+				<div class="detail__item__title">
+					START
+				</div>
+				<div class="detail__item__content">
+					12.01.2021 10:20
 				</div>
 			</div>
 			<div class="detail__item">
 				<div class="detail__item__title">
-					File Size
+					END
 				</div>
 				<div class="detail__item__content">
-					2342424
+					12.01.2021 12:20
 				</div>
 			</div>
 			<div class="detail__item">
 				<div class="detail__item__title">
-					DATA QUALITY
+					DURATION
 				</div>
 				<div class="detail__item__content">
-					98.89%
+					{{ event.duration }}
+				</div>
+			</div>
+			<div class="detail__item">
+				<div class="detail__item__title">
+					LIMIT
+				</div>
+				<div class="detail__item__content" />
+			</div>
+			<div class="detail__item">
+				<div class="detail__item__title">
+					VALUE
+				</div>
+				<div class="detail__item__content">
+					{{ event.value }}
+				</div>
+			</div>
+			<div class="detail__item">
+				<div class="detail__item__title">
+					FLIGHT PHASE
+				</div>
+				<div class="detail__item__content">
+					LIFTOFF
 				</div>
 			</div>
 		</div>
@@ -36,10 +96,16 @@
 <script>
 import DataInsightComment from './DataInsightComment'
 export default {
-	name: 'DataInsightFileDetail',
+	name: 'DataInsightEventDetail',
 	components: { DataInsightComment },
 	props: {
-		file: { type: Object, default: () => ({}) }
+		event: { type: Object, default: () => ({}) }
+	},
+	data () {
+		return {
+			status: [ 'Under Review', 'Valid', 'False', 'Nuisance', 'Auto Valid' ],
+			severities: [ 'None', 'Low', 'Medium', 'High' ]
+		}
 	}
 }
 </script>
@@ -88,7 +154,7 @@ export default {
 			margin-top: 30px;
 		}
 		&__item {
-			flex: 200px;
+			flex: 0 30%;
 			&__title {
 				font-size: 13px;
 				line-height: 19px;
