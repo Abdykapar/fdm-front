@@ -1,42 +1,51 @@
 <template>
-	<div>
-		<div class="detail__body">
-			<div class="detail__item">
-				<div class="detail__item__title">
-					Flight Number
-				</div>
-				<div class="detail__item__content">
-					EX-389437
+	<fdm-modal @close="$emit('close')">
+		<div
+			slot="content"
+			class="detail-content"
+		>
+			<img
+				src="../../assets/icons/close.svg"
+				class="detail__close"
+				alt=""
+				@click="$emit('close')"
+			>
+			<div class="detail__head">
+				<div class="detail__head__buttons">
+					<button
+						:class="{'active' : menu === 1}"
+						@click="menu = 1"
+					>
+						AIRCRAFT
+					</button>
+					<button
+						:class="{'active' : menu === 2}"
+						@click="menu = 2"
+					>
+						FILE
+					</button>
 				</div>
 			</div>
-			<div class="detail__item">
-				<div class="detail__item__title">
-					Type
-				</div>
-				<div class="detail__item__content">
-					BAFDFWF
-				</div>
-			</div>
-			<div class="detail__item">
-				<div class="detail__item__title">
-					Serial No
-				</div>
-				<div class="detail__item__content">
-					2342424
-				</div>
-			</div>
+			<data-insight-aircraft-detail v-if="menu === 1" />
+			<data-insight-file-detail v-if="menu === 2" />
 		</div>
-		<data-insight-comment />
-	</div>
+	</fdm-modal>
 </template>
 
 <script>
-import DataInsightComment from './DataInsightComment'
+import FdmModal from '../FdmModal'
+import DataInsightAircraftDetail from './DataInsightAircraftDetail'
+import DataInsightFileDetail from './DataInsightFileDetail'
 export default {
-	name: 'DataInsightFileDetail',
-	components: { DataInsightComment },
+	name: 'DataInsightDetail',
+	components: { DataInsightFileDetail, DataInsightAircraftDetail, FdmModal },
 	props: {
 		file: { type: Object, default: () => ({}) }
+	},
+	data () {
+		return {
+			menu: 1
+		}
 	}
 }
 </script>
@@ -79,7 +88,7 @@ export default {
 			margin-top: 60px;
 		}
 		&__item {
-			flex: 200px;
+			flex: 250px;
 			&__title {
 				font-size: 13px;
 				line-height: 19px;

@@ -63,7 +63,7 @@
 					<td>
 						<button
 							class="detail"
-							@click="isShowDetail = true"
+							@click="onDetail(item)"
 						>
 							Details
 						</button>
@@ -71,8 +71,9 @@
 				</tr>
 			</template>
 		</fmd-table>
-		<data-insight-file-detail
+		<data-insight-detail
 			v-if="isShowDetail"
+			:file="file"
 			@close="isShowDetail = false"
 		/>
 	</div>
@@ -82,14 +83,15 @@
 import FmdTable from '../FdmTable'
 import { fileService } from '../../_services/file.service'
 import { mapActions } from 'vuex'
-import DataInsightFileDetail from './DataInsightFileDetail'
+import DataInsightDetail from './DataInsightDetail'
 export default {
 	name: 'DataInsightFile',
-	components: { DataInsightFileDetail, FmdTable },
+	components: { DataInsightDetail, FmdTable },
 	data () {
 		return {
 			files: [],
-			isShowDetail: false
+			isShowDetail: false,
+			file: {}
 		}
 	},
 	mounted () {
@@ -106,6 +108,10 @@ export default {
 				this.setLoading(false)
 				console.log(err)
 			})
+		},
+		onDetail (item ){
+			this.isShowDetail = true
+			this.file = item
 		}
 	}
 }

@@ -1,40 +1,51 @@
 <template>
-	<div>
-		<div class="detail__body">
-			<div class="detail__item">
-				<div class="detail__item__title">
-					Flight Number
-				</div>
-				<div class="detail__item__content">
-					EX-389437
-				</div>
+	<div class="detail__body">
+		<div class="detail__item">
+			<div class="detail__item__title">
+				Flight Number
 			</div>
-			<div class="detail__item">
-				<div class="detail__item__title">
-					Type
-				</div>
-				<div class="detail__item__content">
-					BAFDFWF
-				</div>
-			</div>
-			<div class="detail__item">
-				<div class="detail__item__title">
-					Serial No
-				</div>
-				<div class="detail__item__content">
-					2342424
-				</div>
+			<div class="detail__item__content">
+				EX-389437
 			</div>
 		</div>
-		<data-insight-comment />
+		<div class="detail__item">
+			<div class="detail__item__title">
+				Type
+			</div>
+			<div class="detail__item__content">
+				BAFDFWF
+			</div>
+		</div>
+		<div class="detail__item">
+			<div class="detail__item__title">
+				Serial No
+			</div>
+			<div class="detail__item__content">
+				2342424
+			</div>
+		</div>
+		<div class="detail__item">
+			<div class="detail__item__title">
+				Recorded part no.
+			</div>
+			<div class="detail__item__content">
+				EX-389437
+			</div>
+		</div>
+		<div class="detail__item">
+			<div class="detail__item__title">
+				Recorded Serial
+			</div>
+			<div class="detail__item__content">
+				EX-389437
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
-import DataInsightComment from './DataInsightComment'
 export default {
-	name: 'DataInsightFileDetail',
-	components: { DataInsightComment },
+	name: 'DataInsightAircraftDetail',
 	props: {
 		file: { type: Object, default: () => ({}) }
 	}
@@ -79,7 +90,7 @@ export default {
 			margin-top: 60px;
 		}
 		&__item {
-			flex: 200px;
+			flex: 250px;
 			&__title {
 				font-size: 13px;
 				line-height: 19px;

@@ -56,7 +56,7 @@
 						class="form__row"
 						:class="{ error: errors.has('serial_no') }"
 					>
-						<label for="serial_no">Win</label>
+						<label for="serial_no">Vin</label>
 						<input
 							id="serial_no"
 							v-model="aircraft.serial_no"
