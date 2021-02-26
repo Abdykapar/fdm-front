@@ -110,6 +110,10 @@ export default {
 			this.setLoading(true)
 			const roles = await roleService.getAll()
 			const admin = roles.find(i => i.code === 'ROLE_ADMIN')
+			if (!admin) {
+				this.setLoading(false)
+				return this.$toastr.e('ROLE_ADMIN not found!')
+			}
 			usersService
 				.getAll(admin.id)
 				.then(res => {

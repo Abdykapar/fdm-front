@@ -52,23 +52,29 @@
 					:key="i"
 				>
 					<td>
-						{{ item.file_name.join(', ') }}
+						{{ item.file_name }}
 					</td>
 					<td>{{ item.created_at }}</td>
 					<td>{{ item.file_size }}</td>
-					<td class="center">
+					<td class="pl20">
 						98
 					</td>
 					<td>{{ item.comment }}</td>
 					<td>
-						<button class="detail">
+						<button
+							class="detail"
+							@click="isShowDetail = true"
+						>
 							Details
 						</button>
 					</td>
 				</tr>
 			</template>
 		</fmd-table>
-		<data-insight-file-detail />
+		<data-insight-file-detail
+			v-if="isShowDetail"
+			@close="isShowDetail = false"
+		/>
 	</div>
 </template>
 
@@ -82,7 +88,8 @@ export default {
 	components: { DataInsightFileDetail, FmdTable },
 	data () {
 		return {
-			files: []
+			files: [],
+			isShowDetail: false
 		}
 	},
 	mounted () {

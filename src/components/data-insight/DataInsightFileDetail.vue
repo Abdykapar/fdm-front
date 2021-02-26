@@ -1,5 +1,5 @@
 <template>
-	<fdm-modal>
+	<fdm-modal @close="$emit('close')">
 		<div
 			slot="content"
 			class="detail-content"

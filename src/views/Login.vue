@@ -17,14 +17,14 @@
 
 				<form @submit.prevent="onSubmit">
 					<div class="login__item">
-						<label for="">Email Address</label>
+						<label for="">Username</label>
 						<input
 							v-model="username"
 							v-validate="'required'"
 							type="text"
 							:class="{ 'is-invalid': submitted && errors.has('username') }"
 							name="username"
-							placeholder="Example: jane@doe.com"
+							placeholder="Example: jane"
 						>
 					</div>
 					<div class="login__item">
