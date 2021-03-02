@@ -89,22 +89,47 @@
 				</div>
 			</div>
 		</div>
-		<data-insight-comment />
+		<data-insight-comment
+			:id="event.id"
+			:comments="messages"
+			type="event"
+			@fetch="fetchComments"
+		/>
 	</div>
 </template>
 
 <script>
 import DataInsightComment from './DataInsightComment'
+import { eventCommentService } from '../../_services/event-comment.service'
+import moment from 'moment'
 export default {
 	name: 'DataInsightEventDetail',
 	components: { DataInsightComment },
 	props: {
-		event: { type: Object, default: () => ({}) }
+		event: { type: Object, default: () => ({ id: 0 }) }
 	},
 	data () {
 		return {
 			status: [ 'Under Review', 'Valid', 'False', 'Nuisance', 'Auto Valid' ],
-			severities: [ 'None', 'Low', 'Medium', 'High' ]
+			severities: [ 'None', 'Low', 'Medium', 'High' ],
+			messages: []
+		}
+	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
+	mounted () {
+		this.fetchComments()
+	},
+	methods: {
+		fetchComments () {
+			eventCommentService.getAll(this.userProfile.user.id).then(res => {
+				this.messages = res.map(i => ({ ...i, created_at: moment(i.created_at).format('DD-MM-YYYY HH:mm') }))
+			}).catch(err => {
+				console.log(err)
+			})
 		}
 	}
 }

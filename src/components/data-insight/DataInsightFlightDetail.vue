@@ -97,22 +97,47 @@
 				</div>
 			</div>
 		</div>
-		<data-insight-comment />
+		<data-insight-comment
+			:id="flight.id"
+			:comments="messages"
+			type="flight"
+		/>
 	</div>
 </template>
 
 <script>
 import DataInsightComment from './DataInsightComment'
+import moment from 'moment'
+import { flightCommentService } from '../../_services/flight-comment.service'
 export default {
 	name: 'DataInsightFlightDetail',
 	components: { DataInsightComment },
 	props: {
-		flight: { type: Object, default: () => ({}) }
+		flight: { type: Object, default: () => ({ id: 0 }) }
 	},
 	data () {
 		return {
 			status: [ 'Under Review', 'Valid', 'False', 'Nuisance', 'Auto Valid' ],
-			severities: [ 'None', 'Low', 'Medium', 'High' ]
+			severities: [ 'None', 'Low', 'Medium', 'High' ],
+			messages: []
+		}
+	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
+	mounted () {
+		this.fetchComments()
+		console.log(this.flight)
+	},
+	methods: {
+		fetchComments () {
+			flightCommentService.getAll(this.userProfile.user.id).then(res => {
+				this.messages = res.map(i => ({ ...i, created_at: moment(i.created_at).format('DD-MM-YYYY HH:mm') }))
+			}).catch(err => {
+				console.log(err)
+			})
 		}
 	}
 }

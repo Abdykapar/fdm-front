@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="title">
-			File Name
+			{{ file.file_name }}
 		</div>
 		<div class="detail__body">
 			<div class="detail__item">
@@ -9,7 +9,7 @@
 					Updated Date
 				</div>
 				<div class="detail__item__content">
-					BAFDFWF
+					{{ file.updated_at }}
 				</div>
 			</div>
 			<div class="detail__item">
@@ -17,7 +17,7 @@
 					File Size
 				</div>
 				<div class="detail__item__content">
-					2342424
+					{{ file.file_size }}
 				</div>
 			</div>
 			<div class="detail__item">
@@ -29,17 +29,61 @@
 				</div>
 			</div>
 		</div>
-		<data-insight-comment />
+		<data-insight-comment
+			v-if="isShowComment"
+			:id="file.id"
+			:comments="messages"
+			type="file"
+			@fetch="fetchComments"
+		/>
 	</div>
 </template>
 
 <script>
 import DataInsightComment from './DataInsightComment'
+import moment from 'moment'
+import { fileCommentService } from '../../_services/file-comment.service'
+import { fileService } from '../../_services/file.service'
 export default {
 	name: 'DataInsightFileDetail',
 	components: { DataInsightComment },
 	props: {
-		file: { type: Object, default: () => ({}) }
+		fileId: { type: Number, default: 0 }
+	},
+	data () {
+		return {
+			messages: [],
+			file: {},
+			isShowComment: false
+		}
+	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
+	mounted () {
+		this.fetchComments()
+		this.fetchFile()
+	},
+	methods: {
+		fetchFile () {
+			if (!this.fileId) return
+			fileService.getById(this.fileId).then(res => {
+				this.file = { ...res, updated_at: moment(res.updated_at).format('DD-MM-YYYY HH:mm') }
+				this.isShowComment = true
+			}).catch(err => {
+				this.isShowComment = true
+				console.log(err)
+			})
+		},
+		fetchComments () {
+			fileCommentService.getAll(this.userProfile.user.id).then(res => {
+				this.messages = res.map(i => ({ ...i, created_at: moment(i.created_at).format('DD-MM-YYYY HH:mm') }))
+			}).catch(err => {
+				console.log(err)
+			})
+		}
 	}
 }
 </script>

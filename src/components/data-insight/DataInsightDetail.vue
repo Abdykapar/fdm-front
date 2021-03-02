@@ -44,7 +44,7 @@
 			/>
 			<data-insight-file-detail
 				v-if="menu === 2"
-				:file="file"
+				:file-id="fileId"
 			/>
 			<data-insight-event-detail
 				v-if="menu === 4"
@@ -61,7 +61,6 @@ import DataInsightFileDetail from './DataInsightFileDetail'
 import { aircraftService } from '../../_services/aircraft.service'
 import { flightService } from '../../_services/flight.service'
 import { eventService } from '../../_services/event.service'
-import { fileService } from '../../_services/file.service'
 import DataInsightEventDetail from './DataInsightEventDetail'
 export default {
 	name: 'DataInsightDetail',
@@ -93,9 +92,6 @@ export default {
 			switch (id) {
 			case 1:
 				this.fetchAircraft()
-				break
-			case 2:
-				this.fetchFile()
 				break
 			case 3:
 				this.fetchFlight()
@@ -129,15 +125,6 @@ export default {
 				console.log(err)
 			})
 		},
-
-		fetchFile () {
-			if (!this.fileId) return
-			fileService.getById(this.fileId).then(res => {
-				this.file = res
-			}).catch(err => {
-				console.log(err)
-			})
-		}
 
 	}
 }

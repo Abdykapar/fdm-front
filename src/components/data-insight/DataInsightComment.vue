@@ -10,24 +10,52 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<td>1</td>
-					<td>LOREM</td>
-					<td>Ultricies.</td>
-					<td>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut orci auctor nam eu pharetra arcu ac in ut.</td>
-				</tr>
-				<tr>
-					<td>2</td>
-					<td>LOREM</td>
-					<td>Ultricies.</td>
-					<td>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut orci auctor nam eu pharetra arcu ac in ut.</td>
+				<tr
+					v-for="(item, i) in comments"
+					:key="item.id"
+				>
+					<td>{{ i + 1 }}</td>
+					<td>{{ item.owner_fullname }}</td>
+					<td>{{ item.created_at }}</td>
+					<td>{{ item.description }}</td>
 				</tr>
 				<tr>
 					<td
 						colspan="4"
 						class="center add-comment"
 					>
-						<button>ADD ANOTHER COMMENT</button>
+						<button
+							v-show="!isAddComment"
+							@click="isAddComment = true"
+						>
+							ADD ANOTHER COMMENT
+						</button>
+						<form
+							v-show="isAddComment"
+							class="comment__form"
+							@submit.prevent="onSubmit"
+						>
+							<input
+								v-model="comment"
+								v-validate="'required'"
+								:class="{ 'invalid' : errors.has('comment') }"
+								type="text"
+								name="comment"
+							>
+							<button
+								type="submit"
+								:disabled="isLoading"
+							>
+								Save
+							</button>
+							<button
+								type="reset"
+								class="reset"
+								@click="isAddComment = false"
+							>
+								Cancel
+							</button>
+						</form>
 					</td>
 				</tr>
 			</tbody>
@@ -36,8 +64,64 @@
 </template>
 
 <script>
+import { eventCommentService } from '../../_services/event-comment.service'
+import { fileCommentService } from '../../_services/file-comment.service'
+
 export default {
-	name: 'DataInsightComment'
+	name: 'DataInsightComment',
+	props: {
+		type: { type: String, default: 'event' },
+		id: { type: Number, required: true },
+		comments: { type: Array, default: () => [] }
+	},
+	data () {
+		return {
+			isAddComment: false,
+			isLoading: false,
+			comment: '',
+		}
+	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
+	methods: {
+		onSubmit () {
+			this.$validator.validate().then(valid => {
+				if (valid) {
+					const data = {
+						event: this.id,
+						owner: this.userProfile.user.id,
+						description: this.comment
+					}
+					this.createComment(data)
+				}
+			})
+		},
+		createComment (data) {
+			switch (this.type) {
+			case 'event':
+				this.creatingComment(eventCommentService, data)
+				break
+			case 'file':
+				this.creatingComment(fileCommentService, data)
+				break
+			}
+		},
+		creatingComment (service, data) {
+			service.create(data).then(res => {
+				this.isAddComment = false
+				this.isLoading = false
+				this.comment = ''
+				this.$emit('fetch')
+			}).catch(err => {
+				console.log(err)
+				this.isLoading = false
+				this.$toastr.e(err)
+			})
+		}
+	}
 }
 </script>
 
@@ -102,5 +186,33 @@ export default {
 				}
 			}
 		}
+		&__form {
+			display: flex;
+			height: 35px;
+			gap: 20px;
+
+			input {
+				flex: 1;
+				outline: none;
+				padding: 0 10px;
+				border: 1px solid #33393F;
+				border-radius: 2px;
+			}
+
+			button {
+				flex: 0.3;
+				text-decoration: none !important;
+				color: #FFFFFF !important;
+				background: #298BFE !important;
+				border-radius: 3px;
+
+				&.reset {
+					background: #FA2B56 !important;
+				}
+			}
+		}
+	}
+	.invalid {
+		border: 1px solid #f91c3d !important;
 	}
 </style>
