@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<!--		<div class="title">-->
-		<!--			{{ event.event_name }}-->
-		<!--		</div>-->
+		<div class="title">
+			Flight Title
+		</div>
 		<div class="detail__body">
 			<div class="form__row no-margin">
 				<label for="model">DEPARTURE</label>
@@ -55,7 +55,7 @@
 					TOUCHDOWN
 				</div>
 				<div class="detail__item__content">
-					{{ event.duration }}
+					{{ flight.duration }}
 				</div>
 			</div>
 			<div class="detail__item">
@@ -69,7 +69,7 @@
 					START
 				</div>
 				<div class="detail__item__content">
-					{{ event.value }}
+					1/29/2020
 				</div>
 			</div>
 			<div class="detail__item">
@@ -77,7 +77,7 @@
 					END
 				</div>
 				<div class="detail__item__content">
-					LIFTOFF
+					1/29/2020
 				</div>
 			</div>
 			<div class="detail__item">
@@ -85,23 +85,49 @@
 					TOUCHDOWN DISTANCE
 				</div>
 				<div class="detail__item__content">
-					LIFTOFF
+					1641.54 ft
 				</div>
 			</div>
-			<div class="detail__item">
-				<div class="detail__item__title">
-					TYPE
-				</div>
-				<div class="detail__item__content">
-					LIFTOFF
-				</div>
+			<div class="form__row no-margin">
+				<label for="type">TYPE</label>
+				<select
+					id="type"
+					name="severity"
+				>
+					<option
+						v-for="item in types"
+						:key="item"
+						:value="item"
+					>
+						{{ item }}
+					</option>
+				</select>
 			</div>
 		</div>
-		<data-insight-comment
-			:id="flight.id"
-			:comments="messages"
-			type="flight"
-		/>
+		<div class="flight-event">
+			<div class="flight-event__buttons">
+				<button
+					:class="{ 'active' : buttonType === 'event' }"
+					@click="buttonType = 'event'"
+				>
+					Events
+				</button>
+				<button
+					:class="{ 'active' : buttonType === 'comment' }"
+					@click="buttonType = 'comment'"
+				>
+					Comments
+				</button>
+			</div>
+			<data-insight-flight-event v-if="buttonType === 'event'" />
+			<data-insight-comment
+				v-if="buttonType === 'comment'"
+				:id="flight.id"
+				:comments="messages"
+				type="flight"
+				@fetch="fetchComments"
+			/>
+		</div>
 	</div>
 </template>
 
@@ -109,9 +135,10 @@
 import DataInsightComment from './DataInsightComment'
 import moment from 'moment'
 import { flightCommentService } from '../../_services/flight-comment.service'
+import DataInsightFlightEvent from './DataInsightFlightEvent'
 export default {
 	name: 'DataInsightFlightDetail',
-	components: { DataInsightComment },
+	components: { DataInsightFlightEvent, DataInsightComment },
 	props: {
 		flight: { type: Object, default: () => ({ id: 0 }) }
 	},
@@ -119,7 +146,9 @@ export default {
 		return {
 			status: [ 'Under Review', 'Valid', 'False', 'Nuisance', 'Auto Valid' ],
 			severities: [ 'None', 'Low', 'Medium', 'High' ],
-			messages: []
+			types: [ 'Revenue', 'Training', 'Ferry/Reposition', 'Special/Other', 'Maintenance', 'Test FLight', 'Ground Run' ],
+			messages: [],
+			buttonType: 'event'
 		}
 	},
 	computed: {
@@ -129,7 +158,6 @@ export default {
 	},
 	mounted () {
 		this.fetchComments()
-		console.log(this.flight)
 	},
 	methods: {
 		fetchComments () {
@@ -205,6 +233,24 @@ export default {
 				font-size: 14px;
 				line-height: 19px;
 				color: #FFFFFF;
+			}
+		}
+	}
+	.flight-event {
+		&__buttons {
+			margin: 30px 0;
+			button {
+				height: 36px;
+				min-width: 116px;
+				margin-right: 20px;
+				text-decoration: none !important;
+				color: #FFFFFF !important;
+				background: #2A3546 !important;
+				border-radius: 3px;
+
+				&.active {
+					background: #298BFE !important;
+				}
 			}
 		}
 	}

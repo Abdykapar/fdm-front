@@ -83,7 +83,7 @@
 					<td />
 				</tr>
 				<tr
-					v-for="item in events"
+					v-for="item in eventPerPage"
 					:key="item.id"
 				>
 					<td>{{ item.registration }}</td>
@@ -107,12 +107,16 @@
 				</tr>
 			</template>
 		</fmd-table>
+		<pagination
+			:total-elements="totalElements"
+			@change="onPageChange"
+		/>
 		<data-insight-detail
 			v-if="isShowDetail"
 			:event-id="event.id"
 			:flight-id="event.flight"
-			:aircraft-id="event.aircraft"
-			:file-id="event.file"
+			:aircraft-id="event.aircraft_id"
+			:file-id="event.file_id"
 			@close="isShowDetail = false"
 		/>
 	</div>
@@ -122,30 +126,47 @@
 import FmdTable from '../FdmTable'
 import { eventService } from '../../_services/event.service'
 import DataInsightDetail from './DataInsightDetail'
+import { mapActions } from 'vuex'
+import Pagination from '../elements/Pagination'
 export default {
 	name: 'DataInsightEvent',
-	components: { DataInsightDetail, FmdTable },
+	components: { Pagination, DataInsightDetail, FmdTable },
 	data () {
 		return {
 			events: [],
 			event: {},
-			isShowDetail: false
+			isShowDetail: false,
+			currentPage: 1,
+			totalElements: 0
+		}
+	},
+	computed: {
+		eventPerPage () {
+			return this.events.slice((this.currentPage - 1) * 10, this.currentPage * 10)
 		}
 	},
 	mounted () {
 		this.fetchEvents()
 	},
 	methods: {
+		...mapActions('loader', [ 'setLoading' ]),
 		fetchEvents () {
+			this.setLoading(true)
 			eventService.getAll().then(res => {
+				this.setLoading(false)
 				this.events = res
+				this.totalElements = this.events.length
 			}).catch(err => {
+				this.setLoading(false)
 				console.log(err)
 			})
 		},
 		onDetail (item) {
 			this.event = item
 			this.isShowDetail = true
+		},
+		onPageChange (num) {
+			this.currentPage = num
 		}
 	}
 }

@@ -95,7 +95,7 @@
 			:event-id="flight.event"
 			:flight-id="flight.id"
 			:aircraft-id="flight.aircraft"
-			:file-id="flight.file"
+			:file-id="flight.file_id"
 			@close="isShowDetail = false"
 		/>
 	</div>

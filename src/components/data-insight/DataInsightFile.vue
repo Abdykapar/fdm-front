@@ -86,9 +86,10 @@ import FmdTable from '../FdmTable'
 import { fileService } from '../../_services/file.service'
 import { mapActions } from 'vuex'
 import DataInsightDetail from './DataInsightDetail'
+import Pagination from '../elements/Pagination'
 export default {
 	name: 'DataInsightFile',
-	components: { DataInsightDetail, FmdTable },
+	components: { Pagination, DataInsightDetail, FmdTable },
 	data () {
 		return {
 			files: [],
@@ -110,6 +111,9 @@ export default {
 				this.setLoading(false)
 				console.log(err)
 			})
+		},
+		onPageChange (num) {
+			console.log(num)
 		},
 		onDetail (item ){
 			this.file = item

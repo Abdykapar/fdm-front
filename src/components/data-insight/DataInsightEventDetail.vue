@@ -90,6 +90,7 @@
 			</div>
 		</div>
 		<data-insight-comment
+			v-if="isShowComment"
 			:id="event.id"
 			:comments="messages"
 			type="event"
@@ -102,17 +103,20 @@
 import DataInsightComment from './DataInsightComment'
 import { eventCommentService } from '../../_services/event-comment.service'
 import moment from 'moment'
+import { eventService } from '../../_services/event.service'
 export default {
 	name: 'DataInsightEventDetail',
 	components: { DataInsightComment },
 	props: {
-		event: { type: Object, default: () => ({ id: 0 }) }
+		eventId: { type: Number, default: 0 }
 	},
 	data () {
 		return {
 			status: [ 'Under Review', 'Valid', 'False', 'Nuisance', 'Auto Valid' ],
 			severities: [ 'None', 'Low', 'Medium', 'High' ],
-			messages: []
+			messages: [],
+			event: {},
+			isShowComment: false
 		}
 	},
 	computed: {
@@ -122,8 +126,19 @@ export default {
 	},
 	mounted () {
 		this.fetchComments()
+		this.fetchEvent()
 	},
 	methods: {
+		fetchEvent () {
+			if (!this.eventId) return
+			eventService.getById(this.eventId).then(res => {
+				this.event = res
+				this.isShowComment = true
+			}).catch(err => {
+				this.isShowComment = true
+				console.log(err)
+			})
+		},
 		fetchComments () {
 			eventCommentService.getAll(this.userProfile.user.id).then(res => {
 				this.messages = res.map(i => ({ ...i, created_at: moment(i.created_at).format('DD-MM-YYYY HH:mm') }))

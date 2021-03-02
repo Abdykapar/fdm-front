@@ -276,3 +276,58 @@ body {
 .center {
 	text-align: center;
 }
+
+.paginate {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 10px;
+	color: #FFFFFF;
+
+	li {
+		list-style-type: none;
+	}
+
+	&__item {
+		a {
+			display: block;
+			outline: none;
+			background: #2A3546;
+			padding: 5px;
+			min-width: 35px;
+			text-align: center;
+			border-radius: 4px;
+		}
+	}
+
+	&__active {
+		a {
+			background: #298BFE;
+		}
+	}
+
+	.button {
+		a {
+			background: #298BFE;
+			border-radius: 4px;
+			padding: 5px 10px;
+			outline: none;
+		}
+
+		&.disabled {
+			opacity: 0.5;
+
+			a {
+				cursor: text;
+			}
+		}
+	}
+
+	&__prev {
+		@extend .button
+	}
+
+	&__next {
+		@extend .button
+	}
+}

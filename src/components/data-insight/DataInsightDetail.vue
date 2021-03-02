@@ -32,6 +32,7 @@
 					</button>
 					<button
 						:class="{'active' : menu === 4}"
+						:disabled="!eventId"
 						@click="onMenuChange(4)"
 					>
 						EVENT
@@ -46,9 +47,10 @@
 				v-if="menu === 2"
 				:file-id="fileId"
 			/>
+			<data-insight-flight-detail v-if="menu === 3" />
 			<data-insight-event-detail
 				v-if="menu === 4"
-				:event="event"
+				:event-id="eventId"
 			/>
 		</div>
 	</fdm-modal>
@@ -60,11 +62,11 @@ import DataInsightAircraftDetail from './DataInsightAircraftDetail'
 import DataInsightFileDetail from './DataInsightFileDetail'
 import { aircraftService } from '../../_services/aircraft.service'
 import { flightService } from '../../_services/flight.service'
-import { eventService } from '../../_services/event.service'
 import DataInsightEventDetail from './DataInsightEventDetail'
+import DataInsightFlightDetail from './DataInsightFlightDetail'
 export default {
 	name: 'DataInsightDetail',
-	components: { DataInsightEventDetail, DataInsightFileDetail, DataInsightAircraftDetail, FdmModal },
+	components: { DataInsightFlightDetail, DataInsightEventDetail, DataInsightFileDetail, DataInsightAircraftDetail, FdmModal },
 	props: {
 		fileId: { type: Number, default: 0 },
 		flightId: { type: Number, default: 0 },
@@ -75,9 +77,7 @@ export default {
 		return {
 			menu: 1,
 			aircraft: {},
-			flight: {},
-			file: {},
-			event: {}
+			flight: {}
 		}
 	},
 	mounted () {
@@ -96,9 +96,6 @@ export default {
 			case 3:
 				this.fetchFlight()
 				break
-			case 4:
-				this.fetchEvent()
-				break
 			}
 		},
 		fetchAircraft () {
@@ -113,14 +110,6 @@ export default {
 			if (!this.flightId) return
 			flightService.getById(this.flightId).then(res => {
 				this.flight = res
-			}).catch(err => {
-				console.log(err)
-			})
-		},
-		fetchEvent () {
-			if (!this.eventId) return
-			eventService.getById(this.eventId).then(res => {
-				this.event = res
 			}).catch(err => {
 				console.log(err)
 			})

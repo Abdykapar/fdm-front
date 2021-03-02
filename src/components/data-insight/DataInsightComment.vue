@@ -66,6 +66,7 @@
 <script>
 import { eventCommentService } from '../../_services/event-comment.service'
 import { fileCommentService } from '../../_services/file-comment.service'
+import { flightCommentService } from '../../_services/flight-comment.service'
 
 export default {
 	name: 'DataInsightComment',
@@ -106,6 +107,9 @@ export default {
 				break
 			case 'file':
 				this.creatingComment(fileCommentService, data)
+				break
+			case 'flight':
+				this.creatingComment(flightCommentService, data)
 				break
 			}
 		},
