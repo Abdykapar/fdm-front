@@ -9,7 +9,10 @@
 					REVIEWED
 				</div>
 				<div class="detail__item__content">
-					{{ event.is_reviewed }}
+					<fdm-switch
+						:value="event.is_reviewed"
+						@click="event.is_reviewed = !event.is_reviewed"
+					/>
 				</div>
 			</div>
 			<div class="form__row no-margin">
@@ -31,14 +34,15 @@
 				<label for="severity">SEVERITY</label>
 				<select
 					id="severity"
+					v-model="event.event_severity"
 					name="severity"
 				>
 					<option
 						v-for="item in severities"
-						:key="item"
-						:value="item"
+						:key="item.value"
+						:value="item.value"
 					>
-						{{ item }}
+						{{ item.title }}
 					</option>
 				</select>
 			</div>
@@ -104,19 +108,20 @@ import DataInsightComment from './DataInsightComment'
 import { eventCommentService } from '../../_services/event-comment.service'
 import moment from 'moment'
 import { eventService } from '../../_services/event.service'
+import FdmSwitch from '../elements/FdmSwitch'
 export default {
 	name: 'DataInsightEventDetail',
-	components: { DataInsightComment },
+	components: { FdmSwitch, DataInsightComment },
 	props: {
 		eventId: { type: Number, default: 0 }
 	},
 	data () {
 		return {
 			status: [ 'Under Review', 'Valid', 'False', 'Nuisance', 'Auto Valid' ],
-			severities: [ 'None', 'Low', 'Medium', 'High' ],
+			severities: [ { title: 'None', value: 'none' }, { title: 'Low', value: 'L' }, { title: 'Medium', value: 'M' }, { title: 'High', value: 'H' } ],
 			messages: [],
 			event: {},
-			isShowComment: false
+			isShowComment: false,
 		}
 	},
 	computed: {

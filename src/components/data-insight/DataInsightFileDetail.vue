@@ -48,7 +48,7 @@ export default {
 	name: 'DataInsightFileDetail',
 	components: { DataInsightComment },
 	props: {
-		fileId: { type: Number, default: 0 }
+		fileId: { type: [ Number, String ], default: 0 }
 	},
 	data () {
 		return {
@@ -71,17 +71,17 @@ export default {
 			if (!this.fileId) return
 			fileService.getById(this.fileId).then(res => {
 				this.file = { ...res, updated_at: moment(res.updated_at).format('DD-MM-YYYY HH:mm') }
-				this.isShowComment = true
 			}).catch(err => {
-				this.isShowComment = true
 				console.log(err)
 			})
 		},
 		fetchComments () {
 			fileCommentService.getAll(this.userProfile.user.id).then(res => {
 				this.messages = res.map(i => ({ ...i, created_at: moment(i.created_at).format('DD-MM-YYYY HH:mm') }))
+				this.isShowComment = true
 			}).catch(err => {
 				console.log(err)
+				this.isShowComment = true
 			})
 		}
 	}

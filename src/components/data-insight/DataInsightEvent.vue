@@ -9,6 +9,7 @@
 					<th>Duration</th>
 					<th>Flight Number</th>
 					<th>Departure Airport</th>
+					<th>Arrival Airport</th>
 					<th>Event Severity</th>
 					<th>Event Status</th>
 					<th>Reviewed</th>
@@ -91,6 +92,7 @@
 					<td>{{ item.event_name }}</td>
 					<td>{{ item.duration }}</td>
 					<td />
+					<td>{{ item.arr_airport }}</td>
 					<td>{{ item.dep_airport }}</td>
 					<td>{{ item.event_severity }}</td>
 					<td>{{ item.event_status }}</td>
@@ -116,7 +118,7 @@
 			:event-id="event.id"
 			:flight-id="event.flight"
 			:aircraft-id="event.aircraft_id"
-			:file-id="event.file_id"
+			:file-id="Math.round(event.file_id)"
 			@close="isShowDetail = false"
 		/>
 	</div>
