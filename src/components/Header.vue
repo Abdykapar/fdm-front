@@ -16,7 +16,7 @@
 		</div>
 		<div
 			v-if="isDashboard"
-			class="header__date-picker"
+			class="header__dashboard"
 		>
 			<FunctionalCalendar
 				v-model="calendarData"
@@ -25,6 +25,7 @@
 				:is-date-range="true"
 				@selectedDaysCount="onClose"
 			/>
+			<top-triggers />
 		</div>
 		<div class="header__right">
 			<div
@@ -125,9 +126,10 @@ import Notifications from './Notifications'
 import Profile from './Profile'
 import { mapActions } from 'vuex'
 import moment from 'moment'
+import TopTriggers from './reports/TopTriggers'
 export default {
 	name: 'Header',
-	components: { Profile, Notifications },
+	components: { TopTriggers, Profile, Notifications },
 	data () {
 		return {
 			isNotif: false,
@@ -243,6 +245,12 @@ export default {
 			&__name {
 				padding: 0 13px 0 16px;
 			}
+		}
+
+		&__dashboard {
+			display: flex;
+			align-items: center;
+			gap: 20px;
 		}
 	}
 	.alert {

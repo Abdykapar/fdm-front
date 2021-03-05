@@ -9,6 +9,7 @@
 					REVIEWED
 				</div>
 				<div class="detail__item__content">
+					<span>{{ event.is_reviewed ? 'On' : 'Off' }}</span>
 					<fdm-switch
 						:value="event.is_reviewed"
 						@click="event.is_reviewed = !event.is_reviewed"
