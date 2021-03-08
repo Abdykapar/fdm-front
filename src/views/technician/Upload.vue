@@ -117,6 +117,11 @@ export default {
 			files: []
 		}
 	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
 	mounted () {
 		this.fetchFiles()
 	},
@@ -127,7 +132,7 @@ export default {
 		},
 		fetchFiles () {
 			this.setLoading(true)
-			fileService.getAll().then(res => {
+			fileService.getAll(this.userProfile.user.id).then(res => {
 				this.files = res.map(i => ({ ...i, date: moment(i.created_at).format('DD.MM.YYYY') }))
 				this.setLoading(false)
 			}).catch(err => {

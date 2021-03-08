@@ -16,7 +16,7 @@
 						class="form__row"
 						:class="{ error: errors.has('aircraft') }"
 					>
-						<label for="aircraft">Registration No</label>
+						<label for="aircraft">Aircraft Registration No</label>
 						<select
 							id="aircraft"
 							v-model="file.aircraft"
@@ -109,7 +109,7 @@ export default {
 			this.setLoading(true)
 			routeService.getAll().then(res => {
 				this.routes = res
-				return aircraftService.getAll()
+				return aircraftService.getAll(this.userProfile.user.airline[0])
 			}).then(res => {
 				this.aircrafts = res
 				this.setLoading(false)

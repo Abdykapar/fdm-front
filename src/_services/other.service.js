@@ -36,6 +36,16 @@ class OtherService extends BaseApiService {
 		const url = `${baseUrl}/averagestats${query}`
 		return this.sendGetRequest(url)
 	}
+
+	topHighEvents (aircraft='', start_date='', end_date='') {
+		const query = this.queryFilter(
+			{ title: 'aircraft', value: aircraft },
+			{ title: 'start_date', value: start_date },
+			{ title: 'end_date', value: end_date }
+		)
+		const url = `${baseUrl}/top10hevents${query}`
+		return this.sendGetRequest(url)
+	}
 }
 
 export const otherService = new OtherService()

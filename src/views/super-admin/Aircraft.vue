@@ -23,6 +23,7 @@
 						<th>Reg. No</th>
 						<th>Win</th>
 						<th>Engine</th>
+						<th>Airline</th>
 						<th />
 						<th />
 					</tr>
@@ -39,6 +40,7 @@
 						<td>{{ item.reg_number }}</td>
 						<td>{{ item.serial_no }}</td>
 						<td>{{ item.engine }}</td>
+						<td>{{ item.airline_title }}</td>
 						<td>
 							<img
 								class="pointer"

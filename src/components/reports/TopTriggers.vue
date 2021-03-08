@@ -15,7 +15,10 @@
 			alt=""
 			hidden
 		>
-		<div style="position: absolute; z-index: -100">
+		<div
+			id="canvas-content"
+			style="position: absolute; z-index: -100"
+		>
 			<canvas
 				id="canvas"
 				height="450"
@@ -44,7 +47,12 @@ export default {
 	},
 	data () {
 		return {
-			bar: ''
+			bar: '',
+			topEvents: [],
+			topHighEvents: [],
+			eventBars: [],
+			months: [],
+			now: new Date()
 		}
 	},
 	methods: {
@@ -52,6 +60,7 @@ export default {
 		makeChart () {
 			this.setLoading(true)
 			otherService.topEvents(this.aircraft, this.start, this.end).then(res => {
+				this.topEvents = res
 				const labels = res.map(i => i.title)
 				const data = res.map(i => i.high)
 				this.bar = new Chart(document.getElementById('canvas').getContext('2d'),{
@@ -110,9 +119,97 @@ export default {
 							} ]
 						},
 						animation: {
-							onComplete: this.exportPdf
+							// onComplete: this.exportPdf
 						}
 					}
+				})
+				return otherService.topHighEvents()
+			}).then(res => {
+				this.topHighEvents = res
+				this.months = []
+				this.eventBars = []
+				for (let i = 1; i <= 12; i ++) {
+					if (i < 10) {
+						this.months.push({
+							title: '0'+i,
+							event: `0${i}_events`,
+							flight: `0${i}_flight`
+						})
+					} else {
+						this.months.push({
+							title: i,
+							event: `${i}_events`,
+							flight: `${i}_flight`
+						})
+					}
+				}
+				res.forEach((trigger, index) => {
+					const canvas = document.createElement('canvas')
+					const content = document.getElementById('canvas-content')
+					content.appendChild(canvas)
+					canvas.width = 600
+					canvas.height = 450
+					const labels = []
+					const data = this.months.filter(i => {
+						if (trigger[i.event] > 0) {
+							labels.push(this.now.getFullYear() + '-' + i.title)
+							return true
+						}
+					}).map(i => trigger[i.event])
+					const b = new Chart(canvas.getContext('2d'),{
+						type: 'bar',
+						data: {
+							labels: labels,
+							datasets: [ {
+								label: 'High',
+								data: data,
+								backgroundColor: '#D82904',
+							} ]
+						},
+						options: {
+							title: {
+								display: true,
+								text: trigger.title,
+								fontSize: 25,
+								fontColor: '#000'
+							},
+							legend: {
+								display: true,
+								fontColor: '#000'
+							},
+							scales: {
+								yAxes: [ {
+									ticks: {
+										beginAtZero: true,
+										fontColor: '#000',
+										fontSize: 12,
+									},
+									scaleLabel: {
+										display: true,
+										labelString: 'EVENT / 100 FLIGHTS',
+										fontSize: 20,
+										fontColor: '#000'
+									}
+								} ],
+								xAxes: [ {
+									ticks: {
+										fontColor: '#000',
+										fontSize: 12,
+									},
+									scaleLabel: {
+										display: true,
+										labelString: 'MONTH',
+										fontSize: 20,
+										fontColor: '#000'
+									}
+								} ]
+							},
+							animation: {
+								onComplete: index + 1 === res.length ? this.exportPdf : ''
+							}
+						}
+					})
+					this.eventBars.push(b)
 				})
 			}).catch(err => {
 				this.setLoading(false)
@@ -127,18 +224,8 @@ export default {
 			c.width = img.naturalWidth
 			const ctx = c.getContext('2d')
 
-			const items = [
-				'Late Thrust Reduction at Landing',
-				'Pitch Low at Touchdown',
-				'Late Rotation',
-				'Short Flare',
-				'GPWS Warning Glideslope',
-				'Late Flare',
-				'Smoke Warning',
-				'Autoland Warning for Airmanas',
-				'High Pitch Rate at Takeoff',
-				'Low Speed at Landing'
-			]
+			const items = this.topEvents.map(i => i.title)
+			const eventLength = this.topEvents.length
 
 			ctx.drawImage(img, 0, 0, c.width, c.height)
 			const base64String = c.toDataURL()
@@ -183,18 +270,7 @@ export default {
 						style: 'subHeader'
 					},
 					{
-						ol: [
-							'Top 10 High Severity Events per 100 Flights (Air Manas)',
-							'Unstable Approach Trend - Air Manas',
-							'Thrust Reduction Late at Landing',
-							'Taxi Speed High in Straight LineTrend - Air Manas',
-							'Short Flare Time Trend - Air Manas',
-							'Reversers Delayed at Landing Trend - Air Manas',
-							'Pitch Low at Touchdown Trend - Air Manas',
-							'High Vertical Speed before Touchdown Trend - Air Manas',
-							'High Acceleration at Touchdown Event Counts',
-							'Hard Landing Hazard Trend - Air Manas'
-						],
+						ol: [ 'Top 10 High Severity Events per 100 Flights (Air Manas)', ...items ],
 						style: 'ul',
 						pageBreak: 'after'
 					},
@@ -209,22 +285,31 @@ export default {
 						margin: [ 20, 30, 10, 20 ]
 					},
 					{
-						image: 'bar',
+						image: this.bar.toBase64Image(),
 						width: 450,
 						height: 350
 					},
 					{
 						style: 'table',
 						table: {
-							widths: [ 30, '*', '*', '*', '*', '*', '*', '*', '*', '*', '*' ],
+							widths: [ 30, ...items.map(i => '*') ],
 							body: [
 								[
 									{ text: '', style: 'tableTd' },
 									...items.map(i => ({ text: i, style: 'tableTd' }))
 								],
-								[ { text: 'High Ratio', style: 'tableTd', alignment: 'left' }, '0.08', '0.08', '0.4', '0.4', '0.4', '0.4', '0.4', '0.4', '0.4', '0.4' ],
-								[ { text: 'High Count', style: 'tableTd', alignment: 'left' }, '0.2', '0.08', '0.08', '0.4', '0.4', '0.4', '0.4', '0.4', '0.4', '0.4' ],
-								[ { text: 'Number of Flights', style: 'tableTd', alignment: 'left' }, '0.2', '0.08', '0.4', '0.4', '0.4', '0.4', '0.4', '0.4', '0.4', '0.4' ],
+								[
+									{ text: 'High Ratio', style: 'tableTd', alignment: 'left' },
+									...this.topEvents.map(i => Math.round(i.high / i.n_of_flights).toFixed(2))
+								],
+								[
+									{ text: 'High Count', style: 'tableTd', alignment: 'left' },
+									...this.topEvents.map(i => i.high)
+								],
+								[
+									{ text: 'Number of Flights', style: 'tableTd', alignment: 'left' },
+									...this.topEvents.map(i => i.n_of_flights)
+								],
 							]
 						},
 						layout: {
@@ -237,12 +322,74 @@ export default {
 							vLineWidth: function (i, node) {
 								return 0
 							},
-						}
+						},
 					},
+					...this.eventBars.map((i, index) => {
+						const m = this.months.filter(e => {
+							if (this.topHighEvents[index] && this.topHighEvents[index][e.event] > 0) {
+								return true
+							}
+						})
+						const events = m.map(e => this.topHighEvents[index] && this.topHighEvents[index][e.event])
+						const monthNames = m.map(e => e.title)
+						const flights = m.map(e => this.topHighEvents[index] && this.topHighEvents[index][e.flight])
+						return [
+							{
+								image: 'imageUrl',
+								width: 150,
+								height: 25,
+								style: 'logo',
+								pageBreak: 'before'
+							},
+							{
+								text: (index + 2) + '.    ' + (this.topHighEvents[index] && this.topHighEvents[index].title),
+								margin: [ 20, 30, 10, 20 ]
+							},
+							{
+								image: i.toBase64Image(),
+								width: 450,
+								height: 350,
+							},
+							{
+								style: 'table',
+								table: {
+									widths: [ 30, ...events.map(i => '*') ],
+									body: [
+										[
+											{ text: '', style: 'tableTd' },
+											...monthNames.map(i => ({ text: this.now.getFullYear() + '-' + i, style: 'tableTd' }))
+										],
+										[
+											{ text: 'High Ratio', style: 'tableTd', alignment: 'left' },
+											...events.map((i, index) => Math.round(i / flights[index]).toFixed(2))
+										],
+										[
+											{ text: 'High Count', style: 'tableTd', alignment: 'left' },
+											...events.map(i => i)
+										],
+										[
+											{ text: 'Number of Flights', style: 'tableTd', alignment: 'left' },
+											...flights.map(i => i)
+										],
+									]
+								},
+								layout: {
+									fillColor: function (rowIndex, node, columnIndex) {
+										return (rowIndex === 0 || columnIndex === 0) ? '#CCCCCC' : null
+									},
+									hLineWidth: function (i, node) {
+										return 0
+									},
+									vLineWidth: function (i, node) {
+										return 0
+									},
+								},
+							},
+						]
+					}).flat()
 				],
 				images: {
 					imageUrl: base64String,
-					bar: this.bar.toBase64Image()
 				},
 				styles: {
 					logo: {

@@ -15,8 +15,12 @@
 					:key="item.id"
 				>
 					<td>{{ i + 1 }}</td>
-					<td>{{ item.owner_fullname }}</td>
-					<td>{{ item.created_at }}</td>
+					<td class="fixed">
+						{{ item.owner_fullname }}
+					</td>
+					<td class="fixed">
+						{{ item.created_at }}
+					</td>
 					<td>{{ item.description }}</td>
 				</tr>
 				<tr>
@@ -174,6 +178,10 @@ export default {
 
 				&:last-child {
 					font-weight: 300;
+				}
+
+				&.fixed {
+					width: 150px;
 				}
 
 				&.add-comment {
