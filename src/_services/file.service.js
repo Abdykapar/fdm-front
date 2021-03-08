@@ -7,8 +7,11 @@ class FileService extends BaseApiService {
 		super()
 	}
 
-	getAll () {
-		const url = `${baseUrl}/files/`
+	getAll (userId='') {
+		const query = this.queryFilter(
+			{ title: 'user_id', value: userId },
+		)
+		const url = `${baseUrl}/files/${query}`
 		return this.sendGetRequest(url)
 	}
 
