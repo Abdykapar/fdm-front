@@ -59,8 +59,8 @@ export default {
 		...mapActions('loader', [ 'setLoading' ]),
 		makeChart () {
 			this.setLoading(true)
-			otherService.topEvents(this.aircraft, this.start, this.end).then(res => {
-				this.topEvents = res
+			otherService.topHighEvents().then(res => {
+				this.topHighEvents = res
 				const labels = res.map(i => i.title)
 				const data = res.map(i => i.high)
 				this.bar = new Chart(document.getElementById('canvas').getContext('2d'),{
@@ -123,7 +123,7 @@ export default {
 						}
 					}
 				})
-				return otherService.topHighEvents()
+				return res
 			}).then(res => {
 				this.topHighEvents = res
 				this.months = []
@@ -224,8 +224,7 @@ export default {
 			c.width = img.naturalWidth
 			const ctx = c.getContext('2d')
 
-			const items = this.topEvents.map(i => i.title)
-			const eventLength = this.topEvents.length
+			const items = this.topHighEvents.map(i => i.title)
 
 			ctx.drawImage(img, 0, 0, c.width, c.height)
 			const base64String = c.toDataURL()
@@ -300,15 +299,15 @@ export default {
 								],
 								[
 									{ text: 'High Ratio', style: 'tableTd', alignment: 'left' },
-									...this.topEvents.map(i => Math.round(i.high / i.n_of_flights).toFixed(2))
+									...this.topHighEvents.map(i => Math.round(i.high / i.n_of_flights).toFixed(2))
 								],
 								[
 									{ text: 'High Count', style: 'tableTd', alignment: 'left' },
-									...this.topEvents.map(i => i.high)
+									...this.topHighEvents.map(i => i.high)
 								],
 								[
 									{ text: 'Number of Flights', style: 'tableTd', alignment: 'left' },
-									...this.topEvents.map(i => i.n_of_flights)
+									...this.topHighEvents.map(i => i.n_of_flights)
 								],
 							]
 						},
