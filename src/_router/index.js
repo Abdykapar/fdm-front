@@ -31,6 +31,13 @@ const routes = [
 				component: () => import('@/views/admin/DataInsight.vue')
 			},
 			{
+				path: '/animate',
+				name: 'Animate',
+				component: () => import('@/components/visualization/Cesium.vue')
+			},
+
+			// Technician Page
+			{
 				path: '/upload',
 				name: 'Upload',
 				component: () => import('@/views/technician/Upload.vue')
@@ -135,6 +142,16 @@ const routes = [
 		path: '/password-recovery',
 		name: 'PasswordRecovery',
 		component: () => import('@/views/PasswordRecovery.vue')
+	},
+	{
+		path: '/visual',
+		name: 'Visual',
+		component: () => import('@/components/visualization/AircraftVisualization.vue')
+	},
+	{
+		path: '/cesium',
+		name: 'Cesium',
+		component: () => import('@/components/visualization/Cesium.vue')
 	},
 	{
 		path: '*',
