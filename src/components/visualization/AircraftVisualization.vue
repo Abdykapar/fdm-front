@@ -5,7 +5,7 @@
 <script>
 import * as THREE from '@/_helpers/threejs/three.min.js'
 import { GLTFLoader } from '@/_helpers/threejs/GLTFLoader'
-import { DRACOLoader } from '../../_helpers/threejs/DRACOLoader'
+import { DRACOLoader } from '../../../public/threejs/DRACOLoader'
 
 export default {
 	name: 'AircraftVisualization',
