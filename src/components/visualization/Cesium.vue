@@ -62,10 +62,10 @@ export default {
 					availability: new Cesium.TimeIntervalCollection([ new Cesium.TimeInterval({ start: start, stop: stop }) ]),
 					position: positionProperty,
 					// Attach the 3D model instead of the green point.
-					model: { uri: '/airbus200/scene.gltf', scale: 1 },
+					model: { uri: '/airbus200/scene.gltf', scale: 1.4 },
 					// Automatically compute the orientation from the position.
 					orientation: new Cesium.VelocityOrientationProperty(positionProperty),
-					path: new Cesium.PathGraphics({ width: 2 })
+					path: new Cesium.PathGraphics({ width: 1 })
 				})
 
 				viewer.trackedEntity = airplaneEntity
