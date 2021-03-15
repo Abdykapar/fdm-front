@@ -24,7 +24,7 @@ export default {
 			)
 			const timeStepInSeconds = 30
 			const totalSeconds = timeStepInSeconds * (flightData.length - 1)
-			const start = Cesium.JulianDate.fromIso8601('2020-03-09T23:10:00Z')
+			const start = Cesium.JulianDate.now()
 			const stop = Cesium.JulianDate.addSeconds(start, totalSeconds, new Cesium.JulianDate())
 			viewer.clock.startTime = start.clone()
 			viewer.clock.stopTime = stop.clone()
@@ -54,6 +54,7 @@ export default {
 					point: { pixelSize: 10, color: Cesium.Color.RED }
 				})
 			}
+			console.log(flightData)
 			async function loadModel () {
 				// Load the glTF model from Cesium ion.
 				const airplaneUri = await Cesium.IonResource.fromAssetId(355099)
