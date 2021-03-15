@@ -13,7 +13,7 @@ export default {
 	},
 	methods: {
 		init () {
-			Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzYzNjNjNhNC02ZjJlLTQ0NmUtOTYxZS02YWRiZTA3OWY3NjMiLCJpZCI6NDU3MTQsImlhdCI6MTYxNTM1OTgzOX0.H7Huad14Kj-rODB78plZIHjVfAzAkqRDIkW3MS26s3s'
+			Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjYWEwOWNkNy05ZTU4LTQxMjQtYmFiNy05NmZmNzY5YWFjMzEiLCJpZCI6NDU3MTQsImlhdCI6MTYxNTc5NDI3OH0.Wpk8AX-oZBjF07M98aCrfVFBmPatRjdV96HawS69RBk'
 			const viewer = new Cesium.Viewer('cesium', {
 				terrainProvider: Cesium.createWorldTerrain()
 			})
@@ -62,7 +62,7 @@ export default {
 					availability: new Cesium.TimeIntervalCollection([ new Cesium.TimeInterval({ start: start, stop: stop }) ]),
 					position: positionProperty,
 					// Attach the 3D model instead of the green point.
-					model: { uri: '/airbus200/scene.gltf', scale: 1.4 },
+					model: { uri: airplaneUri },
 					// Automatically compute the orientation from the position.
 					orientation: new Cesium.VelocityOrientationProperty(positionProperty),
 					path: new Cesium.PathGraphics({ width: 1 })
