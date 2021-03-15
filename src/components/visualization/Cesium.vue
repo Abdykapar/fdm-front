@@ -13,7 +13,7 @@ export default {
 	},
 	methods: {
 		init () {
-			Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjYWEwOWNkNy05ZTU4LTQxMjQtYmFiNy05NmZmNzY5YWFjMzEiLCJpZCI6NDU3MTQsImlhdCI6MTYxNTc5NDI3OH0.Wpk8AX-oZBjF07M98aCrfVFBmPatRjdV96HawS69RBk'
+			Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhNWEyYTFhMS1mZjgxLTQyYjAtOTVhYS0zNTJjM2ZhNThmNzciLCJpZCI6NDU3MTQsImlhdCI6MTYxNTc5NTAxMn0.Rsqp9VdUoOSgIYuA20v2lXkWBggEl37JoLYGgF03aEo'
 			const viewer = new Cesium.Viewer('cesium', {
 				terrainProvider: Cesium.createWorldTerrain()
 			})
