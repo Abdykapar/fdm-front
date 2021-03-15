@@ -3,8 +3,8 @@
 </template>
 
 <script>
+window.CESIUM_BASE_URL = '/'
 import * as Cesium from 'cesium'
-// window.CESIUM_BASE_URL = '/'
 
 export default {
 	name: 'Cesium',
@@ -69,8 +69,8 @@ export default {
 				})
 
 				viewer.trackedEntity = airplaneEntity
-				viewer._cesiumWidget._creditContainer.parentNode.removeChild(
-					viewer._cesiumWidget._creditContainer)
+				// viewer._cesiumWidget._creditContainer.parentNode.removeChild(
+				// 	viewer._cesiumWidget._creditContainer)
 			}
 
 			loadModel()
