@@ -2,7 +2,7 @@
 	<div class="login flex">
 		<div class="login__left flex-center">
 			<img
-				src="/assets/img/login-img.svg"
+				src="/Assets/img/login-img.svg"
 				alt=""
 			>
 		</div>
