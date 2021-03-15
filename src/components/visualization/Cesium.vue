@@ -4,7 +4,7 @@
 
 <script>
 import * as Cesium from 'cesium'
-window.CESIUM_BASE_URL = '/'
+// window.CESIUM_BASE_URL = '/'
 
 export default {
 	name: 'Cesium',
@@ -13,7 +13,7 @@ export default {
 	},
 	methods: {
 		init () {
-			Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJhNWEyYTFhMS1mZjgxLTQyYjAtOTVhYS0zNTJjM2ZhNThmNzciLCJpZCI6NDU3MTQsImlhdCI6MTYxNTc5NTAxMn0.Rsqp9VdUoOSgIYuA20v2lXkWBggEl37JoLYGgF03aEo'
+			Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjYWEwOWNkNy05ZTU4LTQxMjQtYmFiNy05NmZmNzY5YWFjMzEiLCJpZCI6NDU3MTQsImlhdCI6MTYxNTc5NDI3OH0.Wpk8AX-oZBjF07M98aCrfVFBmPatRjdV96HawS69RBk'
 			const viewer = new Cesium.Viewer('cesium', {
 				terrainProvider: Cesium.createWorldTerrain()
 			})
@@ -24,7 +24,7 @@ export default {
 			)
 			const timeStepInSeconds = 30
 			const totalSeconds = timeStepInSeconds * (flightData.length - 1)
-			const start = Cesium.JulianDate.now()
+			const start = Cesium.JulianDate.fromIso8601('2020-03-09T23:10:00Z')
 			const stop = Cesium.JulianDate.addSeconds(start, totalSeconds, new Cesium.JulianDate())
 			viewer.clock.startTime = start.clone()
 			viewer.clock.stopTime = stop.clone()
@@ -54,7 +54,6 @@ export default {
 					point: { pixelSize: 10, color: Cesium.Color.RED }
 				})
 			}
-			console.log(flightData)
 			async function loadModel () {
 				// Load the glTF model from Cesium ion.
 				const airplaneUri = await Cesium.IonResource.fromAssetId(355099)
@@ -63,7 +62,7 @@ export default {
 					availability: new Cesium.TimeIntervalCollection([ new Cesium.TimeInterval({ start: start, stop: stop }) ]),
 					position: positionProperty,
 					// Attach the 3D model instead of the green point.
-					model: { uri: airplaneUri },
+					model: { uri: '/airbus200/scene.gltf', scale: 1.4 },
 					// Automatically compute the orientation from the position.
 					orientation: new Cesium.VelocityOrientationProperty(positionProperty),
 					path: new Cesium.PathGraphics({ width: 1 })
