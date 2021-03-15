@@ -69,6 +69,8 @@ export default {
 				})
 
 				viewer.trackedEntity = airplaneEntity
+				viewer._cesiumWidget._creditContainer.parentNode.removeChild(
+					viewer._cesiumWidget._creditContainer)
 			}
 
 			loadModel()
