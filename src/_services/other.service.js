@@ -46,6 +46,14 @@ class OtherService extends BaseApiService {
 		const url = `${baseUrl}/top10hevents${query}`
 		return this.sendGetRequest(url)
 	}
+
+	getFileCoordinates (file_id='') {
+		const query = this.queryFilter(
+			{ title: 'file_id', value: file_id }
+		)
+		const url = `${baseUrl}/coordinates${query}`
+		return this.sendGetRequest(url)
+	}
 }
 
 export const otherService = new OtherService()

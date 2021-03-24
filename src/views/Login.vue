@@ -17,7 +17,7 @@
 
 				<form @submit.prevent="onSubmit">
 					<div class="login__item">
-						<label for="">Username</label>
+						<label>Username</label>
 						<input
 							v-model="username"
 							v-validate="'required'"

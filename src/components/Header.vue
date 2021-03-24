@@ -27,6 +27,27 @@
 			/>
 			<top-triggers />
 		</div>
+		<div
+			v-if="isAnimate"
+			class="flight-select"
+		>
+			<select
+				placeholder="Choose a file"
+				@change="onSelect"
+			>
+				<option value="first">
+					Choose a file
+				</option>
+				<option
+					v-for="file in files"
+					:key="file.id"
+					:value="file.id"
+					:title="file.file_name"
+				>
+					{{ cropText(file.file_name) }}
+				</option>
+			</select>
+		</div>
 		<div class="header__right">
 			<div
 				v-if="isNotif"
@@ -127,15 +148,18 @@ import Profile from './Profile'
 import { mapActions } from 'vuex'
 import moment from 'moment'
 import TopTriggers from './reports/TopTriggers'
+import FdmSelect from './FdmSelect'
+import { fileService } from '../_services/file.service'
 export default {
 	name: 'Header',
-	components: { TopTriggers, Profile, Notifications },
+	components: { FdmSelect, TopTriggers, Profile, Notifications },
 	data () {
 		return {
 			isNotif: false,
 			isShowProfile: false,
 			isProfile: false,
-			calendarData: {}
+			calendarData: {},
+			files: []
 		}
 	},
 	computed: {
@@ -145,8 +169,18 @@ export default {
 		isDashboard () {
 			return this.$route.path === '/dashboard'
 		},
+		isAnimate () {
+			return this.$route.path === '/animate'
+		},
 		userProfile () {
 			return this.$store.state.account.user
+		}
+	},
+	watch: {
+		isAnimate (value) {
+			if (value) {
+				this.fetchFiles()
+			}
 		}
 	},
 	mounted () {
@@ -157,6 +191,7 @@ export default {
 	},
 	methods: {
 		...mapActions('other', [ 'setCalendar' ]),
+		...mapActions('file', [ 'setFileId' ]),
 		onShowAlert () {
 			this.isNotif = !this.isNotif
 		},
@@ -167,10 +202,27 @@ export default {
 				this.isShowProfile = false
 			}
 		},
+		cropText (text) {
+			if (text.length > 40) {
+				return text.substr(0, 40) + '...'
+			}	else return text
+		},
 		onClose () {
 			this.setCalendar({
 				start: moment(this.calendarData.dateRange.start, 'DD/MM/YYYY').format('YYYY-MM-DD'),
 				end: moment(this.calendarData.dateRange.end, 'DD/MM/YYYY').format('YYYY-MM-DD')
+			})
+		},
+		onSelect (event) {
+			if (event.target.value !== 'first') {
+				this.setFileId(event.target.value)
+			}
+		},
+		fetchFiles () {
+			fileService.getAll().then(res => {
+				this.files = res.map(i => ({ ...i, title: i.file_name }))
+			}).catch(err => {
+				console.log(err)
 			})
 		}
 	}
@@ -218,7 +270,7 @@ export default {
 
 				.alert {
 					position: absolute;
-					top: -2px;
+					top: -6px;
 					right: 3px;
 				}
 			}
@@ -291,6 +343,16 @@ export default {
 			&:hover {
 				background-color: rgba(#FFFFFF, 0.2);
 			}
+		}
+	}
+	.flight-select {
+		select {
+			width: 300px;
+			height: 40px;
+			outline: none;
+			background: #b4b4b4;
+			border-radius: 2px;
+			color: #000000;
 		}
 	}
 </style>
