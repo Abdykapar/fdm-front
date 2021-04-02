@@ -107,10 +107,7 @@ export default {
 
 		fetchRouteCraft () {
 			this.setLoading(true)
-			routeService.getAll().then(res => {
-				this.routes = res
-				return aircraftService.getAll(this.userProfile.user.airline[0])
-			}).then(res => {
+			aircraftService.getAll(this.userProfile.user.airline[0]).then(res => {
 				this.aircrafts = res
 				this.setLoading(false)
 			}).catch(err => {

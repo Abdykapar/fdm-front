@@ -56,7 +56,7 @@ export default {
 			box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
 			border-radius: 2px;
 			padding: 48px 30px 66px;
-			height: 90%;
+			max-height: 90%;
 			max-width: 80vw;
 			overflow-y: auto;
 

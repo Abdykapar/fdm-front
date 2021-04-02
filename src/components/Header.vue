@@ -34,10 +34,8 @@
 			<select
 				placeholder="Choose a file"
 				@change="onSelect"
+				v-model="selectedFile"
 			>
-				<option value="first">
-					Choose a file
-				</option>
 				<option
 					v-for="file in files"
 					:key="file.id"
@@ -150,6 +148,7 @@ import moment from 'moment'
 import TopTriggers from './reports/TopTriggers'
 import FdmSelect from './FdmSelect'
 import { fileService } from '../_services/file.service'
+
 export default {
 	name: 'Header',
 	components: { FdmSelect, TopTriggers, Profile, Notifications },
@@ -159,7 +158,8 @@ export default {
 			isShowProfile: false,
 			isProfile: false,
 			calendarData: {},
-			files: []
+			files: [],
+			selectedFile: 0
 		}
 	},
 	computed: {
@@ -177,9 +177,12 @@ export default {
 		}
 	},
 	watch: {
-		isAnimate (value) {
-			if (value) {
-				this.fetchFiles()
+		isAnimate: {
+			immediate: true,
+			handler: function (value) {
+				if (value) {
+					this.fetchFiles()
+				}
 			}
 		}
 	},
@@ -209,8 +212,8 @@ export default {
 		},
 		onClose () {
 			this.setCalendar({
-				start: moment(this.calendarData.dateRange.start, 'DD/MM/YYYY').format('YYYY-MM-DD'),
-				end: moment(this.calendarData.dateRange.end, 'DD/MM/YYYY').format('YYYY-MM-DD')
+				start: moment(this.calendarData.dateRange.start, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'),
+				end: moment(this.calendarData.dateRange.end, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 			})
 		},
 		onSelect (event) {
@@ -221,6 +224,7 @@ export default {
 		fetchFiles () {
 			fileService.getAll().then(res => {
 				this.files = res.map(i => ({ ...i, title: i.file_name }))
+				// this.selectedFile = this.files[0].id
 			}).catch(err => {
 				console.log(err)
 			})

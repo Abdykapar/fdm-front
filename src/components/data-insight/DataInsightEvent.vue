@@ -157,7 +157,7 @@ export default {
 			eventService.getAll().then(res => {
 				this.setLoading(false)
 				this.events = res
-				this.totalElements = this.events.length
+				this.totalElements = Math.ceil(this.events.length / 10)
 			}).catch(err => {
 				this.setLoading(false)
 				console.log(err)
