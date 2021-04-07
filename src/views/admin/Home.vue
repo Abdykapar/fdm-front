@@ -11,11 +11,11 @@
 					</div>
 				</div>
 				<dashboard-speedometer />
-				<div class="main__left__aircraft">
-					<img
+				<div class="main__left__aircraft" :style="`background-image: url('${selectedAircraft.mainImage}')`">
+					<!-- <img
 						:src="selectedAircraft.mainImage"
 						alt=""
-					>
+					> -->
 				</div>
 			</div>
 			<div class="main__bottom">
@@ -179,14 +179,11 @@ export default {
 			}
 
 			&__aircraft {
-				position: relative;
-
-				img {
-					position: absolute;
-					top: -80px;
-					left: -80px;
-					pointer-events: none;
-				}
+				// position: relative;
+				height: 350px;
+				width: 400px;
+				background-position: center;
+				background-repeat: no-repeat;
 			}
 
 			&__trigger {

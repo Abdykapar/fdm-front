@@ -5,11 +5,13 @@ export default {
 			const center = document.getElementById('center')
 			const altitude = document.getElementById('altitude')
 			const compass = document.getElementById('compass')
+			const engine = document.getElementById('engine')
 
 			this.leftSide(gs, 260, 70, selectedData)
 			this.centerSide(center)
 			this.altitudeSide(altitude)
 			this.compassSide(compass)
+			this.engineSide(engine)
 			
 		},
 		centerSide (centerSvg) {
@@ -99,7 +101,7 @@ export default {
 						},
 						{
 							p: '152,28 160,15 168,28 152,28',
-							t: 'transform: translate(0px, 56px) rotate(0deg); transform-origin: 50% 32%;',
+							t: 'transform: translate(0px, 56px) rotate(0deg); transform-origin: 45% 35%;',
 							c: 'transparent',
 							e: 'polygon',
 							id: 'topArrow',
@@ -110,7 +112,8 @@ export default {
 						},
 						{
 							f: (y1 = 300) => `M ${x1} ${y1} H ${x1 + 60} M ${x1 + 25} ${y1 - 13} H ${x1 + 35} M ${x1 + 15} ${y1 - 2 * 13} H ${x1 + 45} M ${x1 + 25} ${y1 - 3 * 13} H ${x1 + 35}`,
-							text: '10'
+							text: '10',
+							indicator: 'center'
 						},
 						{
 							f: (y1 = 280) => `M ${x1} ${y1} H ${x1 + 60} M ${x1 + 25} ${y1 + 13} H ${x1 + 35} M ${x1 + 15} ${y1 + 2 * 13} H ${x1 + 45} M ${x1 + 25} ${y1 + 3 * 13} H ${x1 + 35}`,
@@ -321,11 +324,16 @@ export default {
 								let y = 173
 								for (let k = 0; k < el.loop; k++){
 									el.text = (k + 1) * 10
+									el.indicator = 'center'
 									this.makeSvgElement(centerSvg, el, innerGroupPoint, y)
 									y -= 52
 								}
 							} else {
 								if (el.front) this.makeSvgElement(centerSvg, el, group)
+								// else if (item.text) {
+								// 	this.makeSvgElement(centerSvg, el, innerGroupPoint)
+								// 	this.createText(centerSvg, el.x, el.y, group, el.text)
+								// }
 								else this.makeSvgElement(centerSvg, el, innerGroupPoint)
 							}
 						}
@@ -334,7 +342,11 @@ export default {
 				} else {
 					if (item.e === 'circle') {
 						this.drawCircle(centerSvg, group, item.attributes)
-					}
+					} 
+					// else if (item.text) {
+					// 	this.makeSvgElement(centerSvg, item, group)
+					// 	this.createText(centerSvg, item.x, item.y, group, item.text, '', item.textId)
+					// }
 					else this.makeSvgElement(centerSvg, item, group)
 				}
 			}
@@ -413,7 +425,8 @@ export default {
 					c: '#050A11',
 					e: 'polygon',
 					o: 0.8,
-					text: '-89',
+					text: '0',
+					id: 'altitudeMarker',
 					sw: 1,
 					x: 125,
 					y: 135,
@@ -482,8 +495,9 @@ export default {
 						{
 							text: '80',
 							x: 74,
-							y: 76,
-							fs: 18
+							y: 176,
+							fs: 18,
+							textClass: 'alt',
 						}
 					]
 				},
@@ -515,10 +529,13 @@ export default {
 					}
 				}
 				else {
-					this.makeSvgElement(svg, element, group)
 					if (element.text) {
-						this.createText(svg, element.x, element.y, group, element.text, element.fs, element.textId)
-					}
+						const g = document.createElementNS(svg.namespaceURI, 'g')
+						g.setAttribute('id', element.id)
+						group.appendChild(g)
+						this.makeSvgElement(svg, element, g)
+						this.createText(svg, element.x, element.y, g, element.text, element.fs, element.textId)
+					} else this.makeSvgElement(svg, element, group)
 				}
 			});
 		},
@@ -538,7 +555,7 @@ export default {
 			if (item.p) {
 				point.setAttribute('points', item.p)
 			}
-			if (item.text) {
+			if (item.text && item.indicator === 'center') {
 				this.createText(centerSvg, 100, y + 4, group, item.text)
 				this.createText(centerSvg, 200, y + 4, group, item.text)
 			}
@@ -560,12 +577,13 @@ export default {
 			}
 			else point.setAttribute('stroke-width', '2')
 			if (item.id) {
-				point.setAttribute('id', item.id)
+				if (item.id === 'topArrow') groupPoint.setAttribute('id', item.id)
+				else point.setAttribute('id', item.id)
 			}
 			groupPoint.appendChild(point)
 			group.appendChild(groupPoint)
 		},
-		createText (svg, x, y, parent, text,  fSize = 15, id, cl) {
+		createText (svg, x, y, parent, text,  fSize = 15, id, cl, ta) {
 			const text1 = document.createElementNS(svg.namespaceURI, 'text')
 			text1.setAttribute('x', `${x}`)
 			text1.setAttribute('y', `${y}`)
@@ -575,6 +593,9 @@ export default {
 			}
 			if (cl) {
 				text1.setAttribute('class', cl)
+			}
+			if (ta) {
+				text1.setAttribute('text-anchor', ta)
 			}
 			text1.setAttribute('style', `font-size: ${fSize}px`)
 			text1.innerHTML = `${text}`
@@ -689,6 +710,9 @@ export default {
 		compassSide (svg) {
 			const group = document.createElementNS(svg.namespaceURI, 'g')
 			group.setAttribute('id', 'main')
+			const innerGroup = document.createElementNS(svg.namespaceURI, 'g')
+			innerGroup.setAttribute('id', 'innerComppass')
+			group.appendChild(innerGroup)
 			const circle = document.createElementNS(svg.namespaceURI, 'circle')
 			circle.setAttribute('cx', 150)
 			circle.setAttribute('cy', 150)
@@ -696,7 +720,7 @@ export default {
 			circle.setAttribute('stroke', 'transparent')
 			circle.setAttribute('fill', '#050A11')
 			circle.setAttribute('opacity', 0.4)
-			group.appendChild(circle)
+			innerGroup.appendChild(circle)
 
 			svg.appendChild(group)
 
@@ -733,10 +757,10 @@ export default {
 					text1.setAttribute( 'transform', 'rotate(' + i * 5 + ', 150, 150)')
 					text1.innerHTML = `${bigTexts[count]}`
 					count++
-					group.appendChild(text1)
+					innerGroup.appendChild(text1)
 				}
 
-				group.appendChild(line)
+				innerGroup.appendChild(line)
 			}
 
 			const tirangle = document.createElementNS(svg.namespaceURI, 'polygon')
@@ -744,6 +768,290 @@ export default {
 			tirangle.setAttribute('fill', '#FF00FF')
 			tirangle.setAttribute('stroke', '#FF00FF')
 			svg.appendChild(tirangle)
+		},
+
+		engineSide (svg) {
+			const g = document.createElementNS(svg.namespaceURI, 'g')
+
+			svg.appendChild(g)
+
+			const radius = 45
+
+			function polarToCartesian (centerX, centerY, radius, angleInDegrees) {
+				const angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+			  
+				return {
+				  x: centerX + (radius * Math.cos(angleInRadians)),
+				  y: centerY + (radius * Math.sin(angleInRadians))
+				}
+			  }
+			  
+			  function describeArc (x, y, radius, startAngle, endAngle){
+			  
+				  const start = polarToCartesian(x, y, radius, endAngle)
+				  const end = polarToCartesian(x, y, radius, startAngle)
+			  
+				  const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1'
+			  
+				  const d = [
+					  'M', x, y,
+					  'L', start.x, start.y, 
+					  'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+					  'L', x, y
+				  ].join(' ')
+			  
+				  return d
+			  }
+
+			  const arc = describeArc(90, 50, 45, 90, 150)
+
+			const items = [
+				{
+					d: 'M 20 0 H 280 V 200 H 20 V 0',
+					s: '#ffffff',
+					c: '#050A11',
+					o: 0.4,
+					sw: 1
+				},
+				{
+					d: arc,
+					s: '#ffffff',
+					c: '#93700E',
+					o: 0.4,
+					sw: 1
+				},
+				{
+					d: describeArc(210, 50, 45, 90, 120),
+					s: '#ffffff',
+					c: '#93700E',
+					o: 0.4,
+					sw: 1
+				},
+				{
+					d: describeArc(90, 150, 45, 90, 190),
+					s: '#ffffff',
+					c: '#93700E',
+					o: 0.4,
+					sw: 1
+				},
+				{
+					d: describeArc(210, 150, 45, 90, 110),
+					s: '#ffffff',
+					c: '#93700E',
+					o: 0.4,
+					sw: 1
+				},
+				{
+					attributes:{ 
+						fill: 'transparent',
+						stroke: '#FFFFFF',
+						cx: 90,
+						cy: 50,
+						r: radius,
+						class: 'engineCircle1'
+					},
+					e: 'circle',
+					style: 'transform-origin: 30% 16.5%; transform: rotate(-31deg);'
+				},
+				{
+					attributes:{ 
+						fill: 'transparent',
+						stroke: '#FFFFFF',
+						cx: 210,
+						cy: 50,
+						r: radius,
+						class: 'engineCircle2'
+					},
+					e: 'circle',
+					style: 'transform-origin: 70% 16.5%; transform: rotate(-31deg);'
+				},
+				{
+					attributes:{ 
+						fill: 'transparent',
+						stroke: '#FFFFFF',
+						cx: 90,
+						cy: 150,
+						r: radius,
+						class: 'engineCircle3'
+					},
+					e: 'circle',
+					style: 'transform-origin: 30% 49.5%; transform: rotate(-31deg);'
+				},
+				{
+					attributes:{ 
+						fill: 'transparent',
+						stroke: '#FFFFFF',
+						cx: 210,
+						cy: 150,
+						r: radius,
+						class: 'engineCircle4'
+					},
+					e: 'circle',
+					style: 'transform-origin: 70% 49.5%; transform: rotate(-31deg);'
+				},
+				{
+					e: 'mask',
+					attributes: {
+						d: 'M 20 20 L 140 50 V 100 H 20 V 40'
+					},
+					id: 'engineMask1'
+				},
+				{
+					e: 'mask',
+					attributes: {
+						d: 'M 140 20 L 260 50 V 100 H 140 V 40'
+					},
+					id: 'engineMask2'
+				},
+				{
+					e: 'mask',
+					attributes: {
+						d: 'M 20 120 L 140 150 V 200 H 20 V 150'
+					},
+					id: 'engineMask3'
+				},
+				{
+					e: 'mask',
+					attributes: {
+						d: 'M 140 120 L 260 150 V 200 H 140 V 150'
+					},
+					id: 'engineMask4'
+				},
+				{
+					d: 'M 110 10 H 150 V 30 H 110 V 10',
+					s: 'transparent',
+					c: '#050A11',
+					o: 0.4,
+					text: '21.9',
+					textId: 'engineText1',
+					x: 130,
+					y: 25,
+					ta: 'middle'
+				},
+				{
+					d: 'M 230 10 H 270 V 30 H 230 V 10',
+					s: 'transparent',
+					c: '#050A11',
+					o: 0.4,
+					text: '80.8',
+					textId: 'engineText2',
+					x: 250,
+					y: 25,
+					ta: 'middle'
+				},
+				{
+					d: 'M 110 110 H 150 V 130 H 110 V 110',
+					s: 'transparent',
+					c: '#050A11',
+					o: 0.4,
+					text: '445',
+					textId: 'engineText3',
+					x: 130,
+					y: 125,
+					ta: 'middle'
+				},
+				{
+					d: 'M 230 110 H 270 V 130 H 230 V 110',
+					s: 'transparent',
+					c: '#050A11',
+					o: 0.4,
+					text: '528',
+					textId: 'engineText4',
+					x: 250,
+					y: 125,
+					ta: 'middle'
+				},
+				{
+					d: '',
+					s: 'transparent',
+					c: 'transparent',
+					text: 'N1',
+					cl: 'engineN1',
+					x: 150,
+					y: 70,
+					ta: 'middle'
+				},
+				{
+					d: '',
+					s: 'transparent',
+					c: 'transparent',
+					text: 'EGT',
+					cl: 'engineN1',
+					x: 150,
+					y: 170,
+					ta: 'middle'
+				},
+			]
+
+			for (let  i = 0; i < items.length; i++) {
+				const el = items[i]
+				if (el.e === 'circle') {
+					this.drawCircle(svg, g, el.attributes)
+
+					const group = document.createElementNS(svg.namespaceURI, 'g')
+					
+					group.setAttribute('style', el.style)
+					g.appendChild(group)
+
+					// transform-origin: 70% 16.5%;transform: rotate(95deg);
+
+					const bigTexts = [ 0, 2, 4, 6, 8, 10 ]
+					const textDeg = [ 90, 225, 185, 150, 110, 70 ]
+					let count = 0
+
+					for (let i = 0; i < 18; i += 2) {
+						if (i > 4) {
+							const line = document.createElementNS(svg.namespaceURI, 'line')
+							line.setAttribute('x1', el.attributes.cx)
+							line.setAttribute('y1', el.attributes.cy - 45)
+							line.setAttribute('x2', el.attributes.cx)
+							line.setAttribute('y2', el.attributes.cy - 35)
+							line.setAttribute('stroke', 'white')
+							line.setAttribute('stroke-width', '2')
+							line.setAttribute( 'transform', 'rotate(' + i * 20 + `, ${el.attributes.cx}, ${el.attributes.cy})`)
+
+							const text = bigTexts[count]
+							const textGroup = document.createElementNS(svg.namespaceURI, 'g')
+							
+							const text1 = document.createElementNS(svg.namespaceURI, 'text')
+							text1.setAttribute('x', `${el.attributes.cx}`)
+							text1.setAttribute('y', `${el.attributes.cy - 22}`)
+							text1.setAttribute('fill', '#ffffff')
+							text1.setAttribute('text-anchor', 'middle')
+							text1.setAttribute('style', `font-size: 12px; text-align: middle; transform-origin: center; transform-box: fill-box; transform: rotate(${textDeg[count]}deg)`)
+							textGroup.setAttribute( 'transform', 'rotate(' + i * 20 + `, ${el.attributes.cx}, ${el.attributes.cy})`)
+							text1.innerHTML = `${text}`
+							count++
+							textGroup.appendChild(text1)
+							group.appendChild(textGroup)
+
+							group.appendChild(line)
+						}
+					}
+				}
+				else if (el.e === 'mask') this.drawMask(svg, el.attributes, el.id)
+				else {
+					this.makeSvgElement(svg, el, g)
+					if (el.text) {
+						this.createText(svg, el.x, el.y, g, el.text, 11, el.textId, el.cl, el.ta)
+					}
+				}
+			}
+		},
+		drawMask (svg, attributes, id) {
+			const defs = document.createElementNS(svg.namespaceURI, 'defs')
+			const clipPath = document.createElementNS(svg.namespaceURI, 'clipPath')
+			clipPath.setAttribute('id', id)
+
+			const path = document.createElementNS(svg.namespaceURI, 'path')
+
+			for (const [ key, value ] of Object.entries(attributes)) {
+				path.setAttribute(key, value)
+			}
+
+			svg.appendChild(defs)
+			defs.appendChild(clipPath)
+			clipPath.appendChild(path)
 		}
 	}
 }

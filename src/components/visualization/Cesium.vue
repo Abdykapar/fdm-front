@@ -56,6 +56,18 @@
 						</clipPath>
 					</defs>
 				</svg>
+				<svg
+					id="engine"
+					height="300"
+					width="300"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<!-- <defs>
+						<clipPath id="engineMask"> -->
+							<!-- <path d="M 120 55 L 260 55 V 100 H 120 V 55"  /> -->
+						<!-- </clipPath>
+					</defs> -->
+				</svg>
 			</div>
 			<!-- <Attitude :size="350" :pitch="pitch" :roll="roll" /> -->
 		</div>
@@ -83,7 +95,9 @@ export default {
 			roll: 0,
 			pitch: 0,
 			viewer: '',
-			selectedData: {}
+			selectedData: {},
+			oldAltitude: 0,
+			oldCoordinates: {}
 		}
 	},
 	computed: {
@@ -107,7 +121,17 @@ export default {
 		const osmBuildings = this.viewer.scene.primitives.add(Cesium.createOsmBuildings())
 	
 		this.makeCanvas(0)
-	},
+		// let count = 1
+		// setInterval(() => {
+		// 	$('.alt').each(function (i) {
+		// 		$(this).attr('y', parseInt($(this).attr('y')) + (count % 5) * 20)
+		// 		if (parseInt($(this).attr('y')) >= 176) $(this).attr('y', $(this).attr('y') - 100)   
+
+				
+		// 	})
+		// 	count = (count) % 10
+		// }, 1000)
+},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
 		fetchData (fileId) {
@@ -136,7 +160,7 @@ export default {
 			this.viewer.clock.stopTime = stop.clone()
 			this.viewer.clock.currentTime = start.clone()
 			this.viewer.timeline.zoomTo(start, stop)
-			// Speed up the playback speed 50x.
+			// Speed up the playback speed 10x.
 			this.viewer.clock.multiplier = 10
 			// Start playing the scene.
 			this.viewer.clock.shouldAnimate = true
@@ -165,9 +189,21 @@ export default {
 					point: { pixelSize: 10, color: Cesium.Color.RED }
 				})
 			}
+			function toDegrees (angle) {
+				return angle * (180 / Math.PI)
+			}
+			function getDirection (lat1, lng1, lat2, lng2){
+				const PI = Math.PI
+				const dTeta = Math.log(Math.tan((lat2/2)+(PI/4))/Math.tan((lat1/2)+(PI/4)))
+				const dLon = Math.abs(lng1-lng2)
+				const teta = Math.atan2(dLon,dTeta)
+				const direction = Math.round(toDegrees(teta))
+				return direction
+
+			}
 			const loadModel  = async () => {
 				// Load the glTF model from Cesium ion.
-				const airplaneUri = await Cesium.IonResource.fromAssetId(355099)
+				// const airplaneUri = await Cesium.IonResource.fromAssetId(355099)
 				// console.log(airplaneUri)
 				const airplaneEntity = this.viewer.entities.add({
 					availability: new Cesium.TimeIntervalCollection([ new Cesium.TimeInterval({ start: start, stop: stop }) ]),
@@ -199,7 +235,7 @@ export default {
 						const speed = Math.round(this.selectedData.ground_speed)
 						const pitchAngle = parseFloat(this.selectedData.pitch_angle)
 						const rollAngle = parseFloat(this.selectedData.roll_angle)
-						const altitude = parseFloat(this.selectedData.altitude)
+						const altitude = parseInt(this.selectedData.altitude)
 						
 						const el = document.getElementById('gsGroupContent')
 						const text = document.getElementById('gsText')
@@ -212,36 +248,57 @@ export default {
 						const altitudeNum0 = document.getElementById('altitudeNum0')
 						const altitudeNum1 = document.getElementById('altitudeNum1')
 						const altitudeNum2 = document.getElementById('altitudeNum2')
-
+						const altitudeMarker = document.getElementById('altitudeMarker')
 						const altitudeRuler = document.getElementById('km')
-						console.log(altitude)
+						const compass = document.getElementById('innerComppass')
+
+						//compass
+						const a = getDirection(this.oldCoordinates.latitude, this.oldCoordinates.longitude, this.selectedData.latitude, this.selectedData.longitude)
+						console.log(a)
+						compass.setAttribute('style', `transform-origin: center; transform: rotate(${a * (-1)}deg)`)
+
 						if (altitude >= 1800) {
 							altitudeRuler.setAttribute('style',`transform: translateY(${altitude * 0.5 - 130}px)`)
-							const num0 = (altitude / 100) % 10
-							const num1 = (altitude / 1000) % 10 || ''
-							const num2 = (altitude / 10000) % 10 || ''
+							const num0 = parseInt((altitude / 100) % 10)
+							const num1 = isNaN(parseInt((altitude / 1000) % 10)) ? '' : parseInt((altitude / 1000) % 10)
+							const num2 = parseInt((altitude / 10000) % 10) || ''
+							const last2Digit = parseInt(altitude) % 100
 
 							altitudeNum0.innerHTML = num0
 							altitudeNum1.innerHTML = num1
 							altitudeNum2.innerHTML = num2
 
-							const texts = document.querySelectorAll('.alt')
-							const centerNum = Array.from(texts).find(i => i.attributes.y.value === '136')
 
+							// Altitude marker
+							const markerText = altitudeMarker.querySelector('text')
+							markerText.innerHTML = parseInt(altitude - this.oldAltitude)
+							altitudeMarker.setAttribute('style',`transform: translateY(${((altitude - this.oldAltitude) > 2000 ? 2000 : (altitude - this.oldAltitude)) * (-1) * 0.0595}px)`)
+
+							const texts = document.querySelectorAll('.alt')
+							const centerNum = Array.from(texts).sort((a,b) => parseInt(a.attributes.y.value) - parseInt(b.attributes.y.value))[2]
+							let count = 0
+							const subtract = 136 - parseInt(centerNum.attributes.y.value)
+
+							if (last2Digit >= parseInt(centerNum.innerHTML)) {
+								count = last2Digit - parseInt(centerNum.innerHTML)
+							} else {
+								count = last2Digit + 100 - parseInt(centerNum.innerHTML)
+							}
+							
 							$('.alt').each(function (i) {
-								$(this).attr('y', parseInt($(this).attr('y')) + count * 20)
+								$(this).attr('y', parseInt($(this).attr('y')) + (count + subtract))
 								if (parseInt($(this).attr('y')) >= 172) $(this).attr('y', $(this).attr('y') - 100)   
 							})
+							
 						}
 
-						// aircraftAngle.setAttribute('style', `transform-origin: 100 100; transform: rotate(${rollAngle}deg);`)
-						// console.log(rollAngle)
+						topArrow.setAttribute('style', `transform: translate(0px, 56px) rotate(${rollAngle}deg); transform-origin: 45% 35%;`)
 						aircraftAngle.setAttribute('style', `transform-box: fill-box; transform-origin: center; transform: rotate(${rollAngle}deg) translateY(${pitchAngle * 6.4}px);`)
 						text.innerHTML = 'GS ' + speed
 						if (speed > 45) {
 							
 							frontNum0.innerHTML = parseInt(speed / 10) % 10
-							frontNum1.innerHTML = parseInt(speed / 100) % 10 || ''
+							frontNum1.innerHTML = isNaN(parseInt(speed / 100) % 10) ? '' : parseInt(speed / 100) % 10
 							frontNum2.innerHTML = parseInt(speed / 1000) || ''
 							
 							el.setAttribute('style',`transform: translateY(${(speed - 45) * 3.3}px)`)
@@ -260,6 +317,9 @@ export default {
 							})
 
 						}
+
+						this.oldAltitude = altitude
+						this.oldCoordinates = this.selectedData
 					}
 
 				}
@@ -278,12 +338,15 @@ export default {
 		position: relative;
 		width: calc(100vw - 240px);
 		height: calc(100vh - 100px);
+		overflow: hidden;
 	}
 	.content {
 		position: absolute;
-		left: 30px;
-		top: 30px;
+		right: 0px;
+		bottom: 0px;
 		z-index: 1;
+		pointer-events: none;
+		margin-bottom: -180px;
 	}
 	#gs {
 		/* border: solid 1px #FFFFFF; */
@@ -322,7 +385,30 @@ export default {
 		clip-path: url(#gsGroupMask);
 	}
 
+	.engineCircle1 {
+		clip-path: url(#engineMask1);
+	}
+
+	.engineCircle2 {
+		clip-path: url(#engineMask2);
+	}
+
+	.engineCircle3 {
+		clip-path: url(#engineMask3);
+	}
+
+	.engineCircle4 {
+		clip-path: url(#engineMask4);
+	}
+
 	.row {
 		display: flex;
+	}
+	.engineN1 {
+		stroke: #00FFFF;
+	}
+	#engine {
+		margin-left: 180px;
+    	margin-top: -140px;
 	}
 </style>
