@@ -113,7 +113,6 @@ export default {
 		},
 	},
 	mounted () {
-		// this.init()
 		Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
 		
 		this.viewer = new Cesium.Viewer('cesium', {
@@ -138,10 +137,7 @@ export default {
 		},
 		init () {
 			const dataLength = this.flightData.length
-			// const totalSeconds = timeStepInSeconds * (this.flightData.length - 1)
-			// const start = Cesium.JulianDate.fromIso8601('2020-03-09T23:10:00Z')
 			const start = Cesium.JulianDate.fromDate(new Date(this.flightData[0].timestamp))
-			// const stop = Cesium.JulianDate.addSeconds(start, totalSeconds, new Cesium.JulianDate())
 			const stop = Cesium.JulianDate.fromDate(new Date(this.flightData[dataLength - 1].timestamp))
 			this.viewer.clock.startTime = start.clone()
 			this.viewer.clock.stopTime = stop.clone()
@@ -189,9 +185,6 @@ export default {
 
 			}
 			const loadModel  = async () => {
-				// Load the glTF model from Cesium ion.
-				// const airplaneUri = await Cesium.IonResource.fromAssetId(355099)
-				// console.log(airplaneUri)
 				const airplaneEntity = this.viewer.entities.add({
 					availability: new Cesium.TimeIntervalCollection([ new Cesium.TimeInterval({ start: start, stop: stop }) ]),
 					position: positionProperty,
