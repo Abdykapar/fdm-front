@@ -85,7 +85,7 @@ export default {
 					class: 'indicator-mask',
 					children: [
 						{
-							d: 'M 0 0 H 320 V 225 H 0 V 0',
+							d: 'M 0 -30 H 320 V 225 H 0 V -30',
 							c: '#3C508C',
 							o: '0.8',
 							s: 'transparent'

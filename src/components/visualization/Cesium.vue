@@ -365,7 +365,8 @@ export default {
 		bottom: 0px;
 		z-index: 1;
 		pointer-events: none;
-		margin-bottom: -145px;
+		margin-bottom: -187px;
+		transform: scale(0.8, 0.8) translate(110px, 15px);
 	}
 	#gs {
 		/* border: solid 1px #FFFFFF; */
@@ -429,7 +430,7 @@ export default {
 	}
 	#engine {
 		margin-left: 180px;
-    	margin-top: -140px;
+    	margin-top: -175px;
 	}
 	.letter-space {
 		letter-spacing: 2px;
