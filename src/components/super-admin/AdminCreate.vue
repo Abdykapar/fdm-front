@@ -127,7 +127,7 @@
 							<input
 								style="opacity: 0"
 								id="avatar"
-								v-validate="{ 'required' : !isEdit }"
+								v-validate="{ 'required' : false }"
 								type="file"
 								name="avatar"
 								@change="onFileSelect"

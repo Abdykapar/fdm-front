@@ -12,107 +12,137 @@
 					class="form"
 					@submit.prevent="onSubmit"
 				>
-					<div
-						class="form__row"
-						:class="{ error: errors.has('lastname') }"
-					>
-						<label for="lastname">Surname</label>
-						<input
-							id="lastname"
-							v-model="user.last_name"
-							v-validate="'required'"
-							type="text"
-							name="lastname"
+					<div class="flex-gap">
+						<div
+							class="form__row"
+							:class="{ error: errors.has('lastname') }"
 						>
-						<template v-if="errors.length">
-							<img
-								src="../../assets/icons/error.svg"
-								alt=""
+							<label for="lastname">Surname</label>
+							<input
+								id="lastname"
+								v-model="user.last_name"
+								v-validate="'required'"
+								type="text"
+								name="lastname"
 							>
-							<span>Required field</span>
-						</template>
-					</div>
-					<div
-						class="form__row"
-						:class="{ error: errors.has('firstname') }"
-					>
-						<label for="firstname">Name</label>
-						<input
-							id="firstname"
-							v-model="user.first_name"
-							v-validate="'required'"
-							type="text"
-							name="firstname"
+							<template v-if="errors.length">
+								<img
+									src="../../assets/icons/error.svg"
+									alt=""
+								>
+								<span>Required field</span>
+							</template>
+						</div>
+						<div
+							class="form__row"
+							:class="{ error: errors.has('firstname') }"
 						>
-						<template v-if="errors.length">
-							<img
-								src="../../assets/icons/error.svg"
-								alt=""
+							<label for="firstname">Name</label>
+							<input
+								id="firstname"
+								v-model="user.first_name"
+								v-validate="'required'"
+								type="text"
+								name="firstname"
 							>
-							<span>Required field</span>
-						</template>
+							<template v-if="errors.length">
+								<img
+									src="../../assets/icons/error.svg"
+									alt=""
+								>
+								<span>Required field</span>
+							</template>
+						</div>
 					</div>
-					<div
-						class="form__row"
-						:class="{ error: errors.has('username') }"
-					>
-						<label for="username">Username</label>
-						<input
-							id="username"
-							v-model="user.username"
-							v-validate="'required'"
-							type="text"
-							name="username"
+					<div class="flex-gap">
+						<div
+							class="form__row"
+							:class="{ error: errors.has('username') }"
 						>
-						<template v-if="errors.length">
-							<img
-								src="../../assets/icons/error.svg"
-								alt=""
+							<label for="username">Username</label>
+							<input
+								id="username"
+								v-model="user.username"
+								v-validate="'required'"
+								type="text"
+								name="username"
 							>
-							<span>Required field</span>
-						</template>
-					</div>
-					<div
-						class="form__row"
-						:class="{ error: errors.has('email') }"
-					>
-						<label for="email">Email</label>
-						<input
-							id="email"
-							v-model="user.email"
-							v-validate="'required'"
-							type="email"
-							name="email"
+							<template v-if="errors.length">
+								<img
+									src="../../assets/icons/error.svg"
+									alt=""
+								>
+								<span>Required field</span>
+							</template>
+						</div>
+						<div
+							class="form__row"
+							:class="{ error: errors.has('email') }"
 						>
-						<template v-if="errors.length">
-							<img
-								src="../../assets/icons/error.svg"
-								alt=""
+							<label for="email">Email</label>
+							<input
+								id="email"
+								v-model="user.email"
+								v-validate="'required'"
+								type="email"
+								name="email"
 							>
-							<span>Required field</span>
-						</template>
+							<template v-if="errors.length">
+								<img
+									src="../../assets/icons/error.svg"
+									alt=""
+								>
+								<span>Required field</span>
+							</template>
+						</div>
 					</div>
-					<div
-						class="form__row"
-						:class="{ error: errors.has('password') }"
-					>
-						<label for="password">Password</label>
-						<input
-							id="password"
-							v-model="user.password"
-							v-validate="{'required' : !isEdit}"
-							type="password"
-							name="password"
+					<div class="flex-gap">
+						<div
+							class="form__row"
+							:class="{ error: errors.has('password') }"
 						>
-						<template v-if="errors.length">
-							<img
-								src="../../assets/icons/error.svg"
-								alt=""
+							<label for="password">Password</label>
+							<input
+								id="password"
+								v-model="user.password"
+								v-validate="{'required' : !isEdit}"
+								type="password"
+								name="password"
 							>
-							<span>Required field</span>
-						</template>
+							<template v-if="errors.length">
+								<img
+									src="../../assets/icons/error.svg"
+									alt=""
+								>
+								<span>Required field</span>
+							</template>
+						</div>
+						<div
+							class="form__row"
+							:class="{ error: errors.has('avatar') }"
+						>
+							<label for="avatar">Avatar</label>
+							
+							<input
+								style="opacity: 0"
+								id="avatar"
+								v-validate="{ 'required' : false }"
+								type="file"
+								name="avatar"
+								@change="onFileSelect"
+							>
+							<div class="form__row__file flex-center">{{ avatar.name || 'Choose image' | crop }}</div>
+							<template v-if="errors.length">
+								<img
+									src="../../assets/icons/error.svg"
+									alt=""
+								>
+								<span>Required field</span>
+							</template>
+						</div>
 					</div>
-					<div class="form__submit flex-justify-between">
+					
+					<div class="form__submit flex-justify-center flex-gap">
 						<button type="submit">
 							ADD
 						</button>
@@ -149,6 +179,7 @@ export default {
 		return {
 			user: {},
 			airlines: [],
+			avatar: {},
 			roles: []
 		}
 	},
@@ -177,10 +208,14 @@ export default {
 				this.$toastr.e(err)
 			})
 		},
+		onFileSelect (event) {
+			this.avatar = event.target.files[0]
+		},
 		onSubmit () {
 			this.$validator.validate().then(valid => {
 				if (valid) {
 					this.user.airline = this.userProfile.user.airline[0]
+					this.user.avatar = this.avatar
 					if (this.isEdit) {
 						usersService
 							.update(this.user)
