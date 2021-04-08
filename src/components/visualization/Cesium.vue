@@ -114,23 +114,14 @@ export default {
 	},
 	mounted () {
 		// this.init()
-		Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjYWEwOWNkNy05ZTU4LTQxMjQtYmFiNy05NmZmNzY5YWFjMzEiLCJpZCI6NDU3MTQsImlhdCI6MTYxNTc5NDI3OH0.Wpk8AX-oZBjF07M98aCrfVFBmPatRjdV96HawS69RBk'
+		Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
+		
 		this.viewer = new Cesium.Viewer('cesium', {
 			terrainProvider: Cesium.createWorldTerrain()
 		})
 		const osmBuildings = this.viewer.scene.primitives.add(Cesium.createOsmBuildings())
 	
 		this.makeCanvas(0)
-		// let count = 1
-		// setInterval(() => {
-		// 	$('.alt').each(function (i) {
-		// 		$(this).attr('y', parseInt($(this).attr('y')) + (count % 5) * 20)
-		// 		if (parseInt($(this).attr('y')) >= 176) $(this).attr('y', $(this).attr('y') - 100)   
-
-				
-		// 	})
-		// 	count = (count) % 10
-		// }, 1000)
 },
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
@@ -146,10 +137,6 @@ export default {
 			})
 		},
 		init () {
-			// const flightData = JSON.parse(
-			// 	
-			// )
-			// const timeStepInSeconds = 30
 			const dataLength = this.flightData.length
 			// const totalSeconds = timeStepInSeconds * (this.flightData.length - 1)
 			// const start = Cesium.JulianDate.fromIso8601('2020-03-09T23:10:00Z')
@@ -178,7 +165,7 @@ export default {
 				// Declare the time for this individual sample and store it in a new JulianDate instance.
 				// const time = Cesium.JulianDate.addSeconds(start, i * timeStepInSeconds, new Cesium.JulianDate())
 				const time = Cesium.JulianDate.fromDate(new Date(dataPoint.timestamp))
-				const position = Cesium.Cartesian3.fromDegrees(dataPoint.longitude, dataPoint.latitude, dataPoint.altitude)
+				const position = Cesium.Cartesian3.fromDegrees(dataPoint.longitude, dataPoint.latitude, dataPoint.altitude+1000)
 				// Store the position along with its timestamp.
 				// Here we add the positions all upfront, but these can be added at run-time as samples are received from a server.
 				positionProperty.addSample(time, position)
