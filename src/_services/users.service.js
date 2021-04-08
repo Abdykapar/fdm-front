@@ -23,8 +23,12 @@ class UsersService extends BaseApiService {
 	}
 
 	update (data) {
+		const fd = new FormData()
+		for (const [ key, value ] of Object.entries(data)) {
+			fd.append(key, value)
+		}
 		const url = `${baseUrl}/users/${data.id}/`
-		return this.sendPutRequest(url, data)
+		return this.sendPutRequest(url, fd)
 	}
 
 	delete (id) {

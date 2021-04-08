@@ -13,10 +13,14 @@ export const userService = {
 		localStorage.removeItem('user')
 	},
 	register (user) {
+		const fd = new FormData()
+		for (const [ key, value ] of Object.entries(user)) {
+			fd.append(key, value)
+		}
+
 		const requestOptions = {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(user)
+			body: fd
 		}
 		
 		return fetch(`${process.env.VUE_APP_BASE_URL}/auth/register`, requestOptions).then(handleResponse)

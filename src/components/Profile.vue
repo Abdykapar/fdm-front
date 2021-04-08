@@ -4,8 +4,14 @@
 			slot="content"
 			class="create"
 		>
-			<div class="create__head">
-				My Profile
+			<div class="create__head flex-justify-between flex-align-center">
+				<span>My Profile</span>
+				<div
+					v-if="user.avatar"
+					:style="`background-image: url(${user.avatar})`"
+					alt=""
+					class="avatar"
+				></div>
 			</div>
 			<div class="create__body">
 				<form
@@ -117,6 +123,28 @@
 								<span>Required field</span>
 							</template>
 						</div>
+						<div
+							class="form__row"
+							:class="{ error: errors.has('avatar') }"
+						>
+							<label for="avatar">Avatar</label>
+							
+							<input
+								style="opacity: 0"
+								id="avatar"
+								type="file"
+								name="avatar"
+								@change="onFileSelect"
+							>
+							<div class="form__row__file flex-center">{{ avatar.name || 'Choose image' | crop }}</div>
+							<template v-if="errors.length">
+								<img
+									src="../assets/icons/error.svg"
+									alt=""
+								>
+								<span>Required field</span>
+							</template>
+						</div>
 					</div>
 					<div class="form__submit flex-center gap-20 mt20">
 						<button type="submit">
@@ -127,7 +155,7 @@
 							class="black"
 							@click="$emit('close')"
 						>
-							CANCEL
+							CLOSE
 						</button>
 					</div>
 				</form>
@@ -145,7 +173,8 @@ export default {
 	components: { FdmModal },
 	data () {
 		return {
-			user: {}
+			user: {},
+			avatar: {}
 		}
 	},
 	computed: {
@@ -160,16 +189,27 @@ export default {
 			last_name: val.last_name,
 			username: val.username,
 			email: val.email,
-			id: val.id
+			id: val.id,
+			avatar: val.avatar
 		}
 	},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
+		onFileSelect (event) {
+			this.avatar = event.target.files[0]
+		},
 		onSubmit () {
 			this.$validator.validate().then(valid => {
 				if (valid) {
 					this.setLoading(true)
+					this.user.avatar = this.avatar
 					usersService.update(this.user).then(res => {
+						const data = {
+							token: this.userProfile.token,
+							user: res
+						}
+						this.user.avatar = res.avatar
+						this.$store.commit('account/SET_USER', data)
 						this.setLoading(false)
 						this.$toastr.s(this.$t('successMessageEdit'))
 					}).catch(err => {

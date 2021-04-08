@@ -96,7 +96,14 @@
 					:class="{ 'up' : isShowProfile }"
 					@click="isShowProfile = !isShowProfile"
 				>
+					<div
+						v-if="userProfile.user.avatar"
+						:style="`background-image: url(${userProfile.user.avatar})`"
+						alt=""
+						class="avatar"
+					></div>
 					<img
+						v-else
 						src="../assets/img/img.png"
 						alt=""
 					>
@@ -146,12 +153,11 @@ import Profile from './Profile'
 import { mapActions } from 'vuex'
 import moment from 'moment'
 import TopTriggers from './reports/TopTriggers'
-import FdmSelect from './FdmSelect'
 import { fileService } from '../_services/file.service'
 
 export default {
 	name: 'Header',
-	components: { FdmSelect, TopTriggers, Profile, Notifications },
+	components: { TopTriggers, Profile, Notifications },
 	data () {
 		return {
 			isNotif: false,
@@ -359,4 +365,5 @@ export default {
 			color: #000000;
 		}
 	}
+
 </style>
