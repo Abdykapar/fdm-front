@@ -770,6 +770,32 @@ export default {
 			svg.appendChild(tirangle)
 		},
 
+		polarToCartesian (centerX, centerY, radius, angleInDegrees) {
+			const angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+		  
+			return {
+			  x: centerX + (radius * Math.cos(angleInRadians)),
+			  y: centerY + (radius * Math.sin(angleInRadians))
+			}
+		},
+		  
+		describeArc (x, y, radius, startAngle, endAngle){
+		  
+			const start = this.polarToCartesian(x, y, radius, endAngle)
+			const end = this.polarToCartesian(x, y, radius, startAngle)
+		
+			const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1'
+		
+			const d = [
+				'M', x, y,
+				'L', start.x, start.y, 
+				'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+				'L', x, y
+			].join(' ')
+		
+			return d
+		},
+
 		engineSide (svg) {
 			const g = document.createElementNS(svg.namespaceURI, 'g')
 
@@ -777,37 +803,11 @@ export default {
 
 			const radius = 45
 
-			function polarToCartesian (centerX, centerY, radius, angleInDegrees) {
-				const angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
-			  
-				return {
-				  x: centerX + (radius * Math.cos(angleInRadians)),
-				  y: centerY + (radius * Math.sin(angleInRadians))
-				}
-			  }
-			  
-			  function describeArc (x, y, radius, startAngle, endAngle){
-			  
-				  const start = polarToCartesian(x, y, radius, endAngle)
-				  const end = polarToCartesian(x, y, radius, startAngle)
-			  
-				  const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1'
-			  
-				  const d = [
-					  'M', x, y,
-					  'L', start.x, start.y, 
-					  'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y,
-					  'L', x, y
-				  ].join(' ')
-			  
-				  return d
-			  }
-
-			  const arc = describeArc(90, 50, 45, 90, 150)
+			  const arc = this.describeArc(90, 50, 45, 90, 90)
 
 			const items = [
 				{
-					d: 'M 20 0 H 280 V 200 H 20 V 0',
+					d: 'M 20 0 H 280 V 240 H 20 V 0',
 					s: '#ffffff',
 					c: '#050A11',
 					o: 0.4,
@@ -818,28 +818,32 @@ export default {
 					s: '#ffffff',
 					c: '#93700E',
 					o: 0.4,
-					sw: 1
+					sw: 1,
+					id: 'engineCircle1'
 				},
 				{
-					d: describeArc(210, 50, 45, 90, 120),
+					d: this.describeArc(210, 50, 45, 90, 90),
 					s: '#ffffff',
 					c: '#93700E',
 					o: 0.4,
-					sw: 1
+					sw: 1,
+					id: 'engineCircle2'
 				},
 				{
-					d: describeArc(90, 150, 45, 90, 190),
+					d: this.describeArc(90, 150, 45, 90, 90),
 					s: '#ffffff',
 					c: '#93700E',
 					o: 0.4,
-					sw: 1
+					sw: 1,
+					id: 'engineCircle3'
 				},
 				{
-					d: describeArc(210, 150, 45, 90, 110),
+					d: this.describeArc(210, 150, 45, 90, 90),
 					s: '#ffffff',
 					c: '#93700E',
 					o: 0.4,
-					sw: 1
+					sw: 1,
+					id: 'engineCircle4'
 				},
 				{
 					attributes:{ 
@@ -922,7 +926,7 @@ export default {
 					s: 'transparent',
 					c: '#050A11',
 					o: 0.4,
-					text: '21.9',
+					text: '0',
 					textId: 'engineText1',
 					x: 130,
 					y: 25,
@@ -933,7 +937,7 @@ export default {
 					s: 'transparent',
 					c: '#050A11',
 					o: 0.4,
-					text: '80.8',
+					text: '0',
 					textId: 'engineText2',
 					x: 250,
 					y: 25,
@@ -944,7 +948,7 @@ export default {
 					s: 'transparent',
 					c: '#050A11',
 					o: 0.4,
-					text: '445',
+					text: '0',
 					textId: 'engineText3',
 					x: 130,
 					y: 125,
@@ -955,7 +959,7 @@ export default {
 					s: 'transparent',
 					c: '#050A11',
 					o: 0.4,
-					text: '528',
+					text: '0',
 					textId: 'engineText4',
 					x: 250,
 					y: 125,
@@ -975,10 +979,80 @@ export default {
 					d: '',
 					s: 'transparent',
 					c: 'transparent',
-					text: 'EGT',
+					text: 'ITT',
 					cl: 'engineN1',
 					x: 150,
 					y: 170,
+					ta: 'middle'
+				},
+				{
+					d: '',
+					s: 'transparent',
+					c: 'transparent',
+					text: 'OIL PRESS',
+					cl: 'engineN1',
+					x: 150,
+					y: 212,
+					ta: 'middle',
+					fs: 10
+				},
+				{
+					d: '',
+					s: 'transparent',
+					c: 'transparent',
+					text: 'OIL TEMP',
+					cl: 'engineN1',
+					x: 150,
+					y: 230,
+					ta: 'middle',
+					fs: 10
+				},
+				{
+					d: 'M 60 202 H 110 V 216 H 60 V 202',
+					s: 'transparent',
+					c: '#050A11',
+					o: 0.4,
+					text: '0',
+					textId: 'oilPressLeft',
+					cl: 'letter-space',
+					x: 85,
+					y: 213,
+					ta: 'middle'
+				},
+				{
+					d: 'M 190 202 H 240 V 216 H 190 V 202',
+					s: 'transparent',
+					c: '#050A11',
+					o: 0.4,
+					text: '0',
+					textId: 'oilPressRight',
+					cl: 'letter-space',
+					x: 215,
+					y: 213,
+					ta: 'middle'
+				},
+				{
+					d: 'M 60 220 H 110 V 234 H 60 V 220',
+					s: 'transparent',
+					c: '#050A11',
+					o: 0.4,
+					text: '0',
+					textId: 'oilTempLeft',
+					cl: 'letter-space',
+					x: 85,
+					y: 231,
+					ta: 'middle'
+				},
+				{
+					d: 'M 190 220 H 240 V 234 H 190 V 220',
+					s: 'transparent',
+					c: '#050A11',
+					o: 0.4,
+					text: '0',
+					textId: 'oilTempRight',
+					cl: 'letter-space',
+					x: 215,
+					y: 231,
 					ta: 'middle'
 				},
 			]
@@ -1033,7 +1107,7 @@ export default {
 				else {
 					this.makeSvgElement(svg, el, g)
 					if (el.text) {
-						this.createText(svg, el.x, el.y, g, el.text, 11, el.textId, el.cl, el.ta)
+						this.createText(svg, el.x, el.y, g, el.text, el.fs || 11, el.textId, el.cl, el.ta)
 					}
 				}
 			}

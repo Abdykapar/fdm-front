@@ -220,9 +220,18 @@ export default {
 					
 					if (this.selectedData) {
 						const speed = Math.round(this.selectedData.ground_speed)
+						const airSpeed = Math.round(this.selectedData.air_speed)
 						const pitchAngle = parseFloat(this.selectedData.pitch_angle)
 						const rollAngle = parseFloat(this.selectedData.roll_angle)
 						const altitude = parseInt(this.selectedData.altitude)
+						const n1Left = parseFloat(this.selectedData.n1_left)
+						const n1Right = parseFloat(this.selectedData.n1_right)
+						const ittLeft = parseFloat(this.selectedData.itt_left)
+						const ittRight = parseFloat(this.selectedData.itt_right)
+						const oilPressLeft = parseFloat(this.selectedData.oil_press_left)
+						const oilPressRight = parseFloat(this.selectedData.oil_press_right)
+						const oilTempLeft = parseFloat(this.selectedData.oil_temp_left)
+						const oilTempRight = parseFloat(this.selectedData.oil_temp_right)
 						
 						const el = document.getElementById('gsGroupContent')
 						const text = document.getElementById('gsText')
@@ -238,10 +247,40 @@ export default {
 						const altitudeMarker = document.getElementById('altitudeMarker')
 						const altitudeRuler = document.getElementById('km')
 						const compass = document.getElementById('innerComppass')
+						const engineText1 = document.getElementById('engineText1')
+						const engineText2 = document.getElementById('engineText2')
+						const engineText3 = document.getElementById('engineText3')
+						const engineText4 = document.getElementById('engineText4')
+						const oilPressLeftElement = document.getElementById('oilPressLeft')
+						const oilPressRightElement = document.getElementById('oilPressRight')
+						const oilTempLeftElement = document.getElementById('oilTempLeft')
+						const oilTempRightElement = document.getElementById('oilTempRight')
+						const oilPressLeftCircle = document.getElementById('engineCircle1')
+						const oilPressRightCircle = document.getElementById('engineCircle2')
+						const oilTempLeftCircle = document.getElementById('engineCircle3')
+						const oilTempRightCircle = document.getElementById('engineCircle4')
 
+						//Engine
+						engineText1.innerHTML = n1Left.toFixed(1)
+						engineText2.innerHTML = n1Right.toFixed(1)
+						engineText3.innerHTML = ittLeft.toFixed(1)
+						engineText4.innerHTML = ittRight.toFixed(1)
+						oilPressLeftElement.innerHTML = oilPressLeft.toFixed(1)
+						oilPressRightElement.innerHTML = oilPressRight.toFixed(1)
+						oilTempLeftElement.innerHTML = oilTempLeft.toFixed(1)
+						oilTempRightElement.innerHTML = oilTempRight.toFixed(1)
+						const n1L = this.describeArc(90, 50, 45, 90, n1Left * 2 + 90)
+						const n1R = this.describeArc(210, 50, 45, 90, n1Right * 2 + 90)
+						const ittL = this.describeArc(90, 150, 45, 90, ittLeft * 0.2 + 90)
+						const ittR = this.describeArc(210, 150, 45, 90, ittRight * 0.2  + 90)
+						oilPressLeftCircle.setAttribute('d', n1L > 100 ? 100 : n1L)
+						oilPressRightCircle.setAttribute('d', n1R > 100 ? 100 : n1R )
+						oilTempLeftCircle.setAttribute('d', ittL > 1000 ? 1000 : ittL)
+						oilTempRightCircle.setAttribute('d', ittR > 1000 ? 1000 : ittR)
+ 
 						//compass
 						const a = getDirection(this.oldCoordinates.latitude, this.oldCoordinates.longitude, this.selectedData.latitude, this.selectedData.longitude)
-						console.log(a)
+						
 						compass.setAttribute('style', `transform-origin: center; transform: rotate(${a * (-1)}deg)`)
 
 						if (altitude >= 1800) {
@@ -282,17 +321,17 @@ export default {
 						topArrow.setAttribute('style', `transform: translate(0px, 56px) rotate(${rollAngle}deg); transform-origin: 45% 35%;`)
 						aircraftAngle.setAttribute('style', `transform-box: fill-box; transform-origin: center; transform: rotate(${rollAngle}deg) translateY(${pitchAngle * 6.4}px);`)
 						text.innerHTML = 'GS ' + speed
-						if (speed > 45) {
+						if (airSpeed > 45) {
 							
-							frontNum0.innerHTML = parseInt(speed / 10) % 10
-							frontNum1.innerHTML = isNaN(parseInt(speed / 100) % 10) ? '' : parseInt(speed / 100) % 10
-							frontNum2.innerHTML = parseInt(speed / 1000) || ''
+							frontNum0.innerHTML = parseInt(airSpeed / 10) % 10
+							frontNum1.innerHTML = isNaN(parseInt(airSpeed / 100) % 10) ? '' : parseInt(airSpeed / 100) % 10
+							frontNum2.innerHTML = parseInt(airSpeed / 1000) || ''
 							
-							el.setAttribute('style',`transform: translateY(${(speed - 45) * 3.3}px)`)
+							el.setAttribute('style',`transform: translateY(${(airSpeed - 45) * 3.3}px)`)
 							
 							const centerNum = Array.from(gsText.children).find(i => i.attributes.y.value === '136')
 
-							const num = speed % 10
+							const num = airSpeed % 10
 							let count
 							if (num < parseInt(centerNum.innerHTML)) {
 								count = num + 10 - parseInt(centerNum.innerHTML)
@@ -333,7 +372,7 @@ export default {
 		bottom: 0px;
 		z-index: 1;
 		pointer-events: none;
-		margin-bottom: -180px;
+		margin-bottom: -145px;
 	}
 	#gs {
 		/* border: solid 1px #FFFFFF; */
@@ -393,9 +432,13 @@ export default {
 	}
 	.engineN1 {
 		stroke: #00FFFF;
+		letter-spacing: 2px;
 	}
 	#engine {
 		margin-left: 180px;
     	margin-top: -140px;
+	}
+	.letter-space {
+		letter-spacing: 2px;
 	}
 </style>
