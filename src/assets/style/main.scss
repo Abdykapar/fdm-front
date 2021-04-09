@@ -251,6 +251,11 @@ body {
 	background: inherit;
 	color: #298bfe;
 	cursor: pointer;
+
+	&.red {
+		border-color: #ff3654;
+		color: #ff3654;
+	}
 }
 
 .fdm-page {

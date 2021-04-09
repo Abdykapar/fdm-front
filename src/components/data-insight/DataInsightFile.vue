@@ -14,21 +14,28 @@
 			<template slot="body">
 				<tr class="filter">
 					<td>
-						<input type="text">
+						<input type="text" v-model="name">
 						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text">
-						<img
+						<input type="date" v-model="date">
+						<!-- <img
 							src="../../assets/icons/calendar.svg"
 							alt=""
+						> -->
+					</td>
+					<td>
+						<input type="text" v-model="size">
+						<img
+							src="../../assets/icons/search-mini.svg"
+							alt=""
 						>
 					</td>
 					<td>
-						<input type="text"><img
+						<input type="text" v-model="quality"><img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
@@ -40,15 +47,16 @@
 						>
 					</td>
 					<td>
-						<input type="text"><img
-							src="../../assets/icons/search-mini.svg"
-							alt=""
+						<button
+							@click="onClear"
+							class="detail red"
 						>
+							Clear
+						</button>
 					</td>
-					<td />
 				</tr>
 				<tr
-					v-for="(item, i) in files"
+					v-for="(item, i) in filteredFiles"
 					:key="i"
 				>
 					<td>
@@ -86,15 +94,31 @@ import FmdTable from '../FdmTable'
 import { fileService } from '../../_services/file.service'
 import { mapActions } from 'vuex'
 import DataInsightDetail from './DataInsightDetail'
-import Pagination from '../elements/Pagination'
+import moment from 'moment'
+// import Pagination from '../elements/Pagination'
 export default {
 	name: 'DataInsightFile',
-	components: { Pagination, DataInsightDetail, FmdTable },
+	components: { DataInsightDetail, FmdTable },
 	data () {
 		return {
 			files: [],
 			isShowDetail: false,
-			file: {}
+			file: {},
+			name: '',
+			date: '',
+			size: '',
+			quality: '',
+			comment: ''
+		}
+	},
+	computed: {
+		filteredFiles () {
+			let data = this.files
+			if (this.name) data = this.files.filter(i => i.file_name && i.file_name.toLowerCase().includes(this.name.toLowerCase()))
+			if (this.date) data = this.files.filter(i => i.created_at && moment(i.created_at).format('YYYY-MM-DD') === this.date)
+			if (this.size) data = this.files.filter(i => i.file_size && i.file_size.toString().toLowerCase().includes(this.size.toLowerCase()))
+			// if (this.quality) data = this.files.filter(i => i.file_size && i.file_size.toLowerCase().includes(this.size.toLowerCase()))
+			return data
 		}
 	},
 	mounted () {
@@ -118,6 +142,12 @@ export default {
 		onDetail (item ){
 			this.file = item
 			this.isShowDetail = true
+		},
+		onClear () {
+			this.name = ''
+			this.date = ''
+			this.size = ''
+			this.quality = ''
 		}
 	}
 }

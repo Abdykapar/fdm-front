@@ -20,68 +20,82 @@
 			<template slot="body">
 				<tr class="filter">
 					<td>
-						<input type="text">
+						<input type="text" v-model="eventModel.registration">
 						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text">
+						<input type="date" v-model="eventModel.eventDate">
 						<img
 							src="../../assets/icons/calendar.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text"><img
+						<input type="text" v-model="eventModel.eventName"><img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text"><img
+						<input type="text" v-model="eventModel.duration">
+						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text"><img
+						<input type="text" v-model="eventModel.flightNumber">
+						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text"><img
+						<input type="text" v-model="eventModel.depAirport">
+						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text"><img
+						<input type="text" v-model="eventModel.arrAirport">
+						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text"><img
+						<input type="text" v-model="eventModel.eventSeverity">
+						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text"><img
+						<input type="text" v-model="eventModel.eventStatus">
+						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text"><img
-							src="../../assets/icons/search-mini.svg"
-							alt=""
-						>
+						<fdm-switch
+							:value="eventModel.reviewed"
+							@click="eventModel.reviewed = !eventModel.reviewed"
+						/>
 					</td>
-					<td />
+					<td></td>
+					<td>
+						<button
+							@click="onClear"
+							class="detail red"
+						>
+							Clear
+						</button>
+					</td>
 				</tr>
 				<tr
 					v-for="item in eventPerPage"
@@ -92,8 +106,8 @@
 					<td>{{ item.event_name }}</td>
 					<td>{{ item.duration }}</td>
 					<td />
-					<td>{{ item.arr_airport }}</td>
 					<td>{{ item.dep_airport }}</td>
+					<td>{{ item.arr_airport }}</td>
 					<td>{{ item.event_severity }}</td>
 					<td>{{ item.event_status }}</td>
 					<td>{{ item.is_reviewed }}</td>
@@ -130,21 +144,48 @@ import { eventService } from '../../_services/event.service'
 import DataInsightDetail from './DataInsightDetail'
 import { mapActions } from 'vuex'
 import Pagination from '../elements/Pagination'
+import moment from 'moment'
+import FdmSwitch from '@/components/elements/FdmSwitch'
 export default {
 	name: 'DataInsightEvent',
-	components: { Pagination, DataInsightDetail, FmdTable },
+	components: { Pagination, DataInsightDetail, FmdTable, FdmSwitch },
 	data () {
 		return {
 			events: [],
 			event: {},
 			isShowDetail: false,
 			currentPage: 1,
-			totalElements: 0
+			totalElements: 0,
+			eventModel: {
+				registration: '',
+				eventDate: '',
+				eventName: '',
+				duration :'',
+				flightNumber: '',
+				depAirport: '',
+				arrAirport: '',
+				eventSeverity: '',
+				eventStatus: '',
+				reviewed: false
+			}
 		}
 	},
 	computed: {
 		eventPerPage () {
-			return this.events.slice((this.currentPage - 1) * 10, this.currentPage * 10)
+			return this.filteredEvents.slice((this.currentPage - 1) * 10, this.currentPage * 10)
+		},
+		filteredEvents () {
+			let data = this.events
+			if (this.eventModel.registration) data = this.events.filter(i => i.registration && i.registration.toLowerCase().includes(this.eventModel.registration.toLowerCase()))
+			if (this.eventModel.eventDate) data = this.events.filter(i => i.event_date && moment(i.event_date).format('YYYY-MM-DD') === this.eventModel.eventDate)
+			if (this.eventModel.eventName) data = this.events.filter(i => i.event_name && i.event_name.toLowerCase().includes(this.eventModel.eventName.toLowerCase()))
+			if (this.eventModel.duration !== '') data = this.events.filter(i => i.duration === parseFloat(this.eventModel.duration))
+			if (this.eventModel.depAirport) data = this.events.filter(i => i.dep_airport && i.dep_airport.toLowerCase().includes(this.eventModel.depAirport.toLowerCase()))
+			if (this.eventModel.arrAirport) data = this.events.filter(i => i.arr_airport && i.arr_airport.toLowerCase().includes(this.eventModel.arrAirport.toLowerCase()))
+			if (this.eventModel.eventSeverity) data = this.events.filter(i => i.event_severity && i.event_severity.toLowerCase().includes(this.eventModel.eventSeverity.toLowerCase()))
+			if (this.eventModel.eventStatus) data = this.events.filter(i => i.event_status && i.event_status.toLowerCase().includes(this.eventModel.eventStatus.toLowerCase()))
+			if (this.eventModel.reviewed !== '') data = this.events.filter(i => i.is_reviewed === this.eventModel.reviewed)
+			return data
 		}
 	},
 	mounted () {
@@ -169,6 +210,20 @@ export default {
 		},
 		onPageChange (num) {
 			this.currentPage = num
+		},
+		onClear () {
+			this.eventModel = {
+				registration: '',
+				eventDate: '',
+				eventName: '',
+				duration :'',
+				flightNumber: '',
+				depAirport: '',
+				arrAirport: '',
+				eventSeverity: '',
+				eventStatus: '',
+				reviewed: false
+			}
 		}
 	}
 }
