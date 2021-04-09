@@ -161,7 +161,7 @@ export default {
 				// Declare the time for this individual sample and store it in a new JulianDate instance.
 				// const time = Cesium.JulianDate.addSeconds(start, i * timeStepInSeconds, new Cesium.JulianDate())
 				const time = Cesium.JulianDate.fromDate(new Date(dataPoint.timestamp))
-				const position = Cesium.Cartesian3.fromDegrees(dataPoint.longitude, dataPoint.latitude, dataPoint.altitude+1000)
+				const position = Cesium.Cartesian3.fromDegrees(dataPoint.longitude, dataPoint.latitude, dataPoint.altitude)
 				// Store the position along with its timestamp.
 				// Here we add the positions all upfront, but these can be added at run-time as samples are received from a server.
 				positionProperty.addSample(time, position)
