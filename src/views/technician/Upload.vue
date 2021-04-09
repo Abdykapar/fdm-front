@@ -24,21 +24,28 @@
 				<template slot="body">
 					<tr class="filter">
 						<td>
-							<input type="text">
+							<input type="text" v-model="name">
 							<img
 								src="../../assets/icons/search-mini.svg"
 								alt=""
 							>
 						</td>
 						<td>
-							<input type="text">
-							<img
+							<input type="date" v-model="date">
+							<!-- <img
 								src="../../assets/icons/calendar.svg"
 								alt=""
+							> -->
+						</td>
+						<td>
+							<input type="text" v-model="size">
+							<img
+								src="../../assets/icons/search-mini.svg"
+								alt=""
 							>
 						</td>
 						<td>
-							<input type="text"><img
+							<input type="text" v-model="quality"><img
 								src="../../assets/icons/search-mini.svg"
 								alt=""
 							>
@@ -50,15 +57,16 @@
 							>
 						</td>
 						<td>
-							<input type="text"><img
-								src="../../assets/icons/search-mini.svg"
-								alt=""
+							<button
+								@click="onClear"
+								class="detail red"
 							>
+								Clear
+							</button>
 						</td>
-						<td />
 					</tr>
 					<tr
-						v-for="(item,k) in files"
+						v-for="(item,k) in filteredFiles"
 						:key="k"
 					>
 						<td>{{ item.file_name }}</td>
@@ -114,12 +122,25 @@ export default {
 	data () {
 		return {
 			isUpload: false,
-			files: []
+			files: [],
+			name: '',
+			date: '',
+			size: '',
+			quality: '',
+			comment: ''
 		}
 	},
 	computed: {
 		userProfile () {
 			return this.$store.state.account.user
+		},
+		filteredFiles () {
+			let data = this.files
+			if (this.name) data = this.files.filter(i => i.file_name && i.file_name.toLowerCase().includes(this.name.toLowerCase()))
+			if (this.date) data = this.files.filter(i => i.created_at && moment(i.created_at).format('YYYY-MM-DD') === this.date)
+			if (this.size) data = this.files.filter(i => i.file_size && i.file_size.toString().toLowerCase().includes(this.size.toLowerCase()))
+			// if (this.quality) data = this.files.filter(i => i.file_size && i.file_size.toLowerCase().includes(this.size.toLowerCase()))
+			return data
 		}
 	},
 	mounted () {
@@ -140,6 +161,12 @@ export default {
 				this.$toastr.e(err)
 				console.log(err)
 			})
+		},
+		onClear () {
+			this.name = ''
+			this.date = ''
+			this.size = ''
+			this.quality = ''
 		}
 	}
 }
