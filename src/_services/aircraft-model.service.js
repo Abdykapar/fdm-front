@@ -1,34 +1,34 @@
-import {BaseApiService} from '@/_services/baseApi.service'
+import { BaseApiService } from '@/_services/baseApi.service'
 
 const baseUrl = process.env.VUE_APP_BASE_URL
 
 class AircraftModelService extends BaseApiService {
-	constructor() {
+	constructor () {
 		super()
 	}
 
 	getAll () {
-		const url = `${baseUrl}/aircraft-models/`;
+		const url = `${baseUrl}/aircraft-models/`
 		return this.sendGetRequest(url)
 	}
 
 	create (data) {
-		const url = `${baseUrl}/aircraft-models/`;
+		const url = `${baseUrl}/aircraft-models/`
 		return this.sendPostRequest(url, data)
 	}
 
 	getById (id) {
-		const url = `${baseUrl}/aircraft-models/${id}`;
+		const url = `${baseUrl}/aircraft-models/${id}`
 		return this.sendGetRequest(url)
 	}
 
 	update (data) {
-		const url = `${baseUrl}/aircraft-models/${data.id}/`;
+		const url = `${baseUrl}/aircraft-models/${data.id}/`
 		return this.sendPutRequest(url, data)
 	}
 
 	delete (id) {
-		const url = `${baseUrl}/aircraft-models/${id}`;
+		const url = `${baseUrl}/aircraft-models/${id}`
 		return this.sendDeleteRequest(url)
 	}
 }

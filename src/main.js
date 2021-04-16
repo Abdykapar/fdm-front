@@ -9,8 +9,12 @@ import VueToastr from 'vue-toastr'
 import i18n from './i18n'
 import FunctionalCalendar from 'vue-functional-calendar'
 import Paginate from 'vuejs-paginate'
+import 'tailwindcss/tailwind.css'
+import Multiselect from 'vue-multiselect'
 
 import 'cesium/Build/Cesium/Widgets/widgets.css'
+
+Vue.component('multiselect', Multiselect)
 
 Vue.use(FunctionalCalendar, {
 	dayNames: [ 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su' ]

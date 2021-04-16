@@ -431,6 +431,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+#image {
+	display: none;
+}
 .print {
 	width: 148px;
 	height: 36px;

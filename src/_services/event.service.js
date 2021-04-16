@@ -7,8 +7,11 @@ class EventService extends BaseApiService {
 		super()
 	}
 
-	getAll () {
-		const url = `${baseUrl}/events/`
+	getAll (flight_id='') {
+		const query = this.queryFilter(
+			{ title: 'flight_id', value: flight_id },
+		)
+		const url = `${baseUrl}/events/${query}`
 		return this.sendGetRequest(url)
 	}
 

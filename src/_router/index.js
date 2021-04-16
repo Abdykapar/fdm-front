@@ -35,6 +35,16 @@ const routes = [
 				name: 'Animate',
 				component: () => import('@/components/visualization/Cesium.vue')
 			},
+			{
+				path: '/plot',
+				name: 'Plot',
+				component: () => import('@/views/admin/Plot.vue')
+			},
+			{
+				path: '/analytics',
+				name: 'Analytics',
+				component: () => import('@/views/admin/Analytics.vue')
+			},
 
 			// Technician Page
 			{
@@ -122,7 +132,7 @@ const routes = [
 				path: '/aircraft-model-trigger',
 				name: 'AircraftModelTrigger',
 				component: () => import('@/views/super-admin/AircraftModelTrigger.vue')
-			}
+			},
 		],
 		beforeEnter: (to, from, next) => {
 			protect.checkSuperAdmin(next)

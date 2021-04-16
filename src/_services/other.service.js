@@ -27,6 +27,14 @@ class OtherService extends BaseApiService {
 		return this.sendGetRequest(url)
 	}
 
+	eventParameters (eventId='') {
+		const query = this.queryFilter(
+			{ title: 'event_id', value: eventId },
+		)
+		const url = `${baseUrl}/events_parameters${query}`
+		return this.sendGetRequest(url)
+	}
+
 	averageStats (aircraft='', start_date='', end_date='') {
 		const query = this.queryFilter(
 			{ title: 'aircraft', value: aircraft },

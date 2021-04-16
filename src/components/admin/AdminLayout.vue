@@ -3,7 +3,7 @@
 		<sidebar />
 		<div
 			class="home__main"
-			:class="{ small: isAdmin }"
+			:class="{ small: minimize }"
 		>
 			<admin-header />
 			<router-view />
@@ -18,14 +18,14 @@ import { mapActions } from 'vuex'
 export default {
 	components: { Sidebar, AdminHeader },
 	computed: {
-		isAdmin () {
-			return this.$route.path === '/dashboard'
-		},
 		userProfile () {
 			return this.$store.state.account.user
 		},
 		sidebars () {
 			return this.$store.getters['sidebars/sidebars']
+		},
+		minimize () {
+			return this.$store.getters['sidebars/minimize']
 		}
 	},
 	mounted () {
@@ -34,7 +34,7 @@ export default {
 		}
 	},
 	methods: {
-		...mapActions('sidebars', [ 'fetchSidebars' ])
+		...mapActions('sidebars', [ 'fetchSidebars' ]),
 	}
 }
 </script>
@@ -44,10 +44,12 @@ export default {
 		display: flex;
 		background: $black-back;
 		min-height: 100vh;
+		width: 100%;
 
 		&__main {
 			flex: 1;
 			margin-left: 240px;
+			background: $black-back;
 
 			&.small {
 				margin-left: 81px;

@@ -1,7 +1,8 @@
 import { navbarService } from '../_services/navbar.service'
 
 const state = {
-	sidebars: []
+	sidebars: [],
+	minimize: true
 }
 
 const actions = {
@@ -15,19 +16,26 @@ const actions = {
 			console.log(err)
 			dispatch('alert/setAlert', { message: err, type: 'e' }, { root: true })
 		})
+	},
+	setMinimize ({ commit }, data) {
+		commit('SET_MINIMIZE', data)
 	}
 }
 
 const mutations = {
 	SET_SIDEBARS (state, data) {
 		state.sidebars = data
+	},
+	SET_MINIMIZE (state, data) {
+		state.minimize = data
 	}
 }
 
 const getters = {
 	sidebars ({ sidebars }) {
 		return sidebars
-	}
+	},
+	minimize: ({ minimize }) => minimize 
 }
 
 export const sidebars = {

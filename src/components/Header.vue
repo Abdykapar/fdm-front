@@ -32,9 +32,9 @@
 			class="flight-select"
 		>
 			<select
+				v-model="selectedFile"
 				placeholder="Choose a file"
 				@change="onSelect"
-				v-model="selectedFile"
 			>
 				<option
 					v-for="file in files"
@@ -57,7 +57,7 @@
 				@click="onShowAlert"
 			>
 				<img
-					class="pointer alert"
+					class="pointer p-alert"
 					src="../assets/icons/alert.svg"
 					alt=""
 				>
@@ -101,7 +101,7 @@
 						:style="`background-image: url(${userProfile.user.avatar})`"
 						alt=""
 						class="avatar"
-					></div>
+					/>
 					<img
 						v-else
 						src="../assets/img/img.png"
@@ -285,6 +285,12 @@ export default {
 				}
 			}
 
+			.p-alert {
+				position: relative;
+				top: -6px;
+				right: 3px;
+			}
+
 			&__profile {
 				font-weight: 400;
 				font-size: 16px;
@@ -335,7 +341,7 @@ export default {
 		background: #1F2327;
 		box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.16);
 		border-radius: 2px;
-		z-index: 3;
+		z-index: 12;
 
 		&__item {
 			height: 66px;

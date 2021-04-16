@@ -1,5 +1,8 @@
 <template>
-	<div id="cesium">
+	<div
+		id="cesium"
+		:class="{ minimize : minimize }"
+	>
 		<div class="content">
 			<div class="row">
 				<svg
@@ -10,12 +13,18 @@
 				>
 					<defs>
 						<clipPath id="gsGroupMask">
-							<path d="M 0 0 H 70 V 260 H 0 V 0" stroke="transparent" />
+							<path
+								d="M 0 0 H 70 V 260 H 0 V 0"
+								stroke="transparent"
+							/>
 						</clipPath>
 					</defs>
 					<defs>
 						<clipPath id="gsFrontMask">
-							<path d="M 1 120 L 35 120 V 110 H 50 V 122 L 70 130 L 50 137 V 150 H 35 V 140 H 1" stroke="transparent" />
+							<path
+								d="M 1 120 L 35 120 V 110 H 50 V 122 L 70 130 L 50 137 V 150 H 35 V 140 H 1"
+								stroke="transparent"
+							/>
 						</clipPath>
 					</defs>
 				</svg>
@@ -26,7 +35,10 @@
 				>
 					<defs>
 						<clipPath id="myClip">
-							<path d="M 40 155 Q 160 25 280 155 V 295 Q 160 410 40 295 V 155" stroke="transparent" />
+							<path
+								d="M 40 155 Q 160 25 280 155 V 295 Q 160 410 40 295 V 155"
+								stroke="transparent"
+							/>
 						</clipPath>
 					</defs>
 				</svg>
@@ -38,7 +50,10 @@
 				>
 					<defs>
 						<clipPath id="altitudeMask">
-							<path d="M 20 130 L 35 123 V 115 H 70 V 105 H 99 V 155 H 70 V 145 H 35 V 137 L 20 130" stroke="#ffffff" />
+							<path
+								d="M 20 130 L 35 123 V 115 H 70 V 105 H 99 V 155 H 70 V 145 H 35 V 137 L 20 130"
+								stroke="#ffffff"
+							/>
 						</clipPath>
 					</defs>
 				</svg>
@@ -52,7 +67,7 @@
 				>
 					<defs>
 						<clipPath id="compassMask">
-							<path d="M 0 0 H 300 V 88 H 0 V 0"  />
+							<path d="M 0 0 H 300 V 88 H 0 V 0" />
 						</clipPath>
 					</defs>
 				</svg>
@@ -64,8 +79,8 @@
 				>
 					<!-- <defs>
 						<clipPath id="engineMask"> -->
-							<!-- <path d="M 120 55 L 260 55 V 100 H 120 V 55"  /> -->
-						<!-- </clipPath>
+					<!-- <path d="M 120 55 L 260 55 V 100 H 120 V 55"  /> -->
+					<!-- </clipPath>
 					</defs> -->
 				</svg>
 			</div>
@@ -103,6 +118,9 @@ export default {
 	computed: {
 		fileId () {
 			return this.$store.getters['file/selectedFile']
+		},
+		minimize () {
+			return this.$store.getters['sidebars/minimize']
 		}
 	},
 	watch: {
@@ -121,7 +139,7 @@ export default {
 		const osmBuildings = this.viewer.scene.primitives.add(Cesium.createOsmBuildings())
 	
 		this.makeCanvas(0)
-},
+	},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
 		fetchData (fileId) {
@@ -352,12 +370,16 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 	#cesium {
 		position: relative;
 		width: calc(100vw - 240px);
 		height: calc(100vh - 100px);
 		overflow: hidden;
+
+		&.minimize {
+			width: calc(100vw - 81px);
+		}
 	}
 	.content {
 		position: absolute;
@@ -366,7 +388,7 @@ export default {
 		z-index: 1;
 		pointer-events: none;
 		margin-bottom: -187px;
-		transform: scale(0.8, 0.8) translate(110px, 15px);
+		transform: scale(0.7, 0.7) translate(200px, 25px);
 	}
 	#gs {
 		/* border: solid 1px #FFFFFF; */

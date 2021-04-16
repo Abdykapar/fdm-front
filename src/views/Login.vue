@@ -164,6 +164,7 @@ export default {
 				outline-color: #ffffff;
 				font-size: 14px;
 				line-height: 19px;
+				color: #1a1c48;
 			}
 		}
 
@@ -181,6 +182,7 @@ export default {
 			input {
 				width: 16px;
 				height: 16px;
+				margin-right: 10px;
 			}
 		}
 

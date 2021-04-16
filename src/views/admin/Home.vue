@@ -11,7 +11,10 @@
 					</div>
 				</div>
 				<dashboard-speedometer />
-				<div class="main__left__aircraft" :style="`background-image: url('${selectedAircraft.mainImage}')`">
+				<div
+					class="main__left__aircraft"
+					:style="`background-image: url('${selectedAircraft.mainImage}')`"
+				>
 					<!-- <img
 						:src="selectedAircraft.mainImage"
 						alt=""
@@ -162,6 +165,7 @@ export default {
 		justify-content: space-between;
 		color: #ffffff;
 		padding-bottom: 20px;
+		background: $black-back;
 
 		&__left {
 			&__event {
