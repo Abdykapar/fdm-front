@@ -24,28 +24,40 @@
 				<template slot="body">
 					<tr class="filter">
 						<td>
-							<input type="text" v-model="name">
+							<input
+								v-model="name"
+								type="text"
+							>
 							<img
 								src="../../assets/icons/search-mini.svg"
 								alt=""
 							>
 						</td>
 						<td>
-							<input type="date" v-model="date">
+							<input
+								v-model="date"
+								type="date"
+							>
 							<!-- <img
 								src="../../assets/icons/calendar.svg"
 								alt=""
 							> -->
 						</td>
 						<td>
-							<input type="text" v-model="size">
+							<input
+								v-model="size"
+								type="text"
+							>
 							<img
 								src="../../assets/icons/search-mini.svg"
 								alt=""
 							>
 						</td>
 						<td>
-							<input type="text" v-model="quality"><img
+							<input
+								v-model="quality"
+								type="text"
+							><img
 								src="../../assets/icons/search-mini.svg"
 								alt=""
 							>
@@ -58,8 +70,8 @@
 						</td>
 						<td>
 							<button
-								@click="onClear"
 								class="detail red"
+								@click="onClear"
 							>
 								Clear
 							</button>
@@ -74,10 +86,10 @@
 							{{ item.date }}
 						</td>
 						<td class="pl20">
-							{{ item.file_size }}
+							{{ item.file_size.toFixed(2) }}
 						</td>
 						<td class="pl20">
-							tr56177ytu
+							80
 						</td>
 						<td>{{ item.comment }}</td>
 						<td>

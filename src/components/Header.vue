@@ -57,7 +57,7 @@
 				@click="onShowAlert"
 			>
 				<img
-					class="pointer p-alert"
+					class="relative pointer"
 					src="../assets/icons/alert.svg"
 					alt=""
 				>
@@ -102,11 +102,26 @@
 						alt=""
 						class="avatar"
 					/>
-					<img
-						v-else
-						src="../assets/img/img.png"
+					<div
+						v-else-if="userRole && userRole.code === 'ROLE_TECHNICIAN'"
+						:style="`background-image: url(${require('../assets/img/boss.png')})`"
 						alt=""
-					>
+						class="avatar"
+					/>
+					<div
+						v-else
+						:style="`background-image: url(${require('../assets/img/profile.png')})`"
+						alt=""
+						class="avatar"
+					/>
+					<!-- <i
+						v-else-if="userRole && userRole.code === 'ROLE_TECHNICIAN'"
+						class="fas fa-user"
+					/>
+					<i
+						v-else
+						class="fas fa-user-tie"
+					/> -->
 					<span class="header__right__name">{{ userProfile.user.first_name }} {{ userProfile.user.last_name }}</span>
 					<img
 						src="../assets/icons/chevron-down.svg"
@@ -154,6 +169,7 @@ import { mapActions } from 'vuex'
 import moment from 'moment'
 import TopTriggers from './reports/TopTriggers'
 import { fileService } from '../_services/file.service'
+import { roleService } from '../_services/role.service'
 
 export default {
 	name: 'Header',
@@ -165,7 +181,9 @@ export default {
 			isProfile: false,
 			calendarData: {},
 			files: [],
-			selectedFile: 0
+			selectedFile: 0,
+			roles: [],
+			userRole: ''
 		}
 	},
 	computed: {
@@ -194,6 +212,7 @@ export default {
 	},
 	mounted () {
 		document.addEventListener('click', this.onOutsideClick)
+		this.fetchRoles()
 	},
 	beforeDestroy () {
 		document.removeEventListener('click', this.onOutsideClick)
@@ -210,6 +229,12 @@ export default {
 				this.isNotif = false
 				this.isShowProfile = false
 			}
+		},
+		fetchRoles () {
+			roleService.getAll().then(res => {
+				this.roles = res
+				this.userRole = this.roles.find(i => i.id === this.userProfile.user.role[0])
+			}).catch(err => console.log(err))	
 		},
 		cropText (text) {
 			if (text.length > 40) {
@@ -280,8 +305,8 @@ export default {
 
 				.alert {
 					position: absolute;
-					top: -6px;
-					right: 3px;
+					top: -2px;
+    				right: 1px;
 				}
 			}
 

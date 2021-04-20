@@ -3,7 +3,7 @@
 		<div class="plot__head">
 			<select
 				v-model="file"
-				class="w-60 border text-gray-50 rounded px-3 py-2 outline-none bg-transparent"
+				class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
 				placeholder="Select a file"
 				@change="onFileChange"
 			>
@@ -18,7 +18,7 @@
 			</select>
 			<select
 				v-model="flight"
-				class="w-60 border text-gray-50 rounded px-3 py-2 outline-none bg-transparent"
+				class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
 				@change="onFlightChange"
 			>
 				<option
@@ -32,7 +32,7 @@
 			</select>
 			<select
 				v-model="event"
-				class="w-60 border text-gray-50 rounded px-3 py-2 outline-none bg-transparent"
+				class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
 				@change="onEventChange"
 			>
 				<option
@@ -45,8 +45,8 @@
 				</option>
 			</select>
 		</div>
-		<div class="plot__body m-4 text-xl">
-			<div class="plot__body__title flex justify-center text-white">
+		<div class="m-4 text-xl plot__body">
+			<div class="flex justify-center text-white plot__body__title">
 				Flight  (UAFM - UAFO)
 			</div>
 			<div
@@ -54,7 +54,7 @@
 				:key="item.id"
 				class="m-6 bg-gray-600"
 			>
-				<div class="text-white ml-5 p-2">
+				<div class="p-2 ml-5 text-white">
 					{{ item.name }}
 				</div>
 				<vue-apex-charts
@@ -86,13 +86,14 @@ import { fileService } from '../../_services/file.service'
 import { flightService } from '../../_services/flight.service'
 import { eventService } from '../../_services/event.service'
 import { otherService } from '../../_services/other.service'
+import { mapActions } from 'vuex'
 
 export default {
 	name: 'Plot',
 	components: { VueApexCharts },
 	data () {
 		return {
-			isShow: false,
+			isShow: true,
 			chartOptions: {
 				chart: {
 					id: 'basic-bar',
@@ -126,7 +127,6 @@ export default {
 						sizeOffset: 3
 					}
 				},
-				labels: [],
 				xaxis: {
 					labels: {
 						show: false
@@ -176,6 +176,7 @@ export default {
 		this.fetchFiles()
 	},
 	methods: {
+		...mapActions('loader', [ 'setLoading' ]),
 		fetchFiles () {
 			fileService.getAll().then(res => {
 				this.files = res
@@ -198,6 +199,7 @@ export default {
 			})
 		},
 		fetchEventParameters (eventId) {
+			this.setLoading(true)
 			otherService.eventParameters(eventId).then(res => {
 				this.parameters = []
 				const d = res.filter((i, index, self) => self.findIndex(j => j.id === i.id) === index)
@@ -209,7 +211,10 @@ export default {
 					}
 					this.parameters.push(a)
 				})
+				// if (this.parameters.length) this.chartOptions.labels = this.parameters[0].data.map(i => i.timestamp)
+				this.setLoading(false)
 			}).catch(err => {
+				this.setLoading(false)
 				console.log(err)
 			})
 		},
