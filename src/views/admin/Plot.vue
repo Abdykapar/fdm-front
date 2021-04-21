@@ -16,7 +16,7 @@
 					{{ f.file_name | crop }}
 				</option>
 			</select>
-			<select
+			<!-- <select
 				v-model="flight"
 				class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
 				@change="onFlightChange"
@@ -29,8 +29,8 @@
 				>
 					{{ f.dep_airport }} - {{ f.arr_airport }}
 				</option>
-			</select>
-			<select
+			</select> -->
+			<!-- <select
 				v-model="event"
 				class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
 				@change="onEventChange"
@@ -43,25 +43,21 @@
 				>
 					{{ f.event_name }}
 				</option>
-			</select>
+			</select> -->
 		</div>
 		<div class="m-4 text-xl plot__body">
 			<div class="flex justify-center text-white plot__body__title">
 				Flight  (UAFM - UAFO)
 			</div>
 			<div
-				v-for="item in selectedParameters"
-				:key="item.id"
 				class="m-6 bg-gray-600"
 			>
-				<div class="p-2 ml-5 text-white">
-					{{ item.name }}
-				</div>
 				<vue-apex-charts
-					height="250"
+					v-if="isShow"
+					height="450"
 					type="line"
-					:options="item.chartOptions"
-					:series="item.series"
+					:options="chartOptions"
+					:series="series"
 				/>
 			</div>
 			<div class="m-6">
@@ -93,7 +89,7 @@ export default {
 	components: { VueApexCharts },
 	data () {
 		return {
-			isShow: true,
+			isShow: false,
 			chartOptions: {
 				chart: {
 					id: 'basic-bar',
@@ -101,38 +97,34 @@ export default {
 					// 	show: false
 					// }
 				},
+				colors: [ '#499F68' ],
 				stroke: {
 					curve: 'straight',
-					colors: [],
-					width: 1,
+					width: 2,
 				},
-				markers: {
-					size: 3,
-					colors: [ '#ffffff' ],
-					strokeColors: [],
-					strokeWidth: 1,
-					strokeOpacity: 0.9,
-					strokeDashArray: 0,
-					fillOpacity: 1,
-					discrete: [],
-					shape: 'circle',
-					radius: 2,
-					offsetX: 0,
-					offsetY: 0,
-					onClick: undefined,
-					onDblClick: undefined,
-					showNullDataPoints: true,
-					hover: {
-						size: undefined,
-						sizeOffset: 3
-					}
-				},
+				// markers: {
+				// 	size: 1,
+				// 	strokeColors: [],
+				// 	strokeWidth: 1,
+				// 	strokeOpacity: 0.9,
+				// 	strokeDashArray: 0,
+				// 	fillOpacity: 1,
+				// 	discrete: [],
+				// 	shape: 'circle',
+				// 	radius: 1,
+				// 	offsetX: 0,
+				// 	offsetY: 0,
+				// 	onClick: undefined,
+				// 	onDblClick: undefined,
+				// 	showNullDataPoints: true,
+				// 	hover: {
+				// 		size: undefined,
+				// 		sizeOffset: 1
+				// 	}
+				// },
 				xaxis: {
 					labels: {
-						show: false
-						// formatter: function (value) {
-						// 	return value
-						// }
+						show: false,
 					},
 					axisBorder: {
 						color: '#33393F',
@@ -184,23 +176,23 @@ export default {
 				console.log(err)
 			})
 		},
-		fetchFlights (fileId) {
-			flightService.getAll(fileId).then(res => {
-				this.flights = res
-			}).catch(err => {
-				console.log(err)
-			})
-		},
-		fetchEvents (flightId) {
-			eventService.getAll(flightId).then(res => {
-				this.events = res
-			}).catch(err => {
-				console.log(err)
-			})
-		},
-		fetchEventParameters (eventId) {
+		// fetchFlights (fileId) {
+		// 	flightService.getAll(fileId).then(res => {
+		// 		this.flights = res
+		// 	}).catch(err => {
+		// 		console.log(err)
+		// 	})
+		// },
+		// fetchEvents (flightId) {
+		// 	eventService.getAll(flightId).then(res => {
+		// 		this.events = res
+		// 	}).catch(err => {
+		// 		console.log(err)
+		// 	})
+		// },
+		fetchEventParameters (fileId) {
 			this.setLoading(true)
-			otherService.eventParameters(eventId).then(res => {
+			otherService.eventParameters(fileId).then(res => {
 				this.parameters = []
 				const d = res.filter((i, index, self) => self.findIndex(j => j.id === i.id) === index)
 				d.forEach(i => {
@@ -211,44 +203,43 @@ export default {
 					}
 					this.parameters.push(a)
 				})
-				// if (this.parameters.length) this.chartOptions.labels = this.parameters[0].data.map(i => i.timestamp)
+				if (this.parameters.length) this.chartOptions.labels = this.parameters[0].data.map(i => i.timestamp)
 				this.setLoading(false)
 			}).catch(err => {
 				this.setLoading(false)
 				console.log(err)
 			})
 		},
-		onFlightChange (e) {
-			this.fetchEvents(e.target.value)
-		},
+		// onFlightChange (e) {
+		// 	this.fetchEvents(e.target.value)
+		// },
 		onFileChange (e) {
-			this.fetchFlights(e.target.value)
-		},
-		onEventChange (e) {
 			this.fetchEventParameters(e.target.value)
 		},
+		// onEventChange (e) {
+		// 	this.fetchEventParameters(e.target.value)
+		// },
 		onParameterSelect (opt, id) {
-			this.series = [
-				{
-					name: opt.name,
-					data: opt.data.map(i => i.value)
-				}
-			]
+			this.isShow = false
+			this.series.push({
+				name: opt.name,
+				id: opt.id,
+				data: opt.data.map(i => i.value)
+			})
 			const randomColor = '#'+Math.floor(Math.random()*16777215).toString(16)
-			this.chartOptions.stroke.colors = [ randomColor ]
-			this.chartOptions.markers.strokeColors = [ randomColor ]
+			this.chartOptions.colors.push(randomColor)
+			// this.chartOptions.markers.strokeColors = [ randomColor ]
 			this.chartOptions.labels = opt.data.map(i => i.timestamp)
 
-			this.selectedParameters.push({
-				id: opt.id,
-				name: opt.name,
-				series: [ ...this.series ],
-				chartOptions: { ...this.chartOptions }
+			console.log(this.chartOptions.labels)
+			this.$nextTick(() => {
+				this.isShow = true
 			})
-			this.isShow = true
 		},
 		onParameterRemove (opt, id) {
-			this.selectedParameters = this.selectedParameters.filter(i => i.id !== opt.id)
+			const index = this.series.findIndex(i => i.id === opt.id)
+			this.chartOptions.colors.splice(index, 1)
+			this.series = this.series.filter(i => i.id !== opt.id)
 		}
 	}
 }

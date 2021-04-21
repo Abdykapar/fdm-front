@@ -125,7 +125,7 @@ export default {
 					this.file.technician = this.userProfile.user.id
 					fileService.create(this.file).then(res => {
 						this.$emit('close')
-						this.$emit('fetch')
+						this.$emit('fetch', res.id)
 						this.setLoading(false)
 					}).catch(err => {
 						this.setLoading(false)

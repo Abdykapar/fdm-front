@@ -1,16 +1,16 @@
 <template>
 	<div class="loader-box">
 		<div id="loader">
-			<div id="shadow"></div>
-			<div id="box"></div>
+			<div id="shadow" />
+			<div id="box" />
 		</div>
 	</div>
 </template>
 
 <script>
-	export default {
-		name: 'Loader',
-	};
+export default {
+	name: 'Loader',
+}
 </script>
 
 <style scoped>
@@ -21,7 +21,7 @@
 	right: 0;
 	bottom: 0;
 	background: rgba(127, 125, 150, 0.5);
-	z-index: 10;
+	z-index: 13;
 }
 #loader {
 	position: absolute;

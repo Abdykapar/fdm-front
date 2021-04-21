@@ -93,8 +93,15 @@
 						</td>
 						<td>{{ item.comment }}</td>
 						<td>
-							<button class="detail">
+							<button class="mb-2 detail">
 								Details
+							</button>
+							
+							<button
+								v-if="item.isDelete"
+								class="detail red"
+							>
+								Delete
 							</button>
 						</td>
 					</tr>
