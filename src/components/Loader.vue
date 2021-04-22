@@ -1,6 +1,8 @@
 <template>
 	<div class="loader-box">
-		<div id="loader">
+		<div
+			id="loader"
+		>
 			<div id="shadow" />
 			<div id="box" />
 		</div>

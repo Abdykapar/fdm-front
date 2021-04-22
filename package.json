@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "apexcharts": "^3.25.0",
+    "axios": "^0.21.1",
     "cesium": "^1.79.1",
     "chart.js": "^2.9.4",
     "chartjs-plugin-datalabels": "^0.7.0",

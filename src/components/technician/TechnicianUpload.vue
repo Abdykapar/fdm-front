@@ -73,25 +73,60 @@
 					</div>
 				</form>
 			</div>
+			<div
+				v-if="isProgress"
+				class="progress-bar-content"
+			>
+				<div class="flex items-center justify-center h-screen gap-4">
+					<div class="progress-bar">
+						<span class="bar">
+							<span
+								class="progress"
+								:style="`width: ${uploadPercentage}%`"
+							/>
+						</span>
+					</div>
+					<span class="z-10 text-white">{{ uploadPercentage }}%</span>
+				</div>
+			</div>
 		</div>
 	</fdm-modal>
 </template>
 
 <script>
 import FdmModal from '../FdmModal'
-import { fileService } from '../../_services/file.service'
 import { mapActions } from 'vuex'
-import { routeService } from '../../_services/route.service'
 import { aircraftService } from '../../_services/aircraft.service'
+import axios from 'axios'
+import { authHeader, handleResponse } from '@/_helpers/authHeader'
+
+const baseUrl = process.env.VUE_APP_BASE_URL
 export default {
 	name: 'TechnicianUpload',
-	components: { FdmModal },
+	components: { FdmModal  },
 	data () {
 		return {
 			file: {},
 			selectedFile: '',
 			aircrafts: [],
-			routes: []
+			routes: [],
+			uploadPercentage: 0,
+			gradient: {
+				radial: false,
+				colors: [
+					{
+						color: '#6546f7',
+						offset: 0,
+						opacity: '1',
+					},
+					{
+						color: 'lime',
+						offset: 100,
+						opacity: '0.6',
+					},
+				]
+			},
+			isProgress: false
 		}
 	},
 	computed: {
@@ -103,7 +138,7 @@ export default {
 		this.fetchRouteCraft()
 	},
 	methods: {
-		...mapActions('loader', [ 'setLoading' ]),
+		...mapActions('loader', [ 'setLoading', 'setType' ]),
 
 		fetchRouteCraft () {
 			this.setLoading(true)
@@ -120,18 +155,45 @@ export default {
 		onSubmit (e) {
 			this.$validator.validate().then(valid => {
 				if (valid) {
-					this.setLoading(true)
 					this.file.uploaded_file = this.selectedFile
 					this.file.technician = this.userProfile.user.id
-					fileService.create(this.file).then(res => {
-						this.$emit('close')
-						this.$emit('fetch', res.id)
-						this.setLoading(false)
+
+					const formData = new FormData()
+					Object.keys(this.file).forEach(i => {
+						formData.append(i, this.file[i])
+					})
+					this.isProgress = true
+
+					axios.post( baseUrl + '/files/', formData,{
+						headers: {
+							'Content-Type': 'multipart/form-data',
+							...authHeader()
+						},
+						onUploadProgress: function ( progressEvent ) {
+							this.uploadPercentage = parseInt( Math.round( ( progressEvent.loaded / progressEvent.total ) * 100 ))
+							console.log(this.uploadPercentage)
+						}.bind(this)
+					}).then(() => {
+						setTimeout(() => {
+							this.$emit('close')
+							this.$emit('fetch')
+							this.isProgress = false
+						}, 500)
 					}).catch(err => {
-						this.setLoading(false)
+						this.isProgress = false
 						console.log(err)
 						this.$toastr.e(err)
 					})
+					
+					// fileService.create(this.file).then(res => {
+					// 	this.$emit('close')
+					// 	this.$emit('fetch', res.id)
+					// 	this.setLoading(false)
+					// }).catch(err => {
+					// 	this.setLoading(false)
+					// 	console.log(err)
+					// 	this.$toastr.e(err)
+					// })
 				}
 			})
 		},
@@ -142,6 +204,105 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+	.progress-bar-content {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(127, 125, 150, 0.8);
+		z-index: 15;
+	}
+	// Color Variables ======================================
+$green: #75b800;
+$gray-light: #eef1f3;
 
+// Bar Variables ========================================
+$bar-size: 5px;
+$bar-radius: 60px;
+$bar-bg: rgba(0,0,0,0.075);
+
+// Animation =============================================
+// Edit these at random intervals to change the animation.
+@keyframes loader {
+
+	0% {
+		width: 0;
+	}
+
+	20% {
+		width: 10%;
+	}
+
+	25% {
+		width: 24%;
+	}
+
+	43% {
+		width: 41%;
+	}
+
+	56% {
+		width: 50%;
+	}
+
+	66% {
+		width: 52%;
+	}
+
+	71% {
+		width: 60%;
+	}
+
+	75% {
+		width: 76%;
+    
+	}
+
+	94% {
+		width: 86%;
+	}
+
+	100% {
+		width: 100%;
+	}
+
+}
+
+// Bar ============================================
+.progress-bar {
+	border-radius: $bar-radius;
+	overflow: hidden;
+  width: 100%;
+
+	span {
+		display: block;
+	}
+
+}
+
+.bar {
+  background: $bar-bg;
+}
+
+.progress {
+//   animation: loader 8s ease infinite;
+  // Change the animation fill mode 'infinite' to 'forwards' to stop the animation from repeating.
+  background: $green;
+  color: #fff;
+  padding: $bar-size;
+  width: 0;
+  transition: width 350ms ease;
+}
+
+// Vertical Centering ==============================
+// You don't need this to make it work on your site.
+.progress-bar {
+  left: 50%;
+  max-width: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate3d(-50%,-50%,0);
+}
 </style>
