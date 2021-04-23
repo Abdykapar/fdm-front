@@ -1,21 +1,39 @@
 <template>
 	<div class="plot">
 		<div class="plot__head">
-			<select
-				v-model="file"
-				class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
-				placeholder="Select a file"
-				@change="onFileChange"
-			>
-				<option
-					v-for="f in files"
-					:key="f.id"
-					:value="f.id"
-					class="py-1"
+			<div class="flex flex-col">
+				<label>Files</label>
+				<select
+					v-model="file"
+					class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
+					placeholder="Select a file"
+					@change="onFileChange"
 				>
-					{{ f.file_name | crop }}
-				</option>
-			</select>
+					<option
+						v-for="f in files"
+						:key="f.id"
+						:value="f.id"
+						class="py-1"
+					>
+						{{ f.file_name | crop }}
+					</option>
+				</select>
+			</div>
+			<div class="w-90">
+				<label>Paremeters</label>
+				<multiselect
+					v-model="value"	
+					:options="parameters"
+					label="name"
+					track-by="name"
+					select-label=""
+					deselect-label=""
+					:multiple="true"
+					:close-on-select="false"
+					@select="onParameterSelect"
+					@remove="onParameterRemove"
+				/>
+			</div>
 			<!-- <select
 				v-model="flight"
 				class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
@@ -58,18 +76,6 @@
 					type="line"
 					:options="chartOptions"
 					:series="series"
-				/>
-			</div>
-			<div class="m-6">
-				<multiselect
-					v-model="value"	
-					:options="parameters"
-					label="name"
-					track-by="name"
-					:multiple="true"
-					:close-on-select="false"
-					@select="onParameterSelect"
-					@remove="onParameterRemove"
 				/>
 			</div>
 		</div>
@@ -262,7 +268,9 @@ export default {
         &__head {
             display: flex;
             justify-content: center;
-            gap: 1rem;
+			align-items: center;
+            gap: 2rem;
+			color: #fff;
 
 			select {
 				border-color:rgb(118, 118, 118);

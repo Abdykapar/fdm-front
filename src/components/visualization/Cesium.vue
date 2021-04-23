@@ -2,6 +2,7 @@
 	<div
 		id="cesium"
 		:class="{ minimize : minimize }"
+		class="relative"
 	>
 		<div class="content">
 			<div class="row">
@@ -71,20 +72,21 @@
 						</clipPath>
 					</defs>
 				</svg>
-				<svg
-					id="engine"
-					height="300"
-					width="300"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<!-- <defs>
-						<clipPath id="engineMask"> -->
-					<!-- <path d="M 120 55 L 260 55 V 100 H 120 V 55"  /> -->
-					<!-- </clipPath>
-					</defs> -->
-				</svg>
 			</div>
-			<!-- <Attitude :size="350" :pitch="pitch" :roll="roll" /> -->
+		</div>
+		<div class="absolute z-10 engine top-2 left-2">
+			<svg
+				id="engine"
+				height="300"
+				width="300"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<!-- <defs>
+						<clipPath id="engineMask"> -->
+				<!-- <path d="M 120 55 L 260 55 V 100 H 120 V 55"  /> -->
+				<!-- </clipPath>
+					</defs> -->
+			</svg>
 		</div>
 	</div>
 </template>
@@ -388,7 +390,7 @@ export default {
 		z-index: 1;
 		pointer-events: none;
 		margin-bottom: -187px;
-		transform: scale(0.7, 0.7) translate(200px, 25px);
+		transform: scale(0.7, 0.7) translate(140px, 25px);
 	}
 	#gs {
 		/* border: solid 1px #FFFFFF; */
@@ -450,11 +452,14 @@ export default {
 		stroke: #00FFFF;
 		letter-spacing: 2px;
 	}
-	#engine {
-		margin-left: 180px;
-    	margin-top: -175px;
-	}
+	// #engine {
+	// 	margin-left: 180px;
+    // 	margin-top: -175px;
+	// }
 	.letter-space {
 		letter-spacing: 2px;
+	}
+	.engine {
+		transform: scale(0.7, 0.7) translate(-83px, -60px);
 	}
 </style>
