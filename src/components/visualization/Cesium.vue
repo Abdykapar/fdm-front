@@ -133,7 +133,7 @@ export default {
 			}
 		},
 	},
-	async mounted () {
+	mounted () {
 		Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
 		this.audio = new Audio('adi.mp3')
 		this.viewer = new Cesium.Viewer('cesium', {
@@ -143,12 +143,18 @@ export default {
 	
 		this.makeCanvas(0)
 	},
+	beforeDestroy () {
+		this.audio.pause()
+		this.audio.currentTime = 0
+	},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
 		fetchData (fileId) {
 			this.setLoading(true)
+			this.audio.pause()
 			otherService.getFileCoordinates(fileId).then(res => {
 				this.flightData = res
+				this.audio.currentTime = 0
 				this.init()
 				this.setLoading(false)
 			}).catch(err => {
@@ -169,6 +175,16 @@ export default {
 			this.viewer.clock.multiplier = 10
 			// Start playing the scene.
 			this.viewer.clock.shouldAnimate = true
+
+			Cesium.knockout.getObservable(this.viewer.clockViewModel,
+				'shouldAnimate').subscribe(isAnimating => {
+				if (isAnimating) {
+					this.audio.play()
+				} else {
+					this.audio.pause()
+					console.log('Cesium clock is paused.')
+				}
+			})
 
 			// The SampledPositionedProperty stores the position and timestamp for each sample along the radar sample series.
 			const positionProperty = new Cesium.SampledPositionProperty()
