@@ -114,7 +114,8 @@ export default {
 			viewer: '',
 			selectedData: {},
 			oldAltitude: 0,
-			oldCoordinates: {}
+			oldCoordinates: {},
+			audio: ''
 		}
 	},
 	computed: {
@@ -134,7 +135,7 @@ export default {
 	},
 	mounted () {
 		Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
-		
+		this.audio = new Audio('https://storage.cloud.google.com/fdm-music/adi.mp3')
 		this.viewer = new Cesium.Viewer('cesium', {
 			terrainProvider: Cesium.createWorldTerrain()
 		})
@@ -156,6 +157,7 @@ export default {
 			})
 		},
 		init () {
+			this.audio.play()
 			const dataLength = this.flightData.length
 			const start = Cesium.JulianDate.fromDate(new Date(this.flightData[0].timestamp))
 			const stop = Cesium.JulianDate.fromDate(new Date(this.flightData[dataLength - 1].timestamp))

@@ -40,7 +40,7 @@ export default {
 				fill: {
 					colors: [ '#E5E5E5', '#298BFE', '#FFD630', '#906BFF', '#E72D2D' ]
 				},
-				labels: [ 'Rose A', 'Rose B', 'Rose C', 'Rose D', 'Rose E' ],
+				labels: [ 'Takeoff', 'Climb', 'Cruise' , 'Descent', 'Approach' ],
 
 				stroke: {
 					width: 0,
