@@ -1,6 +1,6 @@
 <template>
 	<div class="analytics">
-		<div class="flex justify-between items-center text-white mx-8">
+		<div class="flex items-center justify-between mx-8 text-white">
 			<div>
 				<h2 class="text-4xl">
 					Event Summary
@@ -70,7 +70,7 @@
 		<div class="flex gap-5 m-8 text-white">
 			<div>
 				<div class="flex gap-4">
-					<div class="border w-48 h-24 flex flex-col items-center justify-center">
+					<div class="flex flex-col items-center justify-center w-48 h-24 border">
 						<p class="text-4xl">
 							274
 						</p>
@@ -78,7 +78,7 @@
 							Flights
 						</p>
 					</div>
-					<div class="border w-48 h-24 flex flex-col items-center justify-center">
+					<div class="flex flex-col items-center justify-center w-48 h-24 border">
 						<p class="text-4xl">
 							572
 						</p>
@@ -87,8 +87,8 @@
 						</p>
 					</div>
 				</div>
-				<div class="mt-5 flex gap-4">
-					<div class="border w-40 h-48 flex flex-col items-center justify-center">
+				<div class="flex gap-4 mt-5">
+					<div class="flex flex-col items-center justify-center w-40 h-48 border">
 						<p class="text-4xl">
 							209
 						</p>
@@ -96,7 +96,7 @@
 							Events per 100 Flts
 						</p>
 					</div>
-					<div class="border w-56 h-48 flex flex-col items-center justify-center">
+					<div class="flex flex-col items-center justify-center w-56 h-48 border">
 						<div class="text-gray-400">
 							Events by Aircraft Type
 						</div>
@@ -108,10 +108,10 @@
 					</div>
 				</div>
 				<div
-					class="border mt-5 h-96 flex flex-col items-center justify-center relative chartContainer"
+					class="relative flex flex-col items-center justify-center mt-5 border h-96 chartContainer"
 					style="width: 25rem"
 				>
-					<div class="absolute left-1 top-1 text-sm text-gray-400">
+					<div class="absolute text-sm text-gray-400 left-1 top-1">
 						Watch List
 					</div>
 					<vue-apex-charts
@@ -273,7 +273,7 @@ export default {
 						width: 380,
 						type: 'pie',
 					},
-					labels: [ 'Team A', 'Team B', 'Team C', 'Team D', 'Team E' ],
+					labels: [ 'Takeoff', 'Climb', 'Cruise' , 'Descent', 'Approach', 'Landing'  ],
 					legend: { show: false },
 					stroke: {
 						colors: [ 'transparent' ] 
@@ -314,13 +314,13 @@ export default {
 			},
 			columnCenter: {
 				series: [ {
-					name: 'PRODUCT A',
+					name: 'Low',
 					data: [ 44, 55, 41, 67, 22, 43 ]
 				}, {
-					name: 'PRODUCT B',
+					name: 'Medium',
 					data: [ 13, 23, 20, 8, 13, 27 ]
 				}, {
-					name: 'PRODUCT C',
+					name: 'High',
 					data: [ 11, 17, 15, 15, 21, 14 ]
 				} ],
 				chartOptions: {
@@ -366,9 +366,7 @@ export default {
 						},
 					},
 					xaxis: {
-						type: 'datetime',
-						categories: [ '01/01/2011 GMT', '01/02/2011 GMT', '01/03/2011 GMT', '01/04/2011 GMT',
-							'01/05/2011 GMT', '01/06/2011 GMT'
+						categories: [ 'Takeoff', 'Climb', 'Cruise' , 'Descent', 'Approach', 'Landing' 
 						],
 					},
 					legend: {
@@ -383,11 +381,11 @@ export default {
 			},
 			multipleChart: {
 				series: [ {
-					name: 'Website Blog',
+					name: 'Total flight',
 					type: 'column',
 					data: [ 440, 505, 414, 671, 227, 413, 201, 352, 752, 320, 257, 160 ]
 				}, {
-					name: 'Social Media',
+					name: 'Total events',
 					type: 'line',
 					data: [ 23, 42, 35, 27, 43, 22, 17, 31, 22, 22, 12, 16 ]
 				} ],
@@ -401,7 +399,7 @@ export default {
 						width: [ 0, 4 ]
 					},
 					title: {
-						text: 'Traffic Sources'
+						text: 'Event summary'
 					},
 					dataLabels: {
 						enabled: false,
@@ -413,13 +411,13 @@ export default {
 					},
 					yaxis: [ {
 						title: {
-							text: 'Website Blog',
+							text: 'Total flight (per 100 flights)',
 						},
             
 					}, {
 						opposite: true,
 						title: {
-							text: 'Social Media'
+							text: 'Total events  and total flights'
 						}
 					} ]
 				},
