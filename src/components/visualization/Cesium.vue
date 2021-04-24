@@ -133,9 +133,9 @@ export default {
 			}
 		},
 	},
-	mounted () {
+	async mounted () {
 		Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
-		this.audio = new Audio('https://storage.cloud.google.com/fdm-music/adi.mp3')
+		this.audio = new Audio('adi.mp3')
 		this.viewer = new Cesium.Viewer('cesium', {
 			terrainProvider: Cesium.createWorldTerrain()
 		})
