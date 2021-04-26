@@ -89,7 +89,7 @@
 							{{ item.file_size.toFixed(2) }}
 						</td>
 						<td class="pl20">
-							80
+							{{ item.minutes }}
 						</td>
 						<td>{{ item.comment }}</td>
 						<td>
@@ -98,8 +98,9 @@
 							</button>
 							
 							<button
-								v-if="item.isDelete"
+								v-if="item.minutes > -16"
 								class="detail red"
+								@click="onDelete(item.id)"
 							>
 								Delete
 							</button>
@@ -121,6 +122,11 @@
 				</button>
 			</div>
 		</div>
+		<modal-delete
+			v-if="isDelete"
+			@delete="deleting"
+			@close="isDelete = false"
+		/>
 		<technician-upload
 			v-if="isUpload"
 			@close="isUpload = false"
@@ -135,9 +141,10 @@ import TechnicianUpload from '../../components/technician/TechnicianUpload'
 import { fileService } from '../../_services/file.service'
 import { mapActions } from 'vuex'
 import moment from 'moment'
+import ModalDelete from '../../components/ModalDelete.vue'
 export default {
 	name: 'Upload',
-	components: { TechnicianUpload, FmdTable },
+	components: { TechnicianUpload, FmdTable, ModalDelete },
 	data () {
 		return {
 			isUpload: false,
@@ -146,7 +153,9 @@ export default {
 			date: '',
 			size: '',
 			quality: '',
-			comment: ''
+			comment: '',
+			isDelete: false,
+			deleteId: 0
 		}
 	},
 	computed: {
@@ -173,7 +182,11 @@ export default {
 		fetchFiles () {
 			this.setLoading(true)
 			fileService.getAll(this.userProfile.user.id).then(res => {
-				this.files = res.map(i => ({ ...i, date: moment(i.created_at).format('DD.MM.YYYY') }))
+				this.files = res.map(i => ({ 
+					...i, 
+					date: moment(i.created_at).format('DD.MM.YYYY'),
+					minutes: moment(i.created_at).diff(moment(), 'minutes')
+				}))
 				this.setLoading(false)
 			}).catch(err => {
 				this.setLoading(false)
@@ -186,6 +199,21 @@ export default {
 			this.date = ''
 			this.size = ''
 			this.quality = ''
+		},
+		onDelete (id) {
+			this.isDelete = id
+		},
+
+		deleting () {
+			this.setLoading(true)
+			fileService.delete(this.isDelete).then(res => {
+				this.fetchFiles()
+				this.isDelete = false
+				this.setLoading(false)
+			}).catch(err => {
+				this.setLoading(false)
+				console.log(err)
+			})
 		}
 	}
 }

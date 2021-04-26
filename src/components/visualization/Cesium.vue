@@ -146,9 +146,11 @@ export default {
 	beforeDestroy () {
 		this.audio.pause()
 		this.audio.currentTime = 0
+		this.setFileId(0)
 	},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
+		...mapActions('file', [ 'setFileId' ]),
 		fetchData (fileId) {
 			this.setLoading(true)
 			this.audio.pause()

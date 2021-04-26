@@ -171,7 +171,6 @@ export default {
 						},
 						onUploadProgress: function ( progressEvent ) {
 							this.uploadPercentage = parseInt( Math.round( ( progressEvent.loaded / progressEvent.total ) * 100 ))
-							console.log(this.uploadPercentage)
 						}.bind(this)
 					}).then(() => {
 						setTimeout(() => {
