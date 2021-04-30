@@ -45,6 +45,11 @@ const routes = [
 				name: 'Analytics',
 				component: () => import('@/views/admin/Analytics.vue')
 			},
+			{
+				path: '/report',
+				name: 'Report',
+				component: () => import('@/components/reports/FdmReport.vue')
+			},
 
 			// Technician Page
 			{
