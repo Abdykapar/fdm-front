@@ -67,15 +67,11 @@
 			<div class="flex justify-center text-white plot__body__title">
 				Flight  (UAFM - UAFO)
 			</div>
-			<div
-				class="m-6 bg-gray-600"
-			>
-				<vue-apex-charts
-					v-if="isShow"
-					height="450"
-					type="line"
-					:options="chartOptions"
-					:series="series"
+
+			<div class="m-10">
+				<div
+					id="container"
+					class=""
 				/>
 			</div>
 		</div>
@@ -83,51 +79,28 @@
 </template> 
 
 <script>
-import VueApexCharts from 'vue-apexcharts'
 import { fileService } from '../../_services/file.service'
-import { flightService } from '../../_services/flight.service'
-import { eventService } from '../../_services/event.service'
 import { otherService } from '../../_services/other.service'
 import { mapActions } from 'vuex'
+import Highcharts from 'highcharts'
+import randomColor from 'randomcolor'
 
 export default {
 	name: 'Plot',
-	components: { VueApexCharts },
 	data () {
 		return {
-			isShow: false,
+			isShow: true,
 			chartOptions: {
 				chart: {
 					id: 'basic-bar',
-					// toolbar: {
-					// 	show: false
-					// }
+					group: 'social',
+					type: 'line'
 				},
 				colors: [ '#499F68' ],
 				stroke: {
 					curve: 'straight',
 					width: 2,
 				},
-				// markers: {
-				// 	size: 1,
-				// 	strokeColors: [],
-				// 	strokeWidth: 1,
-				// 	strokeOpacity: 0.9,
-				// 	strokeDashArray: 0,
-				// 	fillOpacity: 1,
-				// 	discrete: [],
-				// 	shape: 'circle',
-				// 	radius: 1,
-				// 	offsetX: 0,
-				// 	offsetY: 0,
-				// 	onClick: undefined,
-				// 	onDblClick: undefined,
-				// 	showNullDataPoints: true,
-				// 	hover: {
-				// 		size: undefined,
-				// 		sizeOffset: 1
-				// 	}
-				// },
 				xaxis: {
 					labels: {
 						show: false,
@@ -167,11 +140,14 @@ export default {
 			value: [],
 			options: [ 'list', 'of', 'options' ],
 			parameters: [],
-			selectedParameters: []
+			selectedParameters: [],
+			syncExtremes: '',
+			xData: []
 		}
 	},
 	mounted () {
 		this.fetchFiles()
+		this.highChartInit()
 	},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
@@ -182,20 +158,6 @@ export default {
 				console.log(err)
 			})
 		},
-		// fetchFlights (fileId) {
-		// 	flightService.getAll(fileId).then(res => {
-		// 		this.flights = res
-		// 	}).catch(err => {
-		// 		console.log(err)
-		// 	})
-		// },
-		// fetchEvents (flightId) {
-		// 	eventService.getAll(flightId).then(res => {
-		// 		this.events = res
-		// 	}).catch(err => {
-		// 		console.log(err)
-		// 	})
-		// },
 		fetchEventParameters (fileId) {
 			this.setLoading(true)
 			otherService.eventParameters(fileId).then(res => {
@@ -209,43 +171,203 @@ export default {
 					}
 					this.parameters.push(a)
 				})
-				if (this.parameters.length) this.chartOptions.labels = this.parameters[0].data.map(i => i.timestamp)
+				if (this.parameters.length) {
+					const d = this.parameters.reduce((acc, i) => i.data.length > acc.length ? i.data : acc, [] )
+					this.xData = d.map(i => i.timestamp)
+				}
 				this.setLoading(false)
 			}).catch(err => {
 				this.setLoading(false)
 				console.log(err)
 			})
 		},
-		// onFlightChange (e) {
-		// 	this.fetchEvents(e.target.value)
-		// },
 		onFileChange (e) {
 			this.fetchEventParameters(e.target.value)
 		},
-		// onEventChange (e) {
-		// 	this.fetchEventParameters(e.target.value)
-		// },
 		onParameterSelect (opt, id) {
-			this.isShow = false
-			this.series.push({
+			this.selectedParameters.push({ name: opt.name, id: opt.id })
+			const dataset = { 
 				name: opt.name,
-				id: opt.id,
-				data: opt.data.map(i => i.value)
-			})
-			const randomColor = '#'+Math.floor(Math.random()*16777215).toString(16)
-			this.chartOptions.colors.push(randomColor)
-			// this.chartOptions.markers.strokeColors = [ randomColor ]
-			this.chartOptions.labels = opt.data.map(i => i.timestamp)
-
-			console.log(this.chartOptions.labels)
-			this.$nextTick(() => {
-				this.isShow = true
-			})
+				data: this.xData.map(i => {
+					const a = opt.data.find(j => j.timestamp === i)
+					if (a) return parseFloat(a.value)
+					return 0
+				} ),
+				'type': 'line',
+			}
+			this.makeDataset(dataset)
 		},
+		makeDataset (dataset) {
+			function getRandomColor () {
+				const letters = 'BCDEF'.split('')
+				let color = '#'
+				for (let i = 0; i < 6; i++ ) {
+					color += letters[Math.floor(Math.random() * letters.length)]
+				}
+				return color
+			}
+			dataset.data = Highcharts.map(dataset.data, (val, j) => {
+				return [ this.xData[j], val ]
+			})
+
+			const chartDiv = document.createElement('div')
+			chartDiv.className = 'chart'
+			document.getElementById('container').appendChild(chartDiv)
+
+			Highcharts.chart(chartDiv, {
+				chart: {
+					marginLeft: 40, // Keep all charts left aligned
+					spacingTop: 20,
+					spacingBottom: 20,
+					style: {
+						color: '#c8c9c5'
+					}
+				},
+				point: {
+					events: {
+						mouseOut: function () {
+							this.series.chart.tooltip.hide()
+						}
+					},
+				},
+				colors: [ 'red', 'orange', 'green', 'blue', 'purple', 'brown' ],
+				title: {
+					text: dataset.name,
+					align: 'left',
+					margin: 0,
+					x: 30,
+					style: {
+						color: '#c8c9c5'
+					}
+				},
+				credits: {
+					enabled: false
+				},
+				legend: {
+					enabled: false
+				},
+				xAxis: {
+					crosshair: true,
+					events: {
+						setExtremes: this.syncExtremes
+					},
+					title: {
+						style: {
+							color: '#c8c9c5'
+						}
+					},
+					categories: this.xData,
+					labels: {
+						enabled: false,
+						style: {
+							color: '#c8c9c5'
+						}
+					}
+				},
+				yAxis: {
+					title: {
+						text: null,
+						style: {
+							color: '#c8c9c5'
+						}
+					},
+					labels: {
+						style: {
+							color: '#c8c9c5',
+						}
+					}
+				},
+				tooltip: {
+					backgroundColor: '#fff',
+					hideDelay: 4000,
+					borderColor: '#C6EDEE',
+					borderRadius: 10,
+					borderWidth: 2,
+					formatter: function () {
+						return `<span class="uppercase text-base">${this.series.name}</span> <br> 
+								<span class="text-xs">Date & Time: </span> <span class="text-xs">${this.x}</span><br>
+								<span class="text-xs">Value: </span> <span class="text-xs">${this.y}</span>`
+					},
+					headerFormat: '',
+					shadow: false,
+					style: {
+						fontSize: '18px',
+						color: '#000',
+					},
+					valueDecimals: dataset.valueDecimals
+				},
+				series: [ {
+					data: dataset.data,
+					name: dataset.name,
+					type: dataset.type,
+					color: randomColor(),
+					fillOpacity: 0.3,
+					turboThreshold: 8000,
+					tooltip: {
+						// valueSuffix: ' ' + dataset.unit
+					}
+				} ]
+			})
+		},	
 		onParameterRemove (opt, id) {
-			const index = this.series.findIndex(i => i.id === opt.id)
-			this.chartOptions.colors.splice(index, 1)
-			this.series = this.series.filter(i => i.id !== opt.id)
+			const index = this.selectedParameters.findIndex(i => i.id === opt.id)
+			const chart = Highcharts.charts[index]
+			chart.container.parentNode.parentNode.removeChild(chart.container.parentNode)
+			Highcharts.charts.splice(index, 1)
+			this.selectedParameters.splice(index, 1)
+		},
+		highChartInit () {
+			[ 'mousemove', 'touchmove', 'touchstart' ].forEach(eventType => {
+				document.getElementById('container').addEventListener(
+					eventType,
+					e => {
+						let chart
+						let point
+						let i
+						let event
+
+						for (i = 0; i < Highcharts.charts.length; i = i + 1) {
+							chart = Highcharts.charts[i]
+							// Find coordinates within the chart
+							event = chart.pointer.normalize(e)
+							// Get the hovered point
+							point = chart.series[0].searchPoint(event, true)
+
+							if (point) {
+								point.highlight(e)
+							}
+						}
+					}
+				)
+			})
+			Highcharts.Pointer.prototype.reset = function () {
+				return undefined
+			}
+			Highcharts.Point.prototype.highlight = function (event) {
+				event = this.series.chart.pointer.normalize(event)
+				this.onMouseOver() // Show the hover marker
+				this.series.chart.tooltip.refresh(this) // Show the tooltip
+				this.series.chart.xAxis[0].drawCrosshair(event, this) // Show the crosshair
+			}
+			this.syncExtremes =  e => {
+				const thisChart = this.chart
+
+				if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
+					Highcharts.each(Highcharts.charts, chart => {
+						if (chart !== thisChart) {
+							if (chart.xAxis[0].setExtremes) { // It is null while updating
+								chart.xAxis[0].setExtremes(
+									e.min,
+									e.max,
+									undefined,
+									false,
+									{ trigger: 'syncExtremes' }
+								)
+							}
+						}
+					})
+				}
+			}
 		}
 	}
 }
@@ -277,4 +399,46 @@ export default {
 			}
         }
     }
+.highcharts-figure, .highcharts-data-table table {
+  min-width: 320px; 
+  max-width: 800px;
+  margin: 1em auto;
+}
+
+.chart {
+  height: 120px;
+//   width: 42vw;
+}
+
+.highcharts-data-table table {
+	font-family: Verdana, sans-serif;
+	border-collapse: collapse;
+	border: 1px solid #c8c9c5;
+	margin: 10px auto;
+	text-align: center;
+	width: 100%;
+	max-width: 500px;
+}
+.highcharts-data-table caption {
+  padding: 1em 0;
+  font-size: 1.2em;
+  color: #555;
+}
+.highcharts-data-table th {
+	font-weight: 600;
+  padding: 0.5em;
+}
+.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+  padding: 0.5em;
+}
+.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+  background: #3f3a3a;
+}
+.highcharts-data-table tr:hover {
+  background: #303336;
+}
+.highcharts-background {
+	fill: rgba(255, 255, 255, 0.02);
+	// fill: rgba($color: #fff, $alpha: 1);
+}
 </style>
