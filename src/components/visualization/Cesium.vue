@@ -101,6 +101,7 @@ import drawSpeedometer from '@/mixins/DrawSpeedometer'
 import moment from 'moment'
 import _ from 'lodash'
 import * as $ from 'jquery'
+import { eventService } from '../../_services/event.service'
 
 export default {
 	name: 'Cesium',
@@ -115,7 +116,8 @@ export default {
 			selectedData: {},
 			oldAltitude: 0,
 			oldCoordinates: {},
-			audio: ''
+			audio: '',
+			events: []
 		}
 	},
 	computed: {
@@ -154,8 +156,15 @@ export default {
 		fetchData (fileId) {
 			this.setLoading(true)
 			this.audio.pause()
-			otherService.getFileCoordinates(fileId).then(res => {
-				this.flightData = res
+			eventService.getAll('', fileId).then(res => {
+				this.events = res
+				return otherService.getFileCoordinates(fileId)
+			}).then(res => {
+				this.flightData = res.map(i => {
+					const e = this.events.find(j => j.timestamp === i.timestamp)
+					if (e) return { ...i, isEvent: true, event_name: e.event_name }
+					return i
+				})
 				this.audio.currentTime = 0
 				this.init()
 				this.setLoading(false)
@@ -206,11 +215,18 @@ export default {
 				// Here we add the positions all upfront, but these can be added at run-time as samples are received from a server.
 				positionProperty.addSample(time, position)
 
-				this.viewer.entities.add({
-					description: `Location: (${dataPoint.longitude}, ${dataPoint.latitude}, ${dataPoint.altitude})`,
-					position: position,
-					point: { pixelSize: 10, color: Cesium.Color.RED }
-				})
+				if (dataPoint.isEvent) {
+					this.viewer.entities.add({
+						description: `${dataPoint.event_name}`,
+						position: position,
+						point: { pixelSize: 10, color: Cesium.Color.RED },
+						label: {
+							text: dataPoint.event_name,
+							horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+							pixelOffset: new Cesium.Cartesian2(10, 0)
+						}
+					})
+				}
 			}
 			function toDegrees (angle) {
 				return angle * (180 / Math.PI)
