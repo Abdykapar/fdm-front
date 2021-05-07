@@ -69,6 +69,11 @@
 			</div>
 
 			<div class="m-10">
+				<!-- <canvas
+					id="events"
+					class="fixed"
+					style="width: 100vw; height: 100vh; top: 0; left: 0"
+				/> -->
 				<div
 					id="container"
 					class=""
@@ -84,52 +89,14 @@ import { otherService } from '../../_services/other.service'
 import { mapActions } from 'vuex'
 import Highcharts from 'highcharts'
 import randomColor from 'randomcolor'
+import { eventService } from '../../_services/event.service'
 
 export default {
 	name: 'Plot',
+	components: {  },
 	data () {
 		return {
 			isShow: true,
-			chartOptions: {
-				chart: {
-					id: 'basic-bar',
-					group: 'social',
-					type: 'line'
-				},
-				colors: [ '#499F68' ],
-				stroke: {
-					curve: 'straight',
-					width: 2,
-				},
-				xaxis: {
-					labels: {
-						show: false,
-					},
-					axisBorder: {
-						color: '#33393F',
-					}
-				},
-				yaxis: {
-					labels: {
-						style: {
-							colors: [ '#ffffff' ],
-							fontSize: '12px',
-							fontFamily: 'Helvetica, Arial, sans-serif',
-							fontWeight: 400,
-							cssClass: 'apexcharts-xaxis-label',
-						},
-					}
-				},
-				grid: {
-					borderColor: '#33393F',
-					strokeDashArray: 0,
-					position: 'back',
-					row: {
-						colors: [ 'transparent' ], // takes an array which will be repeated on columns
-						opacity: 0.5
-					},
-				},
-			},
 			series: [],
 			files: [],
 			flights: [],
@@ -138,11 +105,10 @@ export default {
 			event: '',
 			events: [],
 			value: [],
-			options: [ 'list', 'of', 'options' ],
 			parameters: [],
 			selectedParameters: [],
 			syncExtremes: '',
-			xData: []
+			xData: [],
 		}
 	},
 	mounted () {
@@ -181,7 +147,13 @@ export default {
 				console.log(err)
 			})
 		},
+		fetchEvents (fileId) {
+			eventService.getAll('', fileId).then(res => {
+				this.events = res
+			}).catch(err => console.log(err))
+		},
 		onFileChange (e) {
+			this.fetchEvents(e.target.value)
 			this.fetchEventParameters(e.target.value)
 		},
 		onParameterSelect (opt, id) {
@@ -210,9 +182,48 @@ export default {
 				return [ this.xData[j], val ]
 			})
 
+			const plotLine = this.events.map(i => ({
+				name: i.event_name,
+				x: this.xData.findIndex(j => j === i.timestamp)
+			}))
+			console.log(plotLine)
+
 			const chartDiv = document.createElement('div')
 			chartDiv.className = 'chart'
 			document.getElementById('container').appendChild(chartDiv)
+
+			function syncAnnotations (e) {
+				const thisChart = this.chart
+				const newX = this.options.shapes[0].points[0].x
+				const index = this.chart.annotations.indexOf(this)
+				console.log(newX)
+
+				if (e.type !== 'afterUpdate') {
+					Highcharts.each(Highcharts.charts, chart => {
+						if (chart !== thisChart) {
+							chart.annotations[index].update({
+								labels: [ {
+									point: {
+										x: newX
+									}
+								} ],
+								shapes: [ {
+									points: [ {
+										x: newX,
+										xAxis: 0,
+										y: 0
+									}, {
+										x: newX,
+										xAxis: 0,
+										y: 1000
+									} ]
+								} ]
+							})
+						}
+					})
+				}
+			}
+
 
 			Highcharts.chart(chartDiv, {
 				chart: {
@@ -221,7 +232,12 @@ export default {
 					spacingBottom: 20,
 					style: {
 						color: '#c8c9c5'
-					}
+					},
+					events: {
+						render: function (val) {
+							console.log('sda',val)
+						}
+					},
 				},
 				point: {
 					events: {
@@ -230,6 +246,33 @@ export default {
 						}
 					},
 				},
+				plotOptions: {
+					series: {
+						events: {
+							afterAnimate: function (val) {
+								console.log(val)
+								const arr = val.target.data
+								const can = document.getElementById('events')
+								// can.style.width = val.target.chart.chartWidth+'px'
+								// can.style.height = val.target.chart.chartHeight+'px'
+								const ctx = can.getContext('2d')
+								ctx.beginPath()
+								ctx.strokeStyle = 'red'
+								ctx.lineWidth = 2
+								console.log(plotLine)
+								arr.forEach((i,index) => {
+									if (index % 1000 === 0) {
+										console.log(i.plotX, i.plotY)
+										ctx.moveTo(i.plotX, i.plotY)
+										ctx.lineTo(i.plotX, i.plotY-10)
+									}
+								})
+								ctx.stroke()
+							}
+						},
+					},
+				},
+				
 				colors: [ 'red', 'orange', 'green', 'blue', 'purple', 'brown' ],
 				title: {
 					text: dataset.name,
@@ -247,6 +290,7 @@ export default {
 					enabled: false
 				},
 				xAxis: {
+					id: 'xaxis',
 					crosshair: true,
 					events: {
 						setExtremes: this.syncExtremes
@@ -262,8 +306,45 @@ export default {
 						style: {
 							color: '#c8c9c5'
 						}
-					}
+					},
+					// plotLines: plotLine.map(i => ({
+					// 	color: '#FF0000', // Red
+					// 	width: 1,
+					// 	zIndex: 10,
+					// 	value: i.x, // Position, you'll have to translate this to the values on your x axis
+					// 	label: {
+					// 		text: `<span onmouseover="onMouseOver" class="chartEventTitle" data-x='${i.x}'>${i.name}</span>`,
+					// 		useHTML: true,
+					// 		rotation: 0,
+					// 		style: {
+					// 			color: '#FF0000'
+					// 		}
+					// 	}
+					// }))
 				},
+				annotations: [
+					{
+						events: {
+							afterUpdate: syncAnnotations,
+							add: function (e) {
+								console.log(this.chart, this.options)
+							}
+						},
+						shapes: [ {
+							point: 915,
+							type: 'circle',
+							r: 10
+						}, ],
+						labels: [ {
+							point: {
+								x: 6200,
+								y: 0,
+								xAxis: 0,
+								yAxis: 0
+							}
+						} ]
+					}, 
+				 ],
 				yAxis: {
 					title: {
 						text: null,
@@ -279,7 +360,7 @@ export default {
 				},
 				tooltip: {
 					backgroundColor: '#fff',
-					hideDelay: 4000,
+					hideDelay: 2000,
 					borderColor: '#C6EDEE',
 					borderRadius: 10,
 					borderWidth: 2,
@@ -307,6 +388,8 @@ export default {
 						// valueSuffix: ' ' + dataset.unit
 					}
 				} ]
+			},chart => {
+				console.log(chart.series[0].data[0])
 			})
 		},	
 		onParameterRemove (opt, id) {
@@ -315,6 +398,9 @@ export default {
 			chart.container.parentNode.parentNode.removeChild(chart.container.parentNode)
 			Highcharts.charts.splice(index, 1)
 			this.selectedParameters.splice(index, 1)
+		},
+		onMouseOver () {
+			console.log('over')
 		},
 		highChartInit () {
 			[ 'mousemove', 'touchmove', 'touchstart' ].forEach(eventType => {
@@ -334,15 +420,15 @@ export default {
 							point = chart.series[0].searchPoint(event, true)
 
 							if (point) {
-								point.highlight(e)
+								point.onMouseOver(e)
 							}
 						}
 					}
 				)
 			})
-			Highcharts.Pointer.prototype.reset = function () {
-				return undefined
-			}
+			// Highcharts.Pointer.prototype.reset = function () {
+			// 	return undefined
+			// }
 			Highcharts.Point.prototype.highlight = function (event) {
 				event = this.series.chart.pointer.normalize(event)
 				this.onMouseOver() // Show the hover marker
@@ -440,5 +526,9 @@ export default {
 .highcharts-background {
 	fill: rgba(255, 255, 255, 0.02);
 	// fill: rgba($color: #fff, $alpha: 1);
+}
+#events {
+	pointer-events: none;
+	background: rgba(#fff, 0.6);
 }
 </style>
