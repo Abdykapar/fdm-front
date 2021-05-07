@@ -36,6 +36,9 @@
 				placeholder="Choose a file"
 				@change="onSelect"
 			>
+				<option value="0">
+					Select a file
+				</option>
 				<option
 					v-for="file in files"
 					:key="file.id"
@@ -198,7 +201,10 @@ export default {
 		},
 		userProfile () {
 			return this.$store.state.account.user
-		}
+		},
+		fileId () {
+			return this.$store.getters['file/selectedFile']
+		},
 	},
 	watch: {
 		isAnimate: {
@@ -208,6 +214,9 @@ export default {
 					this.fetchFiles()
 				}
 			}
+		},
+		fileId (val) {
+			this.selectedFile = val
 		}
 	},
 	mounted () {
