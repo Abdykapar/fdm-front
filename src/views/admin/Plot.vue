@@ -19,21 +19,6 @@
 					</option>
 				</select>
 			</div>
-			<div class="w-90">
-				<label>Paremeters</label>
-				<multiselect
-					v-model="value"	
-					:options="parameters"
-					label="name"
-					track-by="name"
-					select-label=""
-					deselect-label=""
-					:multiple="true"
-					:close-on-select="false"
-					@select="onParameterSelect"
-					@remove="onParameterRemove"
-				/>
-			</div>
 			<!-- <select
 				v-model="flight"
 				class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
@@ -76,7 +61,29 @@
 				/> -->
 				<div
 					id="container"
-					class=""
+					class="relative"
+				/>
+			</div>
+		</div>
+		<div
+			class="fixed bottom-0 w-full"
+			style="background: #1f2327;"
+		>
+			<div
+				class="w-90 ml-5 mr-5 mb-5 text-yellow-50 w-11/12"
+			>
+				<label>Paremeters</label>
+				<multiselect
+					v-model="value"
+					:options="parameters"
+					label="name"
+					track-by="name"
+					select-label=""
+					deselect-label=""
+					:multiple="true"
+					:close-on-select="false"
+					@select="onParameterSelect"
+					@remove="onParameterRemove"
 				/>
 			</div>
 		</div>
@@ -184,9 +191,9 @@ export default {
 
 			const plotLine = this.events.map(i => ({
 				name: i.event_name,
+				value: i.value,
 				x: this.xData.findIndex(j => j === i.timestamp)
 			}))
-			console.log(plotLine)
 
 			const chartDiv = document.createElement('div')
 			chartDiv.className = 'chart'
@@ -234,8 +241,8 @@ export default {
 						color: '#c8c9c5'
 					},
 					events: {
-						render: function (val) {
-							console.log('sda',val)
+						render:  val => {
+							this.drawEvents(plotLine)
 						}
 					},
 				},
@@ -246,33 +253,6 @@ export default {
 						}
 					},
 				},
-				plotOptions: {
-					series: {
-						events: {
-							afterAnimate: function (val) {
-								console.log(val)
-								const arr = val.target.data
-								const can = document.getElementById('events')
-								// can.style.width = val.target.chart.chartWidth+'px'
-								// can.style.height = val.target.chart.chartHeight+'px'
-								const ctx = can.getContext('2d')
-								ctx.beginPath()
-								ctx.strokeStyle = 'red'
-								ctx.lineWidth = 2
-								console.log(plotLine)
-								arr.forEach((i,index) => {
-									if (index % 1000 === 0) {
-										console.log(i.plotX, i.plotY)
-										ctx.moveTo(i.plotX, i.plotY)
-										ctx.lineTo(i.plotX, i.plotY-10)
-									}
-								})
-								ctx.stroke()
-							}
-						},
-					},
-				},
-				
 				colors: [ 'red', 'orange', 'green', 'blue', 'purple', 'brown' ],
 				title: {
 					text: dataset.name,
@@ -307,44 +287,18 @@ export default {
 							color: '#c8c9c5'
 						}
 					},
-					// plotLines: plotLine.map(i => ({
-					// 	color: '#FF0000', // Red
-					// 	width: 1,
-					// 	zIndex: 10,
-					// 	value: i.x, // Position, you'll have to translate this to the values on your x axis
-					// 	label: {
-					// 		text: `<span onmouseover="onMouseOver" class="chartEventTitle" data-x='${i.x}'>${i.name}</span>`,
-					// 		useHTML: true,
-					// 		rotation: 0,
-					// 		style: {
-					// 			color: '#FF0000'
-					// 		}
-					// 	}
-					// }))
+					plotLines: plotLine.map(i => {
+						return {
+							value: i.x,
+							width: 0,  
+							label: {
+								text: '',
+								rotation: 0,
+								useHTML: true
+							}
+						}
+					})
 				},
-				annotations: [
-					{
-						events: {
-							afterUpdate: syncAnnotations,
-							add: function (e) {
-								console.log(this.chart, this.options)
-							}
-						},
-						shapes: [ {
-							point: 915,
-							type: 'circle',
-							r: 10
-						}, ],
-						labels: [ {
-							point: {
-								x: 6200,
-								y: 0,
-								xAxis: 0,
-								yAxis: 0
-							}
-						} ]
-					}, 
-				 ],
 				yAxis: {
 					title: {
 						text: null,
@@ -389,9 +343,80 @@ export default {
 					}
 				} ]
 			},chart => {
-				console.log(chart.series[0].data[0])
+				this.drawEvents(plotLine)
 			})
 		},	
+		resetEvents (className) {
+			const a = document.getElementsByClassName(className)
+			for (const i of [ ...a ]) {
+				i.remove()
+			}
+		},
+		drawEvents (plotLine) {
+			this.resetEvents('event-chart-data')
+			const charts = document.getElementsByClassName('chart')
+			for (let j = 0; j < [ ...charts ].length; j++) {
+				const a = charts[j].getElementsByClassName('highcharts-plot-line-label')
+				const container = document.getElementById('container')
+				const c = container.getBoundingClientRect()
+				for (let i = 0; i < [ ...a ].length; i++) {
+					const b = a[i].getBoundingClientRect()
+					const span = document.createElement('span')
+					span.classList = 'event-chart-data'
+					span.style.top = (b.top - c.top) - 40 +'px'
+					span.style.left = (b.left - c.left) +'px'
+					span.style.position = 'absolute'
+					span.style.height = '120px'
+					span.style.width = '2px'
+					span.style.color = 'red'
+					span.style.display = 'block'
+					span.style.background = '#6495EC'
+					if (j === 0) {
+						const innerSpan = document.createElement('span')
+						innerSpan.style.position = 'absolute'
+						innerSpan.style.height = 'auto'
+						innerSpan.style.top = (b.top - c.top) - 40 +'px'
+						innerSpan.style.left = (b.left - c.left) +'px'
+						innerSpan.style.width = 'auto'
+						innerSpan.style.background = 'white'
+						innerSpan.style.color = '#6495EC'
+						innerSpan.style.border = '1px solid #6495EC'
+						innerSpan.style.lineHeight = 1
+						innerSpan.style.fontSize = '12px'
+						innerSpan.style.display = 'block'
+						innerSpan.style.padding = '5px'
+						innerSpan.style.fontWeight = 'bold'
+						innerSpan.style.zIndex = 1
+						innerSpan.classList = 'tooltip event-chart-data'
+						innerSpan.style.borderLeftWidth = '2px'
+						innerSpan.innerText = plotLine[i].name
+						container.appendChild(innerSpan)
+
+						const tooltip = document.createElement('div')
+						tooltip.classList = 'tooltiptext'
+						innerSpan.appendChild(tooltip)
+
+						const title = document.createElement('span')
+						title.classList= 'tooltiptext__title'
+						title.innerText = plotLine[i].name
+						tooltip.appendChild(title)
+
+						const time = document.createElement('p')
+						time.innerText = this.xData[plotLine[i].x]
+						tooltip.appendChild(time)
+
+						const eventLimit = document.createElement('p')
+						eventLimit.innerText = 'Event Limit: 0.5'
+						tooltip.appendChild(eventLimit)
+
+						const eventValue = document.createElement('p')
+						eventValue.innerText = 'Event Value: ' + plotLine[0].value
+						tooltip.appendChild(eventValue)
+					}
+					container.appendChild(span)
+				}
+			}	
+		},
 		onParameterRemove (opt, id) {
 			const index = this.selectedParameters.findIndex(i => i.id === opt.id)
 			const chart = Highcharts.charts[index]
@@ -460,6 +485,13 @@ export default {
 </script>
 
 <style lang="scss">
+	.chart-tooltip {
+		display: block;
+		width: 3px;
+		height: 10000px;
+		// border-radius: 10px;
+		background: cornsilk;
+	}
 	.multiselect__tags {
 		background: transparent;
 		border-color:rgb(118, 118, 118);
@@ -530,5 +562,32 @@ export default {
 #events {
 	pointer-events: none;
 	background: rgba(#fff, 0.6);
+}
+#container {
+	margin-bottom: 90px;
+}
+
+.tooltip .tooltiptext {
+	visibility: hidden;
+  min-width: 200px;
+  background-color: #4aa96c;
+  color: #fff;
+  border-radius: 3px;
+  padding: 5px 5px 5px 10px;
+  font-weight: normal;
+  position: absolute;
+  font-size: 15px;
+  bottom: 30px;
+  line-height: 1.2;
+  z-index: 1;
+  right: 2px;
+
+  &__title {
+	  font-weight: bold;
+  }
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 </style>

@@ -5,7 +5,7 @@
 	>
 		<div
 			class="modal__content"
-			:class="{ 'delete' : type === 'delete', 'auto-height' : autoHeight }"
+			:class="{ 'delete' : type === 'delete', 'auto-height' : autoHeight, 'width' : type === 'fligthData' }"
 		>
 			<slot name="content" />
 		</div>
@@ -62,6 +62,11 @@ export default {
 
 			&.auto-height {
 				height: auto;
+			}
+
+			&.width {
+				width: 60vw;
+				height: 90%;
 			}
 
 			&.delete {

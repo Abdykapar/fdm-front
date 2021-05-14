@@ -498,4 +498,7 @@ export default {
 	.engine {
 		transform: scale(0.7, 0.7) translate(-83px, -60px);
 	}
+	.cesium-widget-credits{
+		display:none !important;
+	}
 </style>
