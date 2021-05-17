@@ -8,7 +8,7 @@
 				Export
 			</button>
 		</div>
-		<div>
+		<div class="invisible">
 			<vue-apex-charts
 				ref="barchart"
 				type="bar"
@@ -797,8 +797,8 @@ export default {
 							{
 								image: 'phaseChart',
 								alignment: 'center',
-								width: 770,
-								height: 300,
+								width: 780,
+								height: 240,
 							},
 							{
 								text: 'Figure 1: Number of Events vs Phase of Flight',
@@ -901,8 +901,8 @@ export default {
 							{
 								image: 'allEventPhase',
 								alignment: 'center',
-								width: 690,
-								height: 310,
+								width: 770,
+								height: 280,
 							},
 							{
 								text: 'Figure 3: Number of Events vs Event Definition',

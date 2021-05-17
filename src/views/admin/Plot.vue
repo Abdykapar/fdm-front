@@ -577,7 +577,7 @@ export default {
   font-weight: normal;
   position: absolute;
   font-size: 15px;
-  bottom: 30px;
+  top: -100px;
   line-height: 1.2;
   z-index: 1;
   right: 2px;
