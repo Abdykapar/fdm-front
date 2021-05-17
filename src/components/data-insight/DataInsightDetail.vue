@@ -1,5 +1,8 @@
 <template>
-	<fdm-modal @close="$emit('close')">
+	<fdm-modal
+		type="fligthData"
+		@close="$emit('close')"
+	>
 		<div
 			slot="content"
 			class="detail-content"
