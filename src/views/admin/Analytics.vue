@@ -273,10 +273,11 @@ export default {
 					tooltip: {
 						colors: [ '#000' ],
 						custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+							console.log(series, w)
 							return '<div class="tooltip">' +
 								'<div> <span> Year</span><span class="desc"> 2019</span>' + '</div>' +
-								'<div> <span>EventName</span><span class="desc"> Hight Rate of Descent daksd sakda kda ks dkadkaskd ajkds asdaksd aksd s</span>' + '</div>' +
-								'<div> <span>Event</span><span class="desc"> 1.75</span>' + '</div>' +
+								'<div> <span>EventName</span><span class="desc"> Hight Rate of Descent</span>' + '</div>' +
+								'<div> <span>Event Rate</span><span class="desc"> 1.75</span>' + '</div>' +
 								'</div>'
 						},
 						fixed: {
