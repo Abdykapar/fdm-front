@@ -245,6 +245,19 @@ export default {
 							this.drawEvents(plotLine)
 						}
 					},
+					zoomType: 'x',
+					resetZoomButton: {
+						position: {
+							// align: 'right', // by default
+							// verticalAlign: 'top', // by default
+							x: -10,
+							y: 0
+						},
+						relativeTo: 'chart',
+						theme: {
+							zIndex: 999999999
+						}
+					}
 				},
 				point: {
 					events: {

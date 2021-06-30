@@ -11,7 +11,9 @@
 					<label for="aircratf">Aircraft Type</label>
 					<multiselect
 						v-model="value2"	
-						:options="typeOptions"
+						:options="aircrafts"
+						label="modelTitle"
+						track-by="modelCode"
 						:select-label="''"
 						:deselect-label="''"
 						:limit="1"
@@ -25,7 +27,8 @@
 					<multiselect
 						v-model="reg"
 						class="w-40"	
-						:options="regOptions"
+						label="reg_number"
+						:options="aircrafts"
 						:select-label="''"
 						:deselect-label="''"
 						:limit="1"
@@ -55,6 +58,7 @@
 							<input
 								type="text"
 								class="rounded-md analytics__input"
+								value="6"
 							>   
 							<multiselect
 								v-model="date2"	
@@ -72,7 +76,7 @@
 				<div class="flex gap-4">
 					<div class="flex flex-col items-center justify-center w-48 h-24 border">
 						<p class="text-4xl">
-							274
+							{{ flights.length }}
 						</p>
 						<p class="text-gray-400">
 							Flights
@@ -80,7 +84,7 @@
 					</div>
 					<div class="flex flex-col items-center justify-center w-48 h-24 border">
 						<p class="text-4xl">
-							572
+							{{ events.length }}
 						</p>
 						<p class="text-gray-400">
 							Events
@@ -90,7 +94,7 @@
 				<div class="flex gap-4 mt-5">
 					<div class="flex flex-col items-center justify-center w-40 h-48 border">
 						<p class="text-4xl">
-							209
+							{{ averageStats.n_events_per_100_flights }}
 						</p>
 						<p class="text-gray-400">
 							Events per 100 Flts
@@ -101,9 +105,10 @@
 							Events by Aircraft Type
 						</div>
 						<vue-apex-charts
+							v-if="!isLoading"
 							type="donut"
-							:options="pie.chartOptions"
-							:series="pie.series"
+							:options="aircraftType.chartOptions"
+							:series="aircraftType.series"
 						/>
 					</div>
 				</div>
@@ -115,11 +120,12 @@
 						Watch List
 					</div>
 					<vue-apex-charts
+						v-if="!isLoading"
 						type="bar"
 						height="100%"
 						width="100%"
-						:options="column.chartOptions"
-						:series="column.series"
+						:options="flightByMonth.chartOptions"
+						:series="flightByMonth.series"
 					/>
 				</div>
 			</div>
@@ -146,6 +152,7 @@
 			<div class="flex-1">
 				<div class="border h-96">
 					<vue-apex-charts
+						v-if="!isLoading"
 						type="line"
 						height="100%"
 						width="100%"
@@ -161,6 +168,12 @@
 
 <script>
 import VueApexCharts from 'vue-apexcharts'
+import { eventService } from '../../_services/event.service'
+import { flightService } from '../../_services/flight.service'
+import { otherService } from '../../_services/other.service'
+import { aircraftService } from '../../_services/aircraft.service'
+import { aircraftModelService } from '../../_services/aircraft-model.service'
+import moment from 'moment'
 
 export default {
 	name: 'Analytics',
@@ -178,8 +191,8 @@ export default {
 			regOptions: [ 'Select all', 'registration' ],
 			date2Options: [ 'Day', 'Week', 'Month', 'Year' ],
 			options: [ 'sdad' ],
-			pie: {
-				series: [ 44 ],
+			aircraftType: {
+				series: [],
 				chartOptions: {
 					chart: {
 						type: 'donut',
@@ -188,7 +201,7 @@ export default {
 					// title: {
 					// 	text: 'Events by Aircraft Type'
 					// },
-					labels: [ 'B737-400' ],
+					labels: [],
 					// fill: {
 					// 	colors: [ '' ]
 					// },
@@ -214,10 +227,10 @@ export default {
 					} ]
 				},
 			},
-			column: {
+			flightByMonth: {
 				series: [ {
 					name: 'Net Profit',
-					data: [ 44, 55, 57, 56, 61, 58 ]
+					data: []
 				} ],
 				chartOptions: {
 					chart: {
@@ -243,13 +256,14 @@ export default {
 					
 					dataLabels: {
 						enabled: false
-					},stroke: {
+					},
+					stroke: {
 						show: true,
 						width: 2,
 						colors: [ 'transparent' ]
 					},
 					xaxis: {
-						categories: [ 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul' ],
+						categories: [],
 					},
 					yaxis: {
 						title: {
@@ -258,11 +272,22 @@ export default {
 					},
 					tooltip: {
 						colors: [ '#000' ],
-						y: {
-							formatter: function (val) {
-								return '$ ' + val + ' thousands'
-							}
+						custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+							console.log(series, w)
+							return '<div class="tooltip">' +
+								'<div> <span> Year</span><span class="desc"> 2019</span>' + '</div>' +
+								'<div> <span>EventName</span><span class="desc"> Hight Rate of Descent</span>' + '</div>' +
+								'<div> <span>Event Rate</span><span class="desc"> 1.75</span>' + '</div>' +
+								'</div>'
+						},
+						fixed: {
+							enabled: true
 						}
+						// y: {
+						// 	formatter: function (val, a) {
+						// 		return val
+						// 	}
+						// }
 					}
 				},
 			},
@@ -381,33 +406,52 @@ export default {
 			},
 			multipleChart: {
 				series: [ {
-					name: 'Total flight',
+					name: 'Low',
 					type: 'column',
-					data: [ 440, 505, 414, 671, 227, 413, 201, 352, 752, 320, 257, 160 ]
+					data: []
+				},{
+					name: 'Medium',
+					type: 'column',
+					data: []
+				},{
+					name: 'High',
+					type: 'column',
+					data: []
 				}, {
+					name: 'Total flight',
+					type: 'line',
+					data: []
+				},{
 					name: 'Total events',
 					type: 'line',
-					data: [ 23, 42, 35, 27, 43, 22, 17, 31, 22, 22, 12, 16 ]
+					data: []
 				} ],
 				chartOptions: {
 					chart: {
 						height: 350,
 						type: 'line',
 						foreColor: '#fff',
+						stacked: true,
+						toolbar: { show: false },
 					},
 					stroke: {
-						width: [ 0, 4 ]
+						width: [ 2,2,2,2,2 ]
 					},
 					title: {
 						text: 'Event summary'
+					},
+					tooltip: {
+						style: {
+							color: '#000'
+						}
 					},
 					dataLabels: {
 						enabled: false,
 						// enabledOnSeries: [ 1 ]
 					},
-					labels: [ '01 Jan 2001', '02 Jan 2001', '03 Jan 2001', '04 Jan 2001', '05 Jan 2001', '06 Jan 2001', '07 Jan 2001', '08 Jan 2001', '09 Jan 2001', '10 Jan 2001', '11 Jan 2001', '12 Jan 2001' ],
+					labels: [ 2019, 2020, 2021 ],
 					xaxis: {
-						type: 'datetime'
+						categories: [ 2019, 2020, 2021 ],
 					},
 					yaxis: [ {
 						title: {
@@ -422,8 +466,63 @@ export default {
 					} ]
 				},
           
-			}
+			},
+			events: [],
+			flights: [],
+			averageStats: {},
+			aircrafts: [],
+			isLoading: false
 		}
+	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		}
+	},
+	mounted () {
+		this.fetchData()
+	},
+	methods: {
+		fetchData () {
+			this.isLoading = true
+			eventService.getAll().then(async res => {
+				this.events = res
+				this.flights = await flightService.getAll()
+				const d = await otherService.averageStats()
+				this.averageStats = d && d[0]
+				this.aircrafts = await aircraftService.getAll(this.userProfile.user.airline[0])
+				for (const i of this.aircrafts) {
+					const model = await aircraftModelService.getById(i.aircraft_model)
+					i.modelTitle = model.title
+					i.modelCode = model.code
+				}
+				this.aircraftType.series = this.aircrafts.map(i => this.events.filter(j => j.aircraft_id === i.id).length)
+				this.aircraftType.chartOptions.labels = this.aircrafts.map(i => i.modelCode)
+				const levels = [ 'L','M','H' ]
+				this.multipleChart.chartOptions.labels.forEach((k, ki) => {
+					this.multipleChart.series[ki].data = levels.map((i,index) => {
+						return this.events.filter(j => {
+							return moment(j.event_date, 'YYYY-MM-DD').year() === k && j.event_severity === levels[index]
+						}).length
+					})
+				})
+				this.multipleChart.series[3].data = this.multipleChart.chartOptions.labels.map((i,index) => {
+					return this.flights.filter(j => moment(j.arrival_time).year() === i).length
+				})
+				this.multipleChart.series[4].data = this.multipleChart.chartOptions.labels.map((i,index) => {
+					return this.events.filter(j => moment(j.event_date, 'YYYY-MM-DD').year() === i).length
+				})
+				console.log(this.multipleChart)
+				const a = await otherService.flightsByMonth()
+				this.flightByMonth.series[0].data = a.map(i => i.flights)
+				this.flightByMonth.chartOptions.xaxis.categories = a.map(i => i.month.substr(0,3))
+				this.isLoading = false
+			}).catch(err => {
+				console.log(err)
+				this.isLoading = false
+			})
+		},
+
 	}
 }
 </script>
@@ -432,9 +531,42 @@ export default {
 .chartContainer .apexcharts-tooltip {
   color: #000000;
 }
+.apexcharts-tooltip {
+    background: #f3f3f3;
+    color: #000000;
+  }
+
+.tooltip {
+	padding: 15px;
+	background: rgba(0,0,0, 0.7);
+	border: none;
+	outline: none;
+	border-radius: 0;
+
+	div {
+		display: flex;
+		span {
+			width: 80px;
+			text-align: right;
+			white-space: pre-wrap;
+			color: #b1a7a6;
+
+			&.desc {
+				width: 200px;
+				margin-left: 10px;
+				text-align: left;
+				color: #f5f3f4;
+			}
+		}
+		&.text {
+			color: #ffffff;
+		}
+	}
+}
 
 .chartContainer .apexcharts-tooltip .apexcharts-tooltip-series-group.active {
   background: #ffffff !important;
+  color: #000000;
 }
     .multiselect__tags {
 		background: transparent;

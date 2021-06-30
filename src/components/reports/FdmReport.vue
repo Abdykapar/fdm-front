@@ -1,8 +1,15 @@
 <template>
-	<div>
-		<div class="flex ml-10">
+	<div class="fdm-report">
+		<div class="flex ml-10 gap-3">
+			<FunctionalCalendar
+				v-model="calendarData"
+				:is-dark="true"
+				:is-modal="true"
+				:is-date-range="true"
+				@selectedDaysCount="onClose"
+			/>
 			<button
-				class="text-white bg-gray-700 p-3 rounded"
+				class="text-white h-10 bg-gray-700 px-3 rounded"
 				@click="makePdf"
 			>
 				Export
@@ -31,6 +38,7 @@
 				:series="allPhaseEvent.series"
 			/>
 			<vue-apex-charts
+				v-if="!loading"
 				ref="eventSeverity"
 				type="bar"
 				height="350"
@@ -63,12 +71,23 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs
 import VueApexCharts from 'vue-apexcharts'
 import Apexcharts from 'apexcharts'
 import { eventService } from '../../_services/event.service'
+import moment from 'moment'
+import { aircraftService } from '../../_services/aircraft.service'
+import { aircraftModelService } from '@/_services/aircraft-model.service'
+import { mapActions } from 'vuex'
+import { flightService } from '../../_services/flight.service'
+
+const levels = [ 'L','M','H' ]
 
 export default {
 	name: 'FdmReport',
 	components: { VueApexCharts },
 	data () {
 		return {
+			calendarData: {},
+			aircrafts: [],
+			events: [],
+			flights: [],
 			series: [ {
 				name: 'Low',
 				data: [ 44, 55, 41, 67, 22, 43, 12, 33, 38, 42, 47 ]
@@ -532,17 +551,54 @@ export default {
 					}
 				}
 			},
+			loading: false
+		}
+	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
 		}
 	},
 	mounted () {
 		// this.makePdf()
 		// this.drawChart()
+		this.getData()
 	},
 	methods: {
+		...mapActions('loader', [ 'setLoading' ]),
 		drawChart () {
 			return this.$refs.barchart.chart.dataURI().then(uri => {
 				return uri.imgURI
 			})
+		},
+		getData () {
+			this.setLoading(true)
+			this.loading = true
+			aircraftService.getAll(this.userProfile.user.airline[0]).then(async res => {
+				this.aircrafts = res
+				for (const i of this.aircrafts) {
+					const model = await aircraftModelService.getById(i.aircraft_model)
+					i.modelTitle = model.title
+					i.modelCode = model.code
+				}
+				this.events = await eventService.getAll()
+				this.eventSeverity.series[0].data = levels.map(i => {
+					return this.events.filter(j => j.event_severity === i).length
+				})
+				this.flights = await flightService.getAll()
+				this.loading = false
+				this.setLoading(false)
+			}).catch(err => {
+				this.loading = false
+				this.setLoading(false)
+				console.log(err)
+			})
+		},
+		onClose () {
+			// this.setCalendar({
+			// 	start: moment(this.calendarData.dateRange.start, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'),
+			// 	end: moment(this.calendarData.dateRange.end, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+			// })
 		},
 		makePdf () {
 			function toDataURL (src, callback, outputFormat) {
@@ -561,6 +617,12 @@ export default {
 				if (image.complete || image.complete === undefined) {
 					image.src = src
 				}
+			}
+			function getEventName (severity) {
+				return severity === 'L' ? 'Low' : severity === 'M' ? 'Medium' : 'High'
+			}
+			function getEventColor (severity) {
+				return severity === 'L' ? '#fcbf49' : severity === 'M' ? '#f77f00' : '#ef233c'
 			}
 			toDataURL('img/airmanas.jpg',
 				async dataUrl => {
@@ -658,19 +720,19 @@ export default {
 									body: [
 										[
 											{ text: 'Aircrafts Type', style: 'tableTh' },
-											{ text: 'Boeing 737-400', style: 'tableTd' }
+											{ text: this.aircrafts.map(i => i.modelTitle).join(', '), style: 'tableTd' }
 										],
 										[
 											{ text: 'Aircrafts Registration', style: 'tableTh' },
-											{ text: 'EP-37402', style: 'tableTd' }
+											{ text: this.aircrafts.map(i => i.reg_number).join(', '), style: 'tableTd' }
 										],
 										[
 											{ text: 'Number of Flights', style: 'tableTh' },
-											{ text: '5', style: 'tableTd' }
+											{ text: this.flights.length, style: 'tableTd' }
 										],
 										[
 											{ text: 'Number of Events', style: 'tableTh' },
-											{ text: '8', style: 'tableTd' }
+											{ text: this.events.length, style: 'tableTd' }
 										],
 									]
 								},
@@ -719,12 +781,14 @@ export default {
 											{ text: 'From', style: 'tableTh', margin: [ 0,0,0,0 ], alignment: 'center' },
 											{ text: 'To', style: 'tableTh', margin: [ 0,0,0,0 ], alignment: 'center' },
 										],
-										[
-											{ text: '1', style: 'tableTd', alignment: 'center' },
-											{ text: '12/07/2019', style: 'tableTd', alignment: 'center' },
-											{ text: '12/09/2019', style: 'tableTd', alignment: 'center' },
-											{ text: '12/09/2019', style: 'tableTd', alignment: 'center' },
-										],
+										...this.flights.map((i, index) => {
+											return [
+												{ text: index  + 1, style: 'tableTd', alignment: 'center' },
+												{ text: '12/07/2019', style: 'tableTd', alignment: 'center' },
+												{ text: moment(i.arrival_time).format('DD/MM/YYYY'), style: 'tableTd', alignment: 'center' },
+												{ text: moment(i.departure_time).format('DD/MM/YYYY'), style: 'tableTd', alignment: 'center' }
+											]
+										}),
 									]
 								},
 								layout: {
@@ -1151,101 +1215,208 @@ export default {
 								pageOrientation: 'portrait',
 								pageBreak: 'before'
 							},
-							{
-								stack: [
+
+							...this.events.map((i, index) => {
+								return [
 									{
-										text: 'FDM Report'
+										stack: [
+											{
+												text: 'FDM Report'
+											},
+											{
+												text: 'EP-37402'
+											}
+										],
+										style: 'header4',
+										pageOrientation: 'landscape',
+										pageBreak: 'before'
 									},
 									{
-										text: 'EP-37402'
-									}
-								],
-								style: 'header4',
-								pageOrientation: 'landscape',
-								pageBreak: 'before'
-							},
-							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
-							},
-							{
-								margin: [ 30, -10, 0, 20 ],
-								table: {
-									fontSize: 9,
-									widths: [ 110, 110, 110, 110, 110, 110 ],
-									// heights: [ 20, 20, 20 ],
-									alignment: 'center',
-									body: [
-										[
-											{ text: '1-Event: Speed high (low alt)', bold: true, alignment: 'center', fillColor: '#f5d68e', colSpan: 6 },
-											'','','', '', ''
-										],
-										[
-											{ text: 'Event Duration', style: 'eventD', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Severity', style: 'eventD', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Flight Phase', style: 'eventD', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Event Time (GMT)', style: 'eventD', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Pilot 1', style: 'eventD', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Pilot 2', style: 'eventD',alignment: 'center', fillColor: '#d1d1d1' },
-										],
-										[
-											{ text: '22s',style: 'eventDN', alignment: 'center' },
-											{ text: 'Low',style: 'eventDN', alignment: 'center', fillColor: '#eff542' },
-											{ text: 'Initial Climb',style: 'eventDN', alignment: 'center' },
-											{ text: '12:52:54',style: 'eventDN', alignment: 'center' },
-											{ text: 'Not Engaged',style: 'eventDN', alignment: 'center' },
-											{ text: 'Engaged',style: 'eventDN', alignment: 'center' },
+										image: 'line',
+										width: 770,
+										height: 25,
+										style: 'line',
+									},
+									{
+										margin: [ 30, -10, 0, 20 ],
+										table: {
+											fontSize: 9,
+											widths: [ 110, 110, 110, 110, 110, 110 ],
+											// heights: [ 20, 20, 20 ],
+											alignment: 'center',
+											body: [
+												[
+													{ text: `${index + 1}-Event: ${i.event_name}`, bold: true, alignment: 'center', fillColor: '#f5d68e', colSpan: 6 },
+													'','','', '', ''
+												],
+												[
+													{ text: 'Event Duration', style: 'eventD', alignment: 'center', fillColor: '#d1d1d1' },
+													{ text: 'Severity', style: 'eventD', alignment: 'center', fillColor: '#d1d1d1' },
+													{ text: 'Flight Phase', style: 'eventD', alignment: 'center', fillColor: '#d1d1d1' },
+													{ text: 'Event Time (GMT)', style: 'eventD', alignment: 'center', fillColor: '#d1d1d1' },
+													{ text: 'Pilot 1', style: 'eventD', alignment: 'center', fillColor: '#d1d1d1' },
+													{ text: 'Pilot 2', style: 'eventD',alignment: 'center', fillColor: '#d1d1d1' },
+												],
+												[
+													{ text: `${i.duration}s`,style: 'eventDN', alignment: 'center' },
+													{ text: `${getEventName(i.event_severity)}`,style: 'eventDN', alignment: 'center', fillColor: getEventColor(i.event_severity) },
+													{ text: 'Initial Climb',style: 'eventDN', alignment: 'center' },
+													{ text: moment(i.timestamp, 'DD/MM/YYYY hh:mm:ss').format('hh:mm:ss'),style: 'eventDN', alignment: 'center' },
+													{ text: 'Not Engaged',style: 'eventDN', alignment: 'center' },
+													{ text: 'Engaged',style: 'eventDN', alignment: 'center' },
+												]
+											]
+										},
+										layout: {
+											hLineColor: function (i, node) {
+												return 'black'
+											},
+											vLineColor: function (i, node) {
+												return 'black'
+											},
+											hLineWidth: function (i, node) {
+												return 0.5
+											},
+											vLineWidth: function (i, node) {
+												return 0.5
+											},
+										},
+									},
+									{
+										columns: [
+											{
+												margin: [ 30, 0, 0, 10 ],
+												table: {
+													fontSize: 9,
+													widths: [ 150, 150 ],
+													// alignment: 'center',
+													body: [
+														[
+															{ text: 'Takeoff Information', style: 'eventD', alignment: 'center', fillColor: '#6a9ebd', colSpan: 2 },
+															''
+														],
+														[
+															{ text: 'Takeoff Time point (GMT)', style: 'eventD', fillColor: '#d1d1d1' },
+															{ text: '12:50:26',style: 'eventDN', fillColor: '#d1d1d1' },
+														],
+														[
+															{ text: 'Departure Airport', style: 'eventD', fillColor: '#d1d1d1' },
+															{ text: 'UCFM',style: 'eventDN', fillColor: '#d1d1d1' },
+														],
+														[
+															{ 
+																colSpan: 2,
+																text: [
+																	{ text: 'Weather:\n', style: 'eventD', },
+																	{ text: 'UCFM 091230Z 26003MPS 8000 NSC M02/M04 Q1016 R26/0///95 NOSIG', style: 'eventDN' }
+																], 
+																fillColor: '#d1d1d1' 
+															}, ''
+														]
+													]
+												},
+												layout: {
+													hLineColor: function (i, node) {
+														return 'black'
+													},
+													vLineColor: function (i, node) {
+														return 'black'
+													},
+													hLineWidth: function (i, node) {
+														return 0.5
+													},
+													vLineWidth: function (i, node) {
+														return 0.5
+													},
+												},
+											},
+											{
+												margin: [ 30, 0, 0, 10 ],
+												table: {
+													fontSize: 9,
+													widths: [ 150, 150 ],
+													// alignment: 'center',
+													body: [
+														[
+															{ text: ' Landing Information', style: 'eventD', alignment: 'center', fillColor: '#faeed2', colSpan: 2 },
+															''
+														],
+														[
+															{ text: 'Landing Time point (GMT)', style: 'eventD', fillColor: '#d1d1d1' },
+															{ text: '13:24:29',style: 'eventDN', fillColor: '#d1d1d1' },
+														],
+														[
+															{ text: 'Arrival Airport', style: 'eventD', fillColor: '#d1d1d1' },
+															{ text: 'UCFO',style: 'eventDN', fillColor: '#d1d1d1' },
+														],
+														[
+															{ 
+																colSpan: 2,
+																text: [
+																	{ text: 'Weather:\n',style: 'eventD', },
+																	{ text: 'UCFO 1300Z 10001MPS 1900 FU SCT050 BKN133 04/M01 Q1016 R12/0///95 TEMPO 1000 BR FU', style: 'eventDN' }
+																], 
+																fillColor: '#d1d1d1' 
+															}, ''
+														]
+													]
+												},
+												layout: {
+													hLineColor: function (i, node) {
+														return 'black'
+													},
+													vLineColor: function (i, node) {
+														return 'black'
+													},
+													hLineWidth: function (i, node) {
+														return 0.5
+													},
+													vLineWidth: function (i, node) {
+														return 0.5
+													},
+												},
+											},
 										]
-									]
-								},
-								layout: {
-									hLineColor: function (i, node) {
-										return 'black'
 									},
-									vLineColor: function (i, node) {
-										return 'black'
-									},
-									hLineWidth: function (i, node) {
-										return 0.5
-									},
-									vLineWidth: function (i, node) {
-										return 0.5
-									},
-								},
-							},
-							{
-								columns: [
 									{
-										margin: [ 30, 0, 0, 10 ],
+										image: 'eventDetail',
+										alignment: 'center',
+										width: 560,
+										height: 180,
+									},
+									{
+										margin: [ 120, 10, 0, 10 ],
 										table: {
-											fontSize: 9,
-											widths: [ 150, 150 ],
-											// alignment: 'center',
+											widths: [ 130, 130, 130, 100 ],
 											body: [
 												[
-													{ text: 'Takeoff Information', style: 'eventD', alignment: 'center', fillColor: '#6a9ebd', colSpan: 2 },
-													''
+													{ text: 'Captured Parameters', style: 'eventD', alignment: 'center', fillColor: '#ded9cc', colSpan: 4 },
+													'', '', ''
 												],
 												[
-													{ text: 'Takeoff Time point (GMT)', style: 'eventD', fillColor: '#d1d1d1' },
-													{ text: '12:50:26',style: 'eventDN', fillColor: '#d1d1d1' },
+													{ text: 'Standard Name', style: 'eventD', fillColor: '#ded9cc' },
+													{ text: 'Units',style: 'eventD', fillColor: '#ded9cc' },
+													{ text: 'Peak',style: 'eventD', fillColor: '#ded9cc' },
+													{ text: 'Limit',style: 'eventD', fillColor: '#ded9cc' },
 												],
 												[
-													{ text: 'Departure Airport', style: 'eventD', fillColor: '#d1d1d1' },
-													{ text: 'UCFM',style: 'eventDN', fillColor: '#d1d1d1' },
+													{ text: 'Pressure Altitude', style: 'eventDN' },
+													{ text: '(feet)',style: 'eventDN' },
+													{ text: '3864',style: 'eventDN' },
+													{ text: '',style: 'eventDN' },
 												],
 												[
-													{ 
-														colSpan: 2,
-														text: [
-															{ text: 'Weather:\n', style: 'eventD', },
-															{ text: 'UCFM 091230Z 26003MPS 8000 NSC M02/M04 Q1016 R26/0///95 NOSIG', style: 'eventDN' }
-														], 
-														fillColor: '#d1d1d1' 
-													}, ''
-												]
+													{ text: 'Radio Height', style: 'eventDN' },
+													{ text: '(feet)',style: 'eventDN' },
+													{ text: '2493',style: 'eventDN' },
+													{ text: '',style: 'eventDN' },
+												],
+												[
+													{ text: 'Computed Airspeed', style: 'eventDN' },
+													{ text: '(knots)',style: 'eventDN' },
+													{ text: '248',style: 'eventDN' },
+													{ text: '230',style: 'eventDN' },
+												],
 											]
 										},
 										layout: {
@@ -1264,184 +1435,83 @@ export default {
 										},
 									},
 									{
-										margin: [ 30, 0, 0, 10 ],
+										image: 'line',
+										width: 770,
+										height: 25,
+										style: 'line',
+									},
+									{
+										margin: [ 0, -10, 0, 0 ], fontSize: 11,
+										columns: [
+											{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
+											{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
+											{ text: [
+												'Page: ',
+												{ text: 11 + 2 * index, bold: true },
+												'of ',
+												{ text: '32', bold: true },
+											], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
+										],
+									},
+									{
+										stack: [
+											{
+												text: 'FDM Report'
+											},
+											{
+												text: 'EP-37402'
+											}
+										],
+										style: 'header4',
+										pageOrientation: 'landscape',
+										pageBreak: 'before'
+									},
+									{
+										image: 'line',
+										width: 770,
+										height: 25,
+										style: 'line',
+									},
+									{
+										margin: [ 30, 0, 0, 0 ],
 										table: {
-											fontSize: 9,
-											widths: [ 150, 150 ],
-											// alignment: 'center',
+											widths: [ 700 ],
 											body: [
 												[
-													{ text: ' Landing Information', style: 'eventD', alignment: 'center', fillColor: '#faeed2', colSpan: 2 },
-													''
-												],
-												[
-													{ text: 'Landing Time point (GMT)', style: 'eventD', fillColor: '#d1d1d1' },
-													{ text: '13:24:29',style: 'eventDN', fillColor: '#d1d1d1' },
-												],
-												[
-													{ text: 'Arrival Airport', style: 'eventD', fillColor: '#d1d1d1' },
-													{ text: 'UCFO',style: 'eventDN', fillColor: '#d1d1d1' },
-												],
-												[
-													{ 
-														colSpan: 2,
-														text: [
-															{ text: 'Weather:\n',style: 'eventD', },
-															{ text: 'UCFO 1300Z 10001MPS 1900 FU SCT050 BKN133 04/M01 Q1016 R12/0///95 TEMPO 1000 BR FU', style: 'eventDN' }
-														], 
-														fillColor: '#d1d1d1' 
-													}, ''
+													{ text: `1- ${i.event_name}`, style: 'tableTh', border: [ 1,1,1,1 ], fillColor: '#e3b11b' }
 												]
 											]
-										},
-										layout: {
-											hLineColor: function (i, node) {
-												return 'black'
-											},
-											vLineColor: function (i, node) {
-												return 'black'
-											},
-											hLineWidth: function (i, node) {
-												return 0.5
-											},
-											vLineWidth: function (i, node) {
-												return 0.5
-											},
-										},
+										}
+									},
+									{
+										image: 'eventDetail2',
+										alignment: 'center',
+										width: 750,
+										height: 320,
+										margin: [ 0,30,0,60 ]
+									},
+									{
+										image: 'line',
+										width: 770,
+										height: 25,
+										style: 'line',
+									},
+									{
+										margin: [ 0, -10, 0, 0 ], fontSize: 11,
+										columns: [
+											{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
+											{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
+											{ text: [
+												'Page: ',
+												{ text: 11 + index * 2 + 1, bold: true },
+												'of ',
+												{ text: '32', bold: true },
+											], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
+										],
 									},
 								]
-							},
-							{
-								image: 'eventDetail',
-								alignment: 'center',
-								width: 560,
-								height: 180,
-							},
-							{
-								margin: [ 120, 10, 0, 10 ],
-								table: {
-									widths: [ 130, 130, 130, 100 ],
-									body: [
-										[
-											{ text: 'Captured Parameters', style: 'eventD', alignment: 'center', fillColor: '#ded9cc', colSpan: 4 },
-											'', '', ''
-										],
-										[
-											{ text: 'Standard Name', style: 'eventD', fillColor: '#ded9cc' },
-											{ text: 'Units',style: 'eventD', fillColor: '#ded9cc' },
-											{ text: 'Peak',style: 'eventD', fillColor: '#ded9cc' },
-											{ text: 'Limit',style: 'eventD', fillColor: '#ded9cc' },
-										],
-										[
-											{ text: 'Pressure Altitude', style: 'eventDN' },
-											{ text: '(feet)',style: 'eventDN' },
-											{ text: '3864',style: 'eventDN' },
-											{ text: '',style: 'eventDN' },
-										],
-										[
-											{ text: 'Radio Height', style: 'eventDN' },
-											{ text: '(feet)',style: 'eventDN' },
-											{ text: '2493',style: 'eventDN' },
-											{ text: '',style: 'eventDN' },
-										],
-										[
-											{ text: 'Computed Airspeed', style: 'eventDN' },
-											{ text: '(knots)',style: 'eventDN' },
-											{ text: '248',style: 'eventDN' },
-											{ text: '230',style: 'eventDN' },
-										],
-									]
-								},
-								layout: {
-									hLineColor: function (i, node) {
-										return 'black'
-									},
-									vLineColor: function (i, node) {
-										return 'black'
-									},
-									hLineWidth: function (i, node) {
-										return 0.5
-									},
-									vLineWidth: function (i, node) {
-										return 0.5
-									},
-								},
-							},
-							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
-							},
-							{
-								margin: [ 0, -10, 0, 0 ], fontSize: 11,
-								columns: [
-									{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
-									{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
-									{ text: [
-										'Page: ',
-										{ text: '11 ', bold: true },
-										'of ',
-										{ text: '32', bold: true },
-									], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
-								],
-							},
-							{
-								stack: [
-									{
-										text: 'FDM Report'
-									},
-									{
-										text: 'EP-37402'
-									}
-								],
-								style: 'header4',
-								pageOrientation: 'landscape',
-								pageBreak: 'before'
-							},
-							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
-							},
-							{
-								margin: [ 30, 0, 0, 0 ],
-								table: {
-									widths: [ 700 ],
-									body: [
-										[
-											{ text: '1- Speed high (low alt)', style: 'tableTh', border: [ 1,1,1,1 ], fillColor: '#e3b11b' }
-										]
-									]
-								}
-							},
-							{
-								image: 'eventDetail2',
-								alignment: 'center',
-								width: 750,
-								height: 320,
-								margin: [ 0,30,0,60 ]
-							},
-							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
-							},
-							{
-								margin: [ 0, -10, 0, 0 ], fontSize: 11,
-								columns: [
-									{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
-									{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
-									{ text: [
-										'Page: ',
-										{ text: '12 ', bold: true },
-										'of ',
-										{ text: '32', bold: true },
-									], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
-								],
-							},
+							}).flat(),
+
 							{
 								text: 'Confidential Report',
 								fontSize: 18,
@@ -1698,4 +1768,8 @@ export default {
 </script>
 
 <style lang="scss">
+	.invisible {
+		height: 0;
+		overflow-y: hidden;
+	}
 </style>
