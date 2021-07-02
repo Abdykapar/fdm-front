@@ -684,7 +684,7 @@ export default {
 								style: 'header2',
 							},
 							{
-								text: 'FDM REPORT (EX-37402)',
+								text: `FDM REPORT (${this.airline.title})`,
 								style: 'header',
 							},
 							{
@@ -791,14 +791,12 @@ export default {
 											{ text: 'From', style: 'tableTh', margin: [ 0,0,0,0 ], alignment: 'center' },
 											{ text: 'To', style: 'tableTh', margin: [ 0,0,0,0 ], alignment: 'center' },
 										],
-										...this.flights.map((i, index) => {
-											return [
-												{ text: index  + 1, style: 'tableTd', alignment: 'center' },
-												{ text: moment().format('DD/MM/YYYY'), style: 'tableTd', alignment: 'center' },
-												{ text: this.startDate, style: 'tableTd', alignment: 'center' },
-												{ text: this.endDate, style: 'tableTd', alignment: 'center' }
-											]
-										}),
+										[
+											{ text: 1, style: 'tableTd', alignment: 'center' },
+											{ text: moment().format('DD/MM/YYYY'), style: 'tableTd', alignment: 'center' },
+											{ text: this.startDate, style: 'tableTd', alignment: 'center' },
+											{ text: this.endDate, style: 'tableTd', alignment: 'center' }
+										]
 									]
 								},
 								layout: {
@@ -829,7 +827,7 @@ export default {
 							{
 								margin: [ 0, -10, 0, 0 ], fontSize: 9,
 								columns: [
-									{ text: 'Date: 16/03/2021', width: 176, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
+									{ text: 'Date: ' + moment().format('DD/MM/YYYY'), width: 176, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
 									{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 176, alignment: 'center', bold: true },
 									{ text: [
 										'Page: ',
@@ -1125,11 +1123,6 @@ export default {
 								height: 25,
 								style: 'line',
 							},
-							{
-								text: '3-2   Event Detection:',
-								style: 'header5',
-								margin: [ 5,-10,0,50 ]
-							},
 							// {
 							// 	margin: [ 30, 0, 0, 170 ],
 							// 	table: {
@@ -1291,22 +1284,24 @@ export default {
 							},
 							{
 								image: 'line',
-								width: 770,
-								height: 25,
+								width: 530,
+								height: 20,
 								style: 'line',
+								margin: [ 0, 380, 0, 0 ]
 							},
 							{
-								margin: [ 0, -10, 0, 0 ], fontSize: 11,
+								margin: [ 0, -10, 0, 0 ], fontSize: 9,
 								columns: [
-									{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
-									{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
+									{ text: 'Date: ' + moment().format('DD/MM/YYYY'), width: 176, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
+									{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 176, alignment: 'center', bold: true },
 									{ text: [
 										'Page: ',
-										{ text: '9 ', bold: true },
+										{ text: '5 ', bold: true },
 										'of ',
 										{ text: '32', bold: true },
 									], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
 								],
+								pageBreak: 'after'
 							},
 							{
 								text: 'Part 4: Details of Events',
