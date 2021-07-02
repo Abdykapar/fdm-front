@@ -62,6 +62,14 @@ class OtherService extends BaseApiService {
 		const url = `${baseUrl}/coordinates${query}`
 		return this.sendGetRequest(url)
 	}
+
+	getAirlineReport (airline_id='') {
+		const query = this.queryFilter(
+			{ title: 'airline_id', value: airline_id }
+		)
+		const url = `${baseUrl}/report${query}`
+		return this.sendGetRequest(url)
+	}
 }
 
 export const otherService = new OtherService()

@@ -7,9 +7,11 @@ class FlightService extends BaseApiService {
 		super()
 	}
 
-	getAll (file_id='') {
+	getAll (file_id='', startDate='', endDate='') {
 		const query = this.queryFilter(
 			{ title: 'file_id', value: file_id },
+			{ title: 'start_date', value: startDate },
+			{ title: 'end_date', value: endDate },
 		)
 		const url = `${baseUrl}/flights/${query}`
 		return this.sendGetRequest(url)

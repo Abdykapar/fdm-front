@@ -73,9 +73,11 @@ import Apexcharts from 'apexcharts'
 import { eventService } from '../../_services/event.service'
 import moment from 'moment'
 import { aircraftService } from '../../_services/aircraft.service'
+import { airlinesService } from '../../_services/airlines.service'
 import { aircraftModelService } from '@/_services/aircraft-model.service'
 import { mapActions } from 'vuex'
 import { flightService } from '../../_services/flight.service'
+import { otherService } from '../../_services/other.service'
 
 const levels = [ 'L','M','H' ]
 
@@ -551,7 +553,10 @@ export default {
 					}
 				}
 			},
-			loading: false
+			loading: false,
+			startDate: '',
+			endDate: '',
+			airline: {}
 		}
 	},
 	computed: {
@@ -562,7 +567,7 @@ export default {
 	mounted () {
 		// this.makePdf()
 		// this.drawChart()
-		this.getData()
+		// this.getData()
 	},
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
@@ -573,8 +578,10 @@ export default {
 		},
 		getData () {
 			this.setLoading(true)
+			const start = moment(this.calendarData.dateRange.start, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+			const end = moment(this.calendarData.dateRange.end, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 			this.loading = true
-			aircraftService.getAll(this.userProfile.user.airline[0]).then(async res => {
+			return aircraftService.getAll(this.userProfile.user.airline[0]).then(async res => {
 				this.aircrafts = res
 				for (const i of this.aircrafts) {
 					const model = await aircraftModelService.getById(i.aircraft_model)
@@ -585,7 +592,8 @@ export default {
 				this.eventSeverity.series[0].data = levels.map(i => {
 					return this.events.filter(j => j.event_severity === i).length
 				})
-				this.flights = await flightService.getAll()
+				this.flights = await flightService.getAll('',start, end)
+				this.airline = await airlinesService.getById(this.userProfile.user.airline[0])
 				this.loading = false
 				this.setLoading(false)
 			}).catch(err => {
@@ -596,11 +604,13 @@ export default {
 		},
 		onClose () {
 			// this.setCalendar({
-			// 	start: moment(this.calendarData.dateRange.start, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'),
-			// 	end: moment(this.calendarData.dateRange.end, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+			this.startDate = moment(this.calendarData.dateRange.start, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY'),
+			this.endDate = moment(this.calendarData.dateRange.end, 'DD/MM/YYYY HH:mm:ss').format('DD/MM/YYYY')
 			// })
 		},
-		makePdf () {
+		async makePdf () {
+			await this.getData()
+			const reports = await otherService.getAirlineReport(this.userProfile.user.airline[0])
 			function toDataURL (src, callback, outputFormat) {
 				const image = new Image()
 				image.crossOrigin = 'Anonymous'
@@ -678,7 +688,7 @@ export default {
 								style: 'header',
 							},
 							{
-								text: 'ISSUE DATE: 16/03/2021',
+								text: 'ISSUE DATE: '+moment().format('DD/MM/YYYY'),
 								style: 'header4',
 							},
 							{
@@ -697,7 +707,7 @@ export default {
 										text: 'FDM Report'
 									},
 									{
-										text: 'EP-37402'
+										text: this.airline.title
 									}
 								],
 								style: 'header4'
@@ -728,7 +738,7 @@ export default {
 										],
 										[
 											{ text: 'Number of Flights', style: 'tableTh' },
-											{ text: this.flights.length, style: 'tableTd' }
+											{ text: reports.number_of_flights, style: 'tableTd' }
 										],
 										[
 											{ text: 'Number of Events', style: 'tableTh' },
@@ -766,7 +776,7 @@ export default {
 									body: [
 										[
 											{ text: 'No.', style: 'tableTh', rowSpan: 2,alignment: 'center', margin: [ 0, 8, 0, 0 ] },
-											{ text: 'Read Out Date', style: 'tableTh', rowSpan: 2, alignment: 'center', margin: [ 0, 8, 0, 0 ] },
+											{ text: 'Generation Date', style: 'tableTh', rowSpan: 2, alignment: 'center', margin: [ 0, 8, 0, 0 ] },
 											{ 
 												text: 'Flights Date', 
 												style: 'tableTh', 
@@ -784,9 +794,9 @@ export default {
 										...this.flights.map((i, index) => {
 											return [
 												{ text: index  + 1, style: 'tableTd', alignment: 'center' },
-												{ text: '12/07/2019', style: 'tableTd', alignment: 'center' },
-												{ text: moment(i.arrival_time).format('DD/MM/YYYY'), style: 'tableTd', alignment: 'center' },
-												{ text: moment(i.departure_time).format('DD/MM/YYYY'), style: 'tableTd', alignment: 'center' }
+												{ text: moment().format('DD/MM/YYYY'), style: 'tableTd', alignment: 'center' },
+												{ text: this.startDate, style: 'tableTd', alignment: 'center' },
+												{ text: this.endDate, style: 'tableTd', alignment: 'center' }
 											]
 										}),
 									]
@@ -834,18 +844,280 @@ export default {
 								text: 'Part 2: Graph of Events',
 								style: 'header3',
 							},
+							// {
+							// 	stack: [
+							// 		{
+							// 			text: 'FDM Report'
+							// 		},
+							// 		{
+							// 			text: 'EP-37402'
+							// 		}
+							// 	],
+							// 	pageBreak: 'before',
+							// 	style: 'header4',
+							// 	pageOrientation: 'landscape'
+							// },
+							// {
+							// 	image: 'line',
+							// 	width: 770,
+							// 	height: 25,
+							// 	style: 'line',
+							// },
+							// {
+							// 	text: '3-1   Event Detection in All Phases and Airports:',
+							// 	style: 'header5',
+							// 	margin: [ 5,-10,0,50 ]
+							// },
+							// {
+							// 	image: 'phaseChart',
+							// 	alignment: 'center',
+							// 	width: 780,
+							// 	height: 240,
+							// },
+							// {
+							// 	text: 'Figure 1: Number of Events vs Phase of Flight',
+							// 	margin: [ 0, 20, 0, 55 ],
+							// 	alignment: 'center',
+							// 	fontSize: 11
+							// },
+							// {
+							// 	image: 'line',
+							// 	width: 770,
+							// 	height: 25,
+							// 	style: 'line',
+							// },
+							// {
+							// 	margin: [ 0, -10, 0, 0 ], fontSize: 11,
+							// 	columns: [
+							// 		{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
+							// 		{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
+							// 		{ text: [
+							// 			'Page: ',
+							// 			{ text: '5 ', bold: true },
+							// 			'of ',
+							// 			{ text: '32', bold: true },
+							// 		], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
+							// 	],
+							// 	pageBreak: 'after'
+							// },
+							// {
+							// 	stack: [
+							// 		{
+							// 			text: 'FDM Report'
+							// 		},
+							// 		{
+							// 			text: 'EP-37402'
+							// 		}
+							// 	],
+							// 	style: 'header4'
+							// },
+							// {
+							// 	image: 'line',
+							// 	width: 770,
+							// 	height: 25,
+							// 	style: 'line',
+							// },
+							// {
+							// 	text: 'Events by Flight Phase',
+							// 	style: 'header5',
+							// 	margin: [ 5,-10,0,50 ],
+							// 	alignment: 'center'
+							// },
+							// {
+							// 	image: 'eventPercentage',
+							// 	alignment: 'center',
+							// 	width: 450,
+							// 	height: 310,
+							// },
+							// {
+							// 	text: 'Figure 2: The percentage of events in each phase of flight',
+							// 	margin: [ 0, 20, 0, 40 ],
+							// 	alignment: 'center',
+							// 	fontSize: 11
+							// },
+							// {
+							// 	image: 'line',
+							// 	width: 770,
+							// 	height: 25,
+							// 	style: 'line',
+							// },
+							// {
+							// 	margin: [ 0, -10, 0, 0 ], fontSize: 11,
+							// 	columns: [
+							// 		{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
+							// 		{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
+							// 		{ text: [
+							// 			'Page: ',
+							// 			{ text: '6 ', bold: true },
+							// 			'of ',
+							// 			{ text: '32', bold: true },
+							// 		], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
+							// 	],
+							// 	pageBreak: 'after'
+							// },
+							// {
+							// 	stack: [
+							// 		{
+							// 			text: 'FDM Report'
+							// 		},
+							// 		{
+							// 			text: 'EP-37402'
+							// 		}
+							// 	],
+							// 	style: 'header4'
+							// },
+							// {
+							// 	image: 'line',
+							// 	width: 770,
+							// 	height: 25,
+							// 	style: 'line',
+							// },
+							// {
+							// 	image: 'allEventPhase',
+							// 	alignment: 'center',
+							// 	width: 770,
+							// 	height: 280,
+							// },
+							// {
+							// 	text: 'Figure 3: Number of Events vs Event Definition',
+							// 	margin: [ 0, 20, 0, 50 ],
+							// 	alignment: 'center',
+							// 	fontSize: 11
+							// },
+							// {
+							// 	margin: [ 30, 0, 0, 20 ],
+							// 	table: {
+							// 		widths: [ 100, 600 ],
+							// 		// heights: [ 20, 20, 20 ],
+							// 		body: [
+							// 			[
+							// 				{ text: 'Analysis: ', style: 'tableTh', alignment: 'center', margin: [ 0, 8, 0, 8 ] },
+							// 				''
+							// 			],
+							// 		]
+							// 	},
+							// 	layout: {
+							// 		hLineColor: function (i, node) {
+							// 			return 'black'
+							// 		},
+							// 		vLineColor: function (i, node) {
+							// 			return 'black'
+							// 		},
+							// 		hLineWidth: function (i, node) {
+							// 			return 0.5
+							// 		},
+							// 		vLineWidth: function (i, node) {
+							// 			return 0.5
+							// 		},
+							// 	},
+							// },
+							// {
+							// 	image: 'line',
+							// 	width: 770,
+							// 	height: 25,
+							// 	style: 'line',
+							// },
+							// {
+							// 	margin: [ 0, -10, 0, 0 ], fontSize: 11,
+							// 	columns: [
+							// 		{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
+							// 		{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
+							// 		{ text: [
+							// 			'Page: ',
+							// 			{ text: '7 ', bold: true },
+							// 			'of ',
+							// 			{ text: '32', bold: true },
+							// 		], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
+							// 	],
+							// 	pageBreak: 'after'
+							// },
+							// {
+							// 	stack: [
+							// 		{
+							// 			text: 'FDM Report'
+							// 		},
+							// 		{
+							// 			text: this.airline.title
+							// 		}
+							// 	],
+							// 	style: 'header4'
+							// },
+							// {
+							// 	image: 'line',
+							// 	width: 770,
+							// 	height: 25,
+							// 	style: 'line',
+							// },
+							// {
+							// 	image: 'eventSeverity',
+							// 	alignment: 'center',
+							// 	width: 690,
+							// 	height: 310,
+							// },
+							// {
+							// 	text: 'Figure 4: Number of Events vs Event Severity',
+							// 	margin: [ 0, 20, 0, 50 ],
+							// 	alignment: 'center',
+							// 	fontSize: 11
+							// },
+							// {
+							// 	margin: [ 30, 0, 0, 20 ],
+							// 	table: {
+							// 		widths: [ 100, 600 ],
+							// 		// heights: [ 20, 20, 20 ],
+							// 		body: [
+							// 			[
+							// 				{ text: 'Analysis: ', style: 'tableTh', alignment: 'center', margin: [ 0, 8, 0, 8 ] },
+							// 				''
+							// 			],
+							// 		]
+							// 	},
+							// 	layout: {
+							// 		hLineColor: function (i, node) {
+							// 			return 'black'
+							// 		},
+							// 		vLineColor: function (i, node) {
+							// 			return 'black'
+							// 		},
+							// 		hLineWidth: function (i, node) {
+							// 			return 0.5
+							// 		},
+							// 		vLineWidth: function (i, node) {
+							// 			return 0.5
+							// 		},
+							// 	},
+							// },
+							// {
+							// 	image: 'line',
+							// 	width: 770,
+							// 	height: 25,
+							// 	style: 'line',
+							// },
+							// {
+							// 	margin: [ 0, -10, 0, 0 ], fontSize: 11,
+							// 	columns: [
+							// 		{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
+							// 		{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
+							// 		{ text: [
+							// 			'Page: ',
+							// 			{ text: '8 ', bold: true },
+							// 			'of ',
+							// 			{ text: '32', bold: true },
+							// 		], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
+							// 	],
+							// 	pageBreak: 'after'
+							// },
 							{
 								stack: [
 									{
 										text: 'FDM Report'
 									},
 									{
-										text: 'EP-37402'
+										text: this.airline.title
 									}
 								],
-								pageBreak: 'before',
 								style: 'header4',
-								pageOrientation: 'landscape'
+								pageBreak: 'before'
 							},
 							{
 								image: 'line',
@@ -854,139 +1126,71 @@ export default {
 								style: 'line',
 							},
 							{
-								text: '3-1   Event Detection in All Phases and Airports:',
+								text: '3-2   Event Detection:',
 								style: 'header5',
 								margin: [ 5,-10,0,50 ]
 							},
+							// {
+							// 	margin: [ 30, 0, 0, 170 ],
+							// 	table: {
+							// 		widths: [ 300, 80, 150, 150 ],
+							// 		// heights: [ 20, 20, 20 ],
+							// 		body: [
+							// 			[
+							// 				{ text: 'Event Definitions', style: 'tableTh', alignment: 'center', fillColor: '#6a9ebd' },
+							// 				{ text: 'Severity', style: 'tableTh', alignment: 'center', fillColor: '#6a9ebd' },
+							// 				{ text: 'Flight Phase Name', style: 'tableTh', alignment: 'center', fillColor: '#6a9ebd' },
+							// 				{ text: 'Number of Events', style: 'tableTh', alignment: 'center', fillColor: '#6a9ebd' },
+							// 			],
+							// 			[
+							// 				{ text: 'MLW Exceedance', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
+							// 				{ text: 'High', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
+							// 				{ text: 'Landing', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
+							// 				{ text: '2', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
+							// 			],
+							// 		]
+							// 	},
+							// 	layout: {
+							// 		hLineColor: function (i, node) {
+							// 			return 'black'
+							// 		},
+							// 		vLineColor: function (i, node) {
+							// 			return 'black'
+							// 		},
+							// 		hLineWidth: function (i, node) {
+							// 			return 0.5
+							// 		},
+							// 		vLineWidth: function (i, node) {
+							// 			return 0.5
+							// 		},
+							// 	},
+							// },
 							{
-								image: 'phaseChart',
-								alignment: 'center',
-								width: 780,
-								height: 240,
+								text: '1-1     Events occured:',
+								style: 'header5'
 							},
 							{
-								text: 'Figure 1: Number of Events vs Phase of Flight',
-								margin: [ 0, 20, 0, 55 ],
-								alignment: 'center',
-								fontSize: 11
-							},
-							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
-							},
-							{
-								margin: [ 0, -10, 0, 0 ], fontSize: 11,
-								columns: [
-									{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
-									{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
-									{ text: [
-										'Page: ',
-										{ text: '5 ', bold: true },
-										'of ',
-										{ text: '32', bold: true },
-									], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
-								],
-								pageBreak: 'after'
-							},
-							{
-								stack: [
-									{
-										text: 'FDM Report'
-									},
-									{
-										text: 'EP-37402'
-									}
-								],
-								style: 'header4'
-							},
-							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
-							},
-							{
-								text: 'Events by Flight Phase',
-								style: 'header5',
-								margin: [ 5,-10,0,50 ],
-								alignment: 'center'
-							},
-							{
-								image: 'eventPercentage',
-								alignment: 'center',
-								width: 450,
-								height: 310,
-							},
-							{
-								text: 'Figure 2: The percentage of events in each phase of flight',
-								margin: [ 0, 20, 0, 40 ],
-								alignment: 'center',
-								fontSize: 11
-							},
-							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
-							},
-							{
-								margin: [ 0, -10, 0, 0 ], fontSize: 11,
-								columns: [
-									{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
-									{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
-									{ text: [
-										'Page: ',
-										{ text: '6 ', bold: true },
-										'of ',
-										{ text: '32', bold: true },
-									], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
-								],
-								pageBreak: 'after'
-							},
-							{
-								stack: [
-									{
-										text: 'FDM Report'
-									},
-									{
-										text: 'EP-37402'
-									}
-								],
-								style: 'header4'
-							},
-							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
-							},
-							{
-								image: 'allEventPhase',
-								alignment: 'center',
-								width: 770,
-								height: 280,
-							},
-							{
-								text: 'Figure 3: Number of Events vs Event Definition',
-								margin: [ 0, 20, 0, 50 ],
-								alignment: 'center',
-								fontSize: 11
-							},
-							{
-								margin: [ 30, 0, 0, 20 ],
+								style: 'table',
 								table: {
-									widths: [ 100, 600 ],
+									widths: [ 220, 220 ],
 									// heights: [ 20, 20, 20 ],
 									body: [
 										[
-											{ text: 'Analysis: ', style: 'tableTh', alignment: 'center', margin: [ 0, 8, 0, 8 ] },
-											''
+											{ text: 'Event Name', style: 'tableTh' },
+											{ text: 'Occured', style: 'tableTh' }
 										],
+										...reports.events_occured.map(i => {
+											return [
+												{ text: i.title, style: 'tableTd' },
+												{ text: i.occured, style: 'tableTd' }
+											]
+										})
 									]
 								},
 								layout: {
+									fillColor: function (rowIndex, node, columnIndex) {
+										return (rowIndex % 2 === 0) ?  '#f7e7bc' : '#dfeaf0'
+									},
 									hLineColor: function (i, node) {
 										return 'black'
 									},
@@ -1002,67 +1206,35 @@ export default {
 								},
 							},
 							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
+								text: '1-2     Max values:',
+								style: 'header5'
 							},
 							{
-								margin: [ 0, -10, 0, 0 ], fontSize: 11,
-								columns: [
-									{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
-									{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
-									{ text: [
-										'Page: ',
-										{ text: '7 ', bold: true },
-										'of ',
-										{ text: '32', bold: true },
-									], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
-								],
-								pageBreak: 'after'
-							},
-							{
-								stack: [
-									{
-										text: 'FDM Report'
-									},
-									{
-										text: 'EP-37402'
-									}
-								],
-								style: 'header4'
-							},
-							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
-							},
-							{
-								image: 'eventSeverity',
-								alignment: 'center',
-								width: 690,
-								height: 310,
-							},
-							{
-								text: 'Figure 4: Number of Events vs Event Severity',
-								margin: [ 0, 20, 0, 50 ],
-								alignment: 'center',
-								fontSize: 11
-							},
-							{
-								margin: [ 30, 0, 0, 20 ],
+								style: 'table',
 								table: {
-									widths: [ 100, 600 ],
+									widths: [ 110, 110, 110, 110 ],
 									// heights: [ 20, 20, 20 ],
 									body: [
 										[
-											{ text: 'Analysis: ', style: 'tableTh', alignment: 'center', margin: [ 0, 8, 0, 8 ] },
-											''
+											{ text: 'Parameter name', style: 'tableTh' },
+											{ text: 'Value', style: 'tableTh' },
+											{ text: 'Date & Time', style: 'tableTh' },
+											{ text: 'Flight Detail', style: 'tableTh' },
 										],
+										...reports.max_malues.map(i => {
+											return [
+												{ text: i.title, style: 'tableTd' },
+												{ text: i.value, style: 'tableTd' },
+												{ text: i.timestamp, style: 'tableTd' },
+												{ text: i.flight_detail, style: 'tableTd' }
+											]
+										})
 									]
 								},
 								layout: {
+									fillColor: function (rowIndex, node, columnIndex) {
+										return (rowIndex % 2 === 0) ?  '#f7e7bc' : '#dfeaf0'
+									},
 									hLineColor: function (i, node) {
 										return 'black'
 									},
@@ -1078,104 +1250,31 @@ export default {
 								},
 							},
 							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
+								text: '1-2     Warning events:',
+								style: 'header5'
 							},
 							{
-								margin: [ 0, -10, 0, 0 ], fontSize: 11,
-								columns: [
-									{ text: 'Date: 16/03/2021', width: 300, alignment: 'left', margin: [ 8, 0, 0, 0 ] },
-									{ text: 'AIRSA-FDMMANAS-37402-21-01', width: 180, alignment: 'center', bold: true },
-									{ text: [
-										'Page: ',
-										{ text: '8 ', bold: true },
-										'of ',
-										{ text: '32', bold: true },
-									], alignment: 'right', margin: [ 0, 0, 8, 0 ] }
-								],
-								pageBreak: 'after'
-							},
-							{
-								stack: [
-									{
-										text: 'FDM Report'
-									},
-									{
-										text: 'EP-37402'
-									}
-								],
-								style: 'header4'
-							},
-							{
-								image: 'line',
-								width: 770,
-								height: 25,
-								style: 'line',
-							},
-							{
-								text: '3-2   Event Detection in Different Phases:',
-								style: 'header5',
-								margin: [ 5,-10,0,50 ]
-							},
-							{
-								margin: [ 30, 0, 0, 170 ],
+								style: 'table',
 								table: {
-									widths: [ 300, 80, 150, 150 ],
+									widths: [ 220, 220 ],
 									// heights: [ 20, 20, 20 ],
 									body: [
 										[
-											{ text: 'Event Definitions', style: 'tableTh', alignment: 'center', fillColor: '#6a9ebd' },
-											{ text: 'Severity', style: 'tableTh', alignment: 'center', fillColor: '#6a9ebd' },
-											{ text: 'Flight Phase Name', style: 'tableTh', alignment: 'center', fillColor: '#6a9ebd' },
-											{ text: 'Number of Events', style: 'tableTh', alignment: 'center', fillColor: '#6a9ebd' },
+											{ text: 'Event Name', style: 'tableTh' },
+											{ text: 'Occured', style: 'tableTh' },
 										],
-										[
-											{ text: 'MLW Exceedance', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'High', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Landing', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: '2', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-										],
-										[
-											{ text: 'Speed high (low alt)', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Low', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Initial Climb', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: '1', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-										],
-										[
-											{ text: 'Speed high (low alt)', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Medium', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Approach', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: '1', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-										],
-										[
-											{ text: 'Speed high (low alt)', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Medium', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Initial Climb', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: '1', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-										],
-										[
-											{ text: 'Speed high below 10000', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'High', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Descent', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: '1', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-										],
-										[
-											{ text: 'Speed high below 10000', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Low', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: 'Descent', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-											{ text: '2', style: 'tableTd', alignment: 'center', fillColor: '#d1d1d1' },
-										],
-										[
-											{ text: '', border: [ 0,0,0,0 ] },
-											{ text: '',border: [ 0,0,0,0 ] },
-											{ text: '',border: [ 0,0,0,0 ] },
-											{ text: '8', style: 'tableTh', alignment: 'center', fillColor: '#ede0b7' },
-										]
+										...reports.warning_events.map(i => {
+											return [
+												{ text: i.title, style: 'tableTd' },
+												{ text: i.occured, style: 'tableTd' }
+											]
+										})
 									]
 								},
 								layout: {
+									fillColor: function (rowIndex, node, columnIndex) {
+										return (rowIndex % 2 === 0) ?  '#f7e7bc' : '#dfeaf0'
+									},
 									hLineColor: function (i, node) {
 										return 'black'
 									},
@@ -1224,7 +1323,7 @@ export default {
 												text: 'FDM Report'
 											},
 											{
-												text: 'EP-37402'
+												text: this.airline.title
 											}
 										],
 										style: 'header4',
@@ -1459,7 +1558,7 @@ export default {
 												text: 'FDM Report'
 											},
 											{
-												text: 'EP-37402'
+												text: this.airline.title
 											}
 										],
 										style: 'header4',
@@ -1558,7 +1657,7 @@ export default {
 										text: 'FDM Report'
 									},
 									{
-										text: 'EP-37402'
+										text: this.airline.title
 									}
 								],
 								style: 'header4',
