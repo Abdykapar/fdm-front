@@ -63,9 +63,11 @@ class OtherService extends BaseApiService {
 		return this.sendGetRequest(url)
 	}
 
-	getAirlineReport (airline_id='') {
+	getAirlineReport (airline_id='', start_date='', end_date='') {
 		const query = this.queryFilter(
-			{ title: 'airline_id', value: airline_id }
+			{ title: 'airline_id', value: airline_id },
+			{ title: 'start_date', value: start_date },
+			{ title: 'end_date', value: end_date }
 		)
 		const url = `${baseUrl}/report${query}`
 		return this.sendGetRequest(url)

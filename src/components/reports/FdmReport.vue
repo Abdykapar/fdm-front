@@ -610,7 +610,10 @@ export default {
 		},
 		async makePdf () {
 			await this.getData()
-			const reports = await otherService.getAirlineReport(this.userProfile.user.airline[0])
+			const start = moment(this.calendarData.dateRange.start, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+			const end = moment(this.calendarData.dateRange.end, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
+			console.log(start, end)
+			const reports = await otherService.getAirlineReport(this.userProfile.user.airline[0], start, end)
 			function toDataURL (src, callback, outputFormat) {
 				const image = new Image()
 				image.crossOrigin = 'Anonymous'
