@@ -7,9 +7,9 @@ class FlightService extends BaseApiService {
 		super()
 	}
 
-	getAll (file_id='', startDate='', endDate='') {
+	getAll (routeId='', startDate='', endDate='') {
 		const query = this.queryFilter(
-			{ title: 'file_id', value: file_id },
+			{ title: 'route_id', value: routeId },
 			{ title: 'start_date', value: startDate },
 			{ title: 'end_date', value: endDate },
 		)

@@ -8,7 +8,7 @@ const actions = {
 		commit('SET_FILE_ID', id)
 	},
 	setFlightId ({ commit }, id) {
-		commit('SET_FILE_ID', id)
+		commit('SET_FLIGHT_ID', id)
 	}
 }
 
@@ -25,8 +25,8 @@ const getters = {
 	selectedFile ({ selectedFileId }) {
 		return selectedFileId
 	},
-	selectedFlight ({ selectedFileId }) {
-		return selectedFileId
+	selectedFlight ({ selectedFlightId }) {
+		return selectedFlightId
 	}
 }
 

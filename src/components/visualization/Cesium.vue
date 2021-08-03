@@ -129,9 +129,13 @@ export default {
 		}
 	},
 	watch: {
-		flightId (value) {
-			if (value) {
-				this.fetchData(value)
+		flightId: {
+			immediate: true,
+			handler (value) {
+				console.log(value)
+				if (value) {
+					this.fetchData(value)
+				}
 			}
 		},
 	},
@@ -155,7 +159,8 @@ export default {
 		...mapActions('file', [ 'setFileId' ]),
 		fetchData (flightId) {
 			this.setLoading(true)
-			this.audio.pause()
+			if (this.audio)
+			{this.audio.pause()}
 			eventService.getAll(flightId).then(res => {
 				this.events = res
 				return otherService.getFileCoordinates(flightId)
@@ -166,7 +171,8 @@ export default {
 					return i
 				})
 				this.audio.currentTime = 0
-				this.init()
+				if (this.flightData.length)
+				{this.init()}
 				this.setLoading(false)
 			}).catch(err => {
 				this.setLoading(false)

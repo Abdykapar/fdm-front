@@ -32,20 +32,37 @@
 			class="flight-select"
 		>
 			<select
-				v-model="selectedFile"
+				v-model="aircraftId"
 				placeholder="Choose a file"
-				@change="onSelect"
+				@change="onAircraftSelect"
 			>
 				<option value="0">
-					Select a file
+					Select an aircraft
 				</option>
 				<option
-					v-for="file in files"
-					:key="file.id"
-					:value="file.id"
-					:title="file.file_name"
+					v-for="aircraft in aircrafts"
+					:key="aircraft.id"
+					:value="aircraft.id"
+					:title="aircraft.title"
 				>
-					{{ cropText(file.file_name) }}
+					{{ aircraft.title }}
+				</option>
+			</select>
+			<select
+				v-model="routeId"
+				placeholder="Choose a route"
+				@change="onRouteSelect"
+			>
+				<option value="0">
+					Select a route
+				</option>
+				<option
+					v-for="route in routes"
+					:key="route.id"
+					:value="route.id"
+					:title="route.from_airport_title + ' - ' + route.to_airport_title"
+				>
+					{{ route.from_airport_title }} - {{ route.to_airport_title }}
 				</option>
 			</select>
 			<select
@@ -60,9 +77,9 @@
 					v-for="f in flights"
 					:key="f.id"
 					:value="f.id"
-					:title="f.dep_airport + ' ' + f.arr_airport"
+					:title="f.flight_no"
 				>
-					{{ f.dep_airport }} - {{ f.arr_airport }}
+					{{ f.flight_no }}
 				</option>
 			</select>
 		</div>
@@ -191,6 +208,8 @@ import TopTriggers from './reports/TopTriggers'
 import { fileService } from '../_services/file.service'
 import { roleService } from '../_services/role.service'
 import { flightService } from '../_services/flight.service'
+import { aircraftService } from '../_services/aircraft.service'
+import { routeService } from '../_services/route.service'
 
 export default {
 	name: 'Header',
@@ -201,8 +220,10 @@ export default {
 			isShowProfile: false,
 			isProfile: false,
 			calendarData: {},
-			files: [],
-			selectedFile: 0,
+			aircrafts: [],
+			aircraftId: 0,
+			routes: [],
+			routeId: 0,
 			roles: [],
 			userRole: '',
 			flights: [],
@@ -231,7 +252,7 @@ export default {
 			immediate: true,
 			handler: function (value) {
 				if (value) {
-					this.fetchFiles()
+					this.fetchAircrafts()
 				}
 			}
 		},
@@ -270,9 +291,23 @@ export default {
 				return text.substr(0, 40) + '...'
 			}	else return text
 		},
-		fetchFlight (fileId) {
-			flightService.getAll(fileId).then(res => {
+		fetchFlight (routeId) {
+			flightService.getAll(routeId).then(res => {
 				this.flights = res
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		fetchAircrafts () {
+			aircraftService.getAll(this.userProfile.user.airline[0]).then(res => {
+				this.aircrafts = res
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		fetchRoutes () {
+			routeService.getAll(this.aircraftId).then(res => {
+				this.routes = res
 			}).catch(err => {
 				console.log(err)
 			})
@@ -283,7 +318,12 @@ export default {
 				end: moment(this.calendarData.dateRange.end, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss')
 			})
 		},
-		onSelect (event) {
+		onAircraftSelect (event) {
+			if (event.target.value !== '0') {
+				this.fetchRoutes()
+			}
+		},
+		onRouteSelect (event) {
 			if (event.target.value !== '0') {
 				this.fetchFlight(event.target.value)
 			}
@@ -292,14 +332,6 @@ export default {
 			if (e.target.value !== '0') {
 				this.setFlightId(e.target.value)
 			}
-		},
-		fetchFiles () {
-			fileService.getAll().then(res => {
-				this.files = res.map(i => ({ ...i, title: i.file_name }))
-				// this.selectedFile = this.files[0].id
-			}).catch(err => {
-				console.log(err)
-			})
 		}
 	}
 }
@@ -429,7 +461,7 @@ export default {
 	}
 	.flight-select {
 		select {
-			width: 300px;
+			width: 200px;
 			height: 40px;
 			outline: none;
 			background: #b4b4b4;
