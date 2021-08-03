@@ -48,6 +48,23 @@
 					{{ cropText(file.file_name) }}
 				</option>
 			</select>
+			<select
+				v-model="flight"
+				placeholder="Choose a file"
+				@change="onFlightSelect"
+			>
+				<option value="0">
+					Select a flight
+				</option>
+				<option
+					v-for="f in flights"
+					:key="f.id"
+					:value="f.id"
+					:title="f.dep_airport + ' ' + f.arr_airport"
+				>
+					{{ f.dep_airport }} - {{ f.arr_airport }}
+				</option>
+			</select>
 		</div>
 		<div class="header__right">
 			<div
@@ -173,6 +190,7 @@ import moment from 'moment'
 import TopTriggers from './reports/TopTriggers'
 import { fileService } from '../_services/file.service'
 import { roleService } from '../_services/role.service'
+import { flightService } from '../_services/flight.service'
 
 export default {
 	name: 'Header',
@@ -186,7 +204,9 @@ export default {
 			files: [],
 			selectedFile: 0,
 			roles: [],
-			userRole: ''
+			userRole: '',
+			flights: [],
+			flight: 0
 		}
 	},
 	computed: {
@@ -228,7 +248,7 @@ export default {
 	},
 	methods: {
 		...mapActions('other', [ 'setCalendar' ]),
-		...mapActions('file', [ 'setFileId' ]),
+		...mapActions('file', [ 'setFileId','setFlightId' ]),
 		onShowAlert () {
 			this.isNotif = !this.isNotif
 		},
@@ -250,6 +270,13 @@ export default {
 				return text.substr(0, 40) + '...'
 			}	else return text
 		},
+		fetchFlight (fileId) {
+			flightService.getAll(fileId).then(res => {
+				this.flights = res
+			}).catch(err => {
+				console.log(err)
+			})
+		},
 		onClose () {
 			this.setCalendar({
 				start: moment(this.calendarData.dateRange.start, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'),
@@ -257,8 +284,13 @@ export default {
 			})
 		},
 		onSelect (event) {
-			if (event.target.value !== 'first') {
-				this.setFileId(event.target.value)
+			if (event.target.value !== '0') {
+				this.fetchFlight(event.target.value)
+			}
+		},
+		onFlightSelect (e) {
+			if (e.target.value !== '0') {
+				this.setFlightId(e.target.value)
 			}
 		},
 		fetchFiles () {
@@ -403,6 +435,7 @@ export default {
 			background: #b4b4b4;
 			border-radius: 2px;
 			color: #000000;
+			margin-right: 10px;
 		}
 	}
 
