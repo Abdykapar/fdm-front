@@ -33,7 +33,7 @@
 		>
 			<select
 				v-model="aircraftId"
-				placeholder="Choose a file"
+				placeholder="Choose an aircraft"
 				@change="onAircraftSelect"
 			>
 				<option value="0">

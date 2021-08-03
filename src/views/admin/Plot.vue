@@ -2,20 +2,66 @@
 	<div class="plot">
 		<div class="plot__head">
 			<div class="flex flex-col">
-				<label>Files</label>
+				<label>Aircraft</label>
 				<select
-					v-model="file"
+					v-model="aircraftId"
+					placeholder="Choose an aircraft"
 					class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
-					placeholder="Select a file"
-					@change="onFileChange"
+					@change="onAircraftSelect"
 				>
+					<option value="0">
+						Select an aircraft
+					</option>
 					<option
-						v-for="f in files"
+						v-for="aircraft in aircrafts"
+						:key="aircraft.id"
+						:value="aircraft.id"
+						:title="aircraft.title"
+					>
+						{{ aircraft.title }}
+					</option>
+				</select>
+			</div>
+			
+			<div class="flex flex-col">
+				<label>Route</label>
+				<select
+					v-model="routeId"
+					placeholder="Choose a route"
+					class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
+					@change="onRouteSelect"
+				>
+					<option value="0">
+						Select a route
+					</option>
+					<option
+						v-for="route in routes"
+						:key="route.id"
+						:value="route.id"
+						:title="route.from_airport_title + ' - ' + route.to_airport_title"
+					>
+						{{ route.from_airport_title }} - {{ route.to_airport_title }}
+					</option>
+				</select>
+			</div>
+			<div class="flex flex-col">
+				<label>Flight</label>
+				<select
+					v-model="flight"
+					placeholder="Choose a flight"
+					class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
+					@change="onFlightSelect"
+				>
+					<option value="0">
+						Select a flight
+					</option>
+					<option
+						v-for="f in flights"
 						:key="f.id"
 						:value="f.id"
-						class="py-1"
+						:title="f.flight_no"
 					>
-						{{ f.file_name | crop }}
+						{{ f.flight_no }}
 					</option>
 				</select>
 			</div>
@@ -97,6 +143,9 @@ import { mapActions } from 'vuex'
 import Highcharts from 'highcharts'
 import randomColor from 'randomcolor'
 import { eventService } from '../../_services/event.service'
+import { flightService } from '../../_services/flight.service'
+import { aircraftService } from '../../_services/aircraft.service'
+import { routeService } from '../../_services/route.service'
 
 export default {
 	name: 'Plot',
@@ -107,7 +156,7 @@ export default {
 			series: [],
 			files: [],
 			flights: [],
-			flight: '',
+			flight: 0,
 			file: '',
 			event: '',
 			events: [],
@@ -116,10 +165,19 @@ export default {
 			selectedParameters: [],
 			syncExtremes: '',
 			xData: [],
+			aircrafts: [],
+			aircraftId: 0,
+			routes: [],
+			routeId: 0,
 		}
 	},
+	computed: {
+		userProfile () {
+			return this.$store.state.account.user
+		},
+	},
 	mounted () {
-		this.fetchFiles()
+		this.fetchAircrafts()
 		this.highChartInit()
 	},
 	methods: {
@@ -159,9 +217,42 @@ export default {
 				this.events = res
 			}).catch(err => console.log(err))
 		},
-		onFileChange (e) {
-			this.fetchEvents(e.target.value)
-			this.fetchEventParameters(e.target.value)
+		fetchFlight (routeId) {
+			flightService.getAll(routeId).then(res => {
+				this.flights = res
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		fetchAircrafts () {
+			aircraftService.getAll(this.userProfile.user.airline[0]).then(res => {
+				this.aircrafts = res
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		fetchRoutes () {
+			routeService.getAll(this.aircraftId).then(res => {
+				this.routes = res
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		onAircraftSelect (event) {
+			if (event.target.value !== '0') {
+				this.fetchRoutes()
+			}
+		},
+		onRouteSelect (event) {
+			if (event.target.value !== '0') {
+				this.fetchFlight()
+			}
+		},
+		onFlightSelect (e) {
+			if (e.target.value != '0') {
+				this.fetchEvents(e.target.value)
+				this.fetchEventParameters(e.target.value)
+			}
 		},
 		onParameterSelect (opt, id) {
 			this.selectedParameters.push({ name: opt.name, id: opt.id })
