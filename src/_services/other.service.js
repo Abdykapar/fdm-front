@@ -55,9 +55,9 @@ class OtherService extends BaseApiService {
 		return this.sendGetRequest(url)
 	}
 
-	getFileCoordinates (file_id='') {
+	getFileCoordinates (flight_id='') {
 		const query = this.queryFilter(
-			{ title: 'file_id', value: file_id }
+			{ title: 'flight_id', value: flight_id }
 		)
 		const url = `${baseUrl}/coordinates${query}`
 		return this.sendGetRequest(url)

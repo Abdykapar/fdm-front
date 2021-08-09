@@ -121,17 +121,21 @@ export default {
 		}
 	},
 	computed: {
-		fileId () {
-			return this.$store.getters['file/selectedFile']
+		flightId () {
+			return this.$store.getters['file/selectedFlight']
 		},
 		minimize () {
 			return this.$store.getters['sidebars/minimize']
 		}
 	},
 	watch: {
-		fileId (value) {
-			if (value) {
-				this.fetchData(value)
+		flightId: {
+			immediate: true,
+			handler (value) {
+				console.log(value)
+				if (value) {
+					this.fetchData(value)
+				}
 			}
 		},
 	},
@@ -153,12 +157,13 @@ export default {
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
 		...mapActions('file', [ 'setFileId' ]),
-		fetchData (fileId) {
+		fetchData (flightId) {
 			this.setLoading(true)
-			this.audio.pause()
-			eventService.getAll('', fileId).then(res => {
+			if (this.audio)
+			{this.audio.pause()}
+			eventService.getAll(flightId).then(res => {
 				this.events = res
-				return otherService.getFileCoordinates(fileId)
+				return otherService.getFileCoordinates(flightId)
 			}).then(res => {
 				this.flightData = res.map(i => {
 					const e = this.events.find(j => j.timestamp === i.timestamp)
@@ -166,7 +171,8 @@ export default {
 					return i
 				})
 				this.audio.currentTime = 0
-				this.init()
+				if (this.flightData.length)
+				{this.init()}
 				this.setLoading(false)
 			}).catch(err => {
 				this.setLoading(false)

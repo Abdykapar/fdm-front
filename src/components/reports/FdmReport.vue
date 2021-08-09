@@ -745,14 +745,14 @@ export default {
 											{ text: 'Aircrafts Registration', style: 'tableTh' },
 											{ text: this.aircrafts.map(i => i.reg_number).join(', '), style: 'tableTd' }
 										],
-										[
-											{ text: 'Number of Flights', style: 'tableTh' },
-											{ text: reports.number_of_flights, style: 'tableTd' }
-										],
-										[
-											{ text: 'Number of Events', style: 'tableTh' },
-											{ text: 0, style: 'tableTd' }
-										],
+										// [
+										// 	{ text: 'Number of Flights', style: 'tableTh' },
+										// 	{ text: reports.number_of_flights, style: 'tableTd' }
+										// ],
+										// [
+										// 	{ text: 'Number of Events', style: 'tableTh' },
+										// 	{ text: 0, style: 'tableTd' }
+										// ],
 									]
 								},
 								layout: {
