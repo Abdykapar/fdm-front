@@ -50,7 +50,10 @@
 				v-if="menu === 2"
 				:file-id="fileId"
 			/>
-			<data-insight-flight-detail v-if="menu === 3" />
+			<data-insight-flight-detail
+				v-if="menu === 3"
+				:flight="flight"
+			/>
 			<data-insight-event-detail
 				v-if="menu === 4"
 				:event-id="eventId"
@@ -67,6 +70,7 @@ import { aircraftService } from '../../_services/aircraft.service'
 import { flightService } from '../../_services/flight.service'
 import DataInsightEventDetail from './DataInsightEventDetail'
 import DataInsightFlightDetail from './DataInsightFlightDetail'
+import moment from 'moment'
 export default {
 	name: 'DataInsightDetail',
 	components: { DataInsightFlightDetail, DataInsightEventDetail, DataInsightFileDetail, DataInsightAircraftDetail, FdmModal },
@@ -75,6 +79,7 @@ export default {
 		flightId: { type: Number, default: 0 },
 		eventId: { type: Number, default: 0 },
 		aircraftId: { type: Number, default: 0 },
+		defaultMenu: { type: Number, default: 1 }
 	},
 	data () {
 		return {
@@ -84,7 +89,9 @@ export default {
 		}
 	},
 	mounted () {
+		this.menu = this.defaultMenu
 		this.fetchAircraft(this.aircraftId)
+		this.onMenuChange(this.menu)
 	},
 	methods: {
 		onMenuChange (id) {
@@ -110,9 +117,15 @@ export default {
 			})
 		},
 		fetchFlight () {
+			console.log(this.flightId)
 			if (!this.flightId) return
 			flightService.getById(this.flightId).then(res => {
-				this.flight = res
+				this.flight = { 
+					...res,
+				 	liftOff: moment(res.departure_time).format('DD-MM-YYYY HH:mm:ss'),
+					touchDown: moment(res.arrival_time).format('DD-MM-YYYY HH:mm:ss'),
+					duration: moment(res.departure_time).diff(moment(res.arrival_time), 'hours')
+				  }
 			}).catch(err => {
 				console.log(err)
 			})

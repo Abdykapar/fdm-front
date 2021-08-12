@@ -132,7 +132,6 @@ export default {
 		flightId: {
 			immediate: true,
 			handler (value) {
-				console.log(value)
 				if (value) {
 					this.fetchData(value)
 				}
@@ -180,7 +179,7 @@ export default {
 			})
 		},
 		init () {
-			this.audio.play()
+			// this.audio.play()
 			const dataLength = this.flightData.length
 			const start = Cesium.JulianDate.fromDate(new Date(this.flightData[0].timestamp))
 			const stop = Cesium.JulianDate.fromDate(new Date(this.flightData[dataLength - 1].timestamp))
