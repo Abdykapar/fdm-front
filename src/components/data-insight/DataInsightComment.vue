@@ -15,10 +15,10 @@
 					:key="item.id"
 				>
 					<td>{{ i + 1 }}</td>
-					<td class="fixed">
+					<td class="">
 						{{ item.owner_fullname }}
 					</td>
-					<td class="fixed">
+					<td class="">
 						{{ item.created_at }}
 					</td>
 					<td>{{ item.description }}</td>

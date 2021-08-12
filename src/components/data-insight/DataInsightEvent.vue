@@ -20,62 +20,89 @@
 			<template slot="body">
 				<tr class="filter">
 					<td>
-						<input type="text" v-model="eventModel.registration">
+						<input
+							v-model="eventModel.registration"
+							type="text"
+						>
 						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="date" v-model="eventModel.eventDate">
+						<input
+							v-model="eventModel.eventDate"
+							type="date"
+						>
 						<img
 							src="../../assets/icons/calendar.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text" v-model="eventModel.eventName"><img
+						<input
+							v-model="eventModel.eventName"
+							type="text"
+						><img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text" v-model="eventModel.duration">
+						<input
+							v-model="eventModel.duration"
+							type="text"
+						>
 						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text" v-model="eventModel.flightNumber">
+						<input
+							v-model="eventModel.flightNumber"
+							type="text"
+						>
 						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text" v-model="eventModel.depAirport">
+						<input
+							v-model="eventModel.depAirport"
+							type="text"
+						>
 						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text" v-model="eventModel.arrAirport">
+						<input
+							v-model="eventModel.arrAirport"
+							type="text"
+						>
 						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text" v-model="eventModel.eventSeverity">
+						<input
+							v-model="eventModel.eventSeverity"
+							type="text"
+						>
 						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
 						>
 					</td>
 					<td>
-						<input type="text" v-model="eventModel.eventStatus">
+						<input
+							v-model="eventModel.eventStatus"
+							type="text"
+						>
 						<img
 							src="../../assets/icons/search-mini.svg"
 							alt=""
@@ -87,11 +114,11 @@
 							@click="eventModel.reviewed = !eventModel.reviewed"
 						/>
 					</td>
-					<td></td>
+					<td />
 					<td>
 						<button
-							@click="onClear"
 							class="detail red"
+							@click="onClear"
 						>
 							Clear
 						</button>
@@ -130,6 +157,7 @@
 		<data-insight-detail
 			v-if="isShowDetail"
 			:event-id="event.id"
+			:default-menu="4"
 			:flight-id="event.flight"
 			:aircraft-id="event.aircraft_id"
 			:file-id="Math.round(event.file_id)"

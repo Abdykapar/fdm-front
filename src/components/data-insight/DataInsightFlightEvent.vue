@@ -15,9 +15,9 @@
 					:key="item.id"
 				>
 					<td>{{ i + 1 }}</td>
-					<td>{{ item.owner_fullname }}</td>
-					<td>{{ item.created_at }}</td>
-					<td>{{ item.description }}</td>
+					<td>{{ item.event_name }}</td>
+					<td>{{ item.duration }}</td>
+					<td>{{ item.event_severity }}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -27,11 +27,9 @@
 <script>
 export default {
 	name: 'DataInsightFlightEvent',
-	data () {
-		return {
-			events: []
-		}
-	}
+	props: {
+		events: { type: Array, default: () => [] },
+	},
 }
 </script>
 

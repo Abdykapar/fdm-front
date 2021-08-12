@@ -94,6 +94,7 @@
 			v-if="isShowDetail"
 			:event-id="flight.event"
 			:flight-id="flight.id"
+			:default-menu="3"
 			:aircraft-id="flight.aircraft"
 			:file-id="flight.file_id"
 			@close="isShowDetail = false"

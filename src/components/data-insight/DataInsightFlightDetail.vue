@@ -1,37 +1,45 @@
 <template>
 	<div>
 		<div class="title">
-			Flight Title
+			Flight n/a
 		</div>
 		<div class="detail__body">
 			<div class="form__row no-margin">
 				<label for="model">DEPARTURE</label>
 				<select
 					id="model"
+					v-model="flight.dep_airport"
 					name="model"
 				>
-					<option
+					<option :value="flight.dep_airport">
+						{{ flight.dep_airport }}
+					</option>
+					<!-- <option
 						v-for="item in status"
 						:key="item"
 						:value="item"
 					>
 						{{ item }}
-					</option>
+					</option> -->
 				</select>
 			</div>
 			<div class="form__row no-margin">
 				<label for="severity">ARRIVAL</label>
 				<select
 					id="severity"
+					v-model="flight.arr_airport"
 					name="severity"
 				>
-					<option
+					<option :value="flight.arr_airport">
+						{{ flight.arr_airport }}
+					</option>
+					<!-- <option
 						v-for="item in severities"
 						:key="item"
 						:value="item"
 					>
 						{{ item }}
-					</option>
+					</option> -->
 				</select>
 			</div>
 			<div class="detail__item">
@@ -39,7 +47,7 @@
 					FLIGHT NO.
 				</div>
 				<div class="detail__item__content">
-					12
+					{{ flight.flight_no }}
 				</div>
 			</div>
 			<div class="detail__item">
@@ -47,7 +55,7 @@
 					LIFTOFF
 				</div>
 				<div class="detail__item__content">
-					12.01.2021 12:20
+					{{ flight.liftOff }}
 				</div>
 			</div>
 			<div class="detail__item">
@@ -55,16 +63,18 @@
 					TOUCHDOWN
 				</div>
 				<div class="detail__item__content">
-					{{ flight.duration }}
+					{{ flight.touchDown }}
 				</div>
 			</div>
 			<div class="detail__item">
 				<div class="detail__item__title">
 					DURATION
 				</div>
-				<div class="detail__item__content" />
+				<div class="detail__item__content">
+					{{ flight.duration }}
+				</div>
 			</div>
-			<div class="detail__item">
+			<!-- <div class="detail__item">
 				<div class="detail__item__title">
 					START
 				</div>
@@ -87,8 +97,8 @@
 				<div class="detail__item__content">
 					1641.54 ft
 				</div>
-			</div>
-			<div class="form__row no-margin">
+			</div> -->
+			<!-- <div class="form__row no-margin">
 				<label for="type">TYPE</label>
 				<select
 					id="type"
@@ -102,7 +112,7 @@
 						{{ item }}
 					</option>
 				</select>
-			</div>
+			</div> -->
 		</div>
 		<div class="flight-event">
 			<div class="flight-event__buttons">
@@ -119,7 +129,10 @@
 					Comments
 				</button>
 			</div>
-			<data-insight-flight-event v-if="buttonType === 'event'" />
+			<data-insight-flight-event
+				v-if="buttonType === 'event'"
+				:events="events"
+			/>
 			<data-insight-comment
 				v-if="buttonType === 'comment'"
 				:id="flight.id"
@@ -136,6 +149,7 @@ import DataInsightComment from './DataInsightComment'
 import moment from 'moment'
 import { flightCommentService } from '../../_services/flight-comment.service'
 import DataInsightFlightEvent from './DataInsightFlightEvent'
+import { eventService } from '@/_services/event.service'
 export default {
 	name: 'DataInsightFlightDetail',
 	components: { DataInsightFlightEvent, DataInsightComment },
@@ -148,12 +162,18 @@ export default {
 			severities: [ 'None', 'Low', 'Medium', 'High' ],
 			types: [ 'Revenue', 'Training', 'Ferry/Reposition', 'Special/Other', 'Maintenance', 'Test FLight', 'Ground Run' ],
 			messages: [],
+			events: [],
 			buttonType: 'event'
 		}
 	},
 	computed: {
 		userProfile () {
 			return this.$store.state.account.user
+		}
+	},
+	watch: {
+		flight (val) {
+			this.fetchEvents(val.id)
 		}
 	},
 	mounted () {
@@ -163,6 +183,13 @@ export default {
 		fetchComments () {
 			flightCommentService.getAll(this.userProfile.user.id).then(res => {
 				this.messages = res.map(i => ({ ...i, created_at: moment(i.created_at).format('DD-MM-YYYY HH:mm') }))
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		fetchEvents (id) {
+			eventService.getAll(id).then(res => {
+				this.events = res
 			}).catch(err => {
 				console.log(err)
 			})
