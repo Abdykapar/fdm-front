@@ -292,7 +292,7 @@ export default {
 			}	else return text
 		},
 		fetchFlight (routeId) {
-			flightService.getAll(routeId).then(res => {
+			flightService.getAll(routeId, '','', this.aircraftId).then(res => {
 				this.flights = res
 			}).catch(err => {
 				console.log(err)
@@ -306,7 +306,7 @@ export default {
 			})
 		},
 		fetchRoutes () {
-			routeService.getAll(this.aircraftId).then(res => {
+			routeService.getAll(this.aircraftId, this.userProfile.user.airline[0]).then(res => {
 				this.routes = res
 			}).catch(err => {
 				console.log(err)

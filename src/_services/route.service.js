@@ -7,9 +7,10 @@ class RouteService extends BaseApiService {
 		super()
 	}
 
-	getAll (aircraft_id='') {
+	getAll (aircraft_id='', airline_id) {
 		const query = this.queryFilter(
-			{ title: 'aircraft_id', value: aircraft_id }
+			{ title: 'aircraft_id', value: aircraft_id },
+			{ title: 'airline_id', value: airline_id },
 		)
 		const url = `${baseUrl}/routes${query}`
 		return this.sendGetRequest(url)
