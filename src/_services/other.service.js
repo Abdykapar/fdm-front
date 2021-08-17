@@ -17,6 +17,20 @@ class OtherService extends BaseApiService {
 		return this.sendGetRequest(url)
 	}
 
+	getParameters () {
+		const url = `${baseUrl}/parameters`
+		return this.sendGetRequest(url)
+	}
+
+	getParameterById (parameter_id='', flight_id='') {
+		const query = this.queryFilter(
+			{ title: 'parameter_id', value: parameter_id },
+			{ title: 'flight_id', value: flight_id },
+		)
+		const url = `${baseUrl}/graph-data${query}`
+		return this.sendGetRequest(url)
+	}
+
 	flightsByMonth (aircraft='', start_date='', end_date='') {
 		const query = this.queryFilter(
 			{ title: 'aircraft', value: aircraft },
