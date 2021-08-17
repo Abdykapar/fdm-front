@@ -109,6 +109,12 @@
 					id="container"
 					class="relative"
 				/>
+				<div
+					v-if="isLoading"
+					class="loader-container"
+				>
+					<div class="spinner-3" />
+				</div>
 			</div>
 		</div>
 		<div
@@ -122,8 +128,8 @@
 				<multiselect
 					v-model="value"
 					:options="parameters"
-					label="name"
-					track-by="name"
+					label="title"
+					track-by="id"
 					select-label=""
 					deselect-label=""
 					:multiple="true"
@@ -169,6 +175,7 @@ export default {
 			aircraftId: 0,
 			routes: [],
 			routeId: 0,
+			isLoading: false
 		}
 	},
 	computed: {
@@ -218,7 +225,7 @@ export default {
 			}).catch(err => console.log(err))
 		},
 		fetchFlight (routeId) {
-			flightService.getAll(routeId).then(res => {
+			flightService.getAll(routeId, '', '', this.aircraftId).then(res => {
 				this.flights = res
 			}).catch(err => {
 				console.log(err)
@@ -232,7 +239,7 @@ export default {
 			})
 		},
 		fetchRoutes () {
-			routeService.getAll(this.aircraftId).then(res => {
+			routeService.getAll(this.aircraftId, this.userProfile.user.airline[0]).then(res => {
 				this.routes = res
 			}).catch(err => {
 				console.log(err)
@@ -251,21 +258,29 @@ export default {
 		onFlightSelect (e) {
 			if (e.target.value != '0') {
 				this.fetchEvents(e.target.value)
-				this.fetchEventParameters(e.target.value)
+				this.fetchParameters()
+				// this.fetchEventParameters(e.target.value)
 			}
 		},
-		onParameterSelect (opt, id) {
-			this.selectedParameters.push({ name: opt.name, id: opt.id })
+		fetchParameters () {
+			otherService.getParameters().then(res => {
+				this.parameters = res
+			}).catch(err => {
+				console.log(err)
+			})
+		},
+		async onParameterSelect (opt, id) {
+			this.isLoading = true
+			const data = await otherService.getParameterById(opt.id, this.flight)
+			this.selectedParameters.push({ name: opt.title, id: opt.id })
+			this.xData = data.map(i => i.timestamp)
 			const dataset = { 
-				name: opt.name,
-				data: this.xData.map(i => {
-					const a = opt.data.find(j => j.timestamp === i)
-					if (a) return parseFloat(a.value)
-					return 0
-				} ),
+				name: opt.title,
+				data: data.map(i => parseFloat(i.value)),
 				'type': 'line',
 			}
 			this.makeDataset(dataset)
+			this.isLoading = false
 		},
 		makeDataset (dataset) {
 			function getRandomColor () {
@@ -522,6 +537,7 @@ export default {
 			}	
 		},
 		onParameterRemove (opt, id) {
+			//TODO: check is removing chart or not
 			const index = this.selectedParameters.findIndex(i => i.id === opt.id)
 			const chart = Highcharts.charts[index]
 			chart.container.parentNode.parentNode.removeChild(chart.container.parentNode)
@@ -589,6 +605,20 @@ export default {
 </script>
 
 <style lang="scss">
+	.spinner-3 {
+		width:50px;
+		height:50px;
+		border-radius:50%;
+		background:conic-gradient(#0000 10%,#25b09b);
+		-webkit-mask:radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
+		animation:s3 1s infinite linear;
+	}
+	@keyframes s3 {to{transform: rotate(1turn)}}
+	.loader-container {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 140px;
+	}
 	.chart-tooltip {
 		display: block;
 		width: 3px;
