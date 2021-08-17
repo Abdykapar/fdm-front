@@ -195,7 +195,7 @@ export default {
 			Cesium.knockout.getObservable(this.viewer.clockViewModel,
 				'shouldAnimate').subscribe(isAnimating => {
 				if (isAnimating) {
-					this.audio.play()
+					// this.audio.play()
 				} else {
 					this.audio.pause()
 					console.log('Cesium clock is paused.')
