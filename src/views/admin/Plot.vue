@@ -110,7 +110,7 @@
 					class="relative"
 				/>
 				<div
-					v-if="isLoading"
+					v-if="isEventLoading"
 					class="loader-container"
 				>
 					<div class="spinner-3" />
@@ -133,6 +133,7 @@
 					select-label=""
 					deselect-label=""
 					:multiple="true"
+					:disabled="isEventLoading"
 					:close-on-select="false"
 					@select="onParameterSelect"
 					@remove="onParameterRemove"
@@ -182,6 +183,9 @@ export default {
 		userProfile () {
 			return this.$store.state.account.user
 		},
+		isEventLoading () {
+			return this.parameters.some(i => i.isLoading)
+		}
 	},
 	mounted () {
 		this.fetchAircrafts()
@@ -196,29 +200,7 @@ export default {
 				console.log(err)
 			})
 		},
-		fetchEventParameters (fileId) {
-			this.setLoading(true)
-			otherService.eventParameters(fileId).then(res => {
-				this.parameters = []
-				const d = res.filter((i, index, self) => self.findIndex(j => j.id === i.id) === index)
-				d.forEach(i => {
-					const a = {
-						id: i.id,
-						name: i.title,
-						data: res.filter(j => j.id === i.id)
-					}
-					this.parameters.push(a)
-				})
-				if (this.parameters.length) {
-					const d = this.parameters.reduce((acc, i) => i.data.length > acc.length ? i.data : acc, [] )
-					this.xData = d.map(i => i.timestamp)
-				}
-				this.setLoading(false)
-			}).catch(err => {
-				this.setLoading(false)
-				console.log(err)
-			})
-		},
+		
 		fetchEvents (fileId) {
 			eventService.getAll('', fileId).then(res => {
 				this.events = res
@@ -270,8 +252,18 @@ export default {
 			})
 		},
 		async onParameterSelect (opt, id) {
-			this.isLoading = true
-			const data = await otherService.getParameterById(opt.id, this.flight)
+			this.parameters = this.parameters.map(i => {
+				if (i.id === opt.id) {
+					return { ...i, $isDisabled: true, isLoading: true }
+				} return i
+			})
+			let data = []
+			try {
+				data = await otherService.getParameterById(opt.id, this.flight)
+			} catch (err){
+				console.log(err)
+				this.$toastr.e(err)
+			}
 			this.selectedParameters.push({ name: opt.title, id: opt.id })
 			this.xData = data.map(i => i.timestamp)
 			const dataset = { 
@@ -280,7 +272,11 @@ export default {
 				'type': 'line',
 			}
 			this.makeDataset(dataset)
-			this.isLoading = false
+			this.parameters = this.parameters.map(i => {
+				if (i.id === opt.id) {
+					return { ...i, $isDisabled: false, isLoading: false }
+				} return i
+			})
 		},
 		makeDataset (dataset) {
 			function getRandomColor () {
@@ -537,12 +533,24 @@ export default {
 			}	
 		},
 		onParameterRemove (opt, id) {
-			//TODO: check is removing chart or not
+			//check is event loading
+			// const event = this.parameters.find(i => i.id === opt.id)
+			// console.log(event.$isDisabled)
+			// if (event.$isDisabled) return
+			// Else remove event
 			const index = this.selectedParameters.findIndex(i => i.id === opt.id)
 			const chart = Highcharts.charts[index]
 			chart.container.parentNode.parentNode.removeChild(chart.container.parentNode)
 			Highcharts.charts.splice(index, 1)
 			this.selectedParameters.splice(index, 1)
+			const evnetLines = document.getElementsByClassName('event-chart-data')
+			const len = [ ...evnetLines ].length
+			const removingEvent = evnetLines[len - 1]
+			removingEvent.parentNode.removeChild(removingEvent)
+			if (len === 2) {
+				const mainEvent = evnetLines[0]
+				mainEvent.parentNode.removeChild(mainEvent)
+			}
 		},
 		onMouseOver () {
 			console.log('over')
@@ -698,7 +706,7 @@ export default {
 	background: rgba(#fff, 0.6);
 }
 #container {
-	margin-bottom: 90px;
+	margin-bottom: 110px;
 }
 
 .tooltip .tooltiptext {
