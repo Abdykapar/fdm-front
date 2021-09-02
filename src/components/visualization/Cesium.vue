@@ -185,10 +185,11 @@ export default {
 			const stop = Cesium.JulianDate.fromDate(new Date(this.flightData[dataLength - 1].timestamp))
 			this.viewer.clock.startTime = start.clone()
 			this.viewer.clock.stopTime = stop.clone()
-			this.viewer.clock.currentTime = start.clone()
+			const quarterTime = Math.round(this.flightData.length / 4)
+			this.viewer.clock.currentTime = Cesium.JulianDate.fromDate(new Date(this.flightData[quarterTime].timestamp))
 			this.viewer.timeline.zoomTo(start, stop)
 			// Speed up the playback speed 10x.
-			this.viewer.clock.multiplier = 10
+			this.viewer.clock.multiplier = 1
 			// Start playing the scene.
 			this.viewer.clock.shouldAnimate = true
 
