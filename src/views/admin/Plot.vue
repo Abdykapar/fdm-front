@@ -2,7 +2,7 @@
 	<div class="plot">
 		<div class="plot__head">
 			<div class="flex flex-col">
-				<label>Aircraft</label>
+				<label class="text-gray-400">Aircraft</label>
 				<select
 					v-model="aircraftId"
 					placeholder="Choose an aircraft"
@@ -24,7 +24,7 @@
 			</div>
 			
 			<div class="flex flex-col">
-				<label>Route</label>
+				<label class="text-gray-400">Route</label>
 				<select
 					v-model="routeId"
 					placeholder="Choose a route"
@@ -45,7 +45,7 @@
 				</select>
 			</div>
 			<div class="flex flex-col">
-				<label>Flight</label>
+				<label class="text-gray-400">Flight</label>
 				<select
 					v-model="flight"
 					placeholder="Choose a flight"
@@ -65,79 +65,71 @@
 					</option>
 				</select>
 			</div>
-			<!-- <select
-				v-model="flight"
-				class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
-				@change="onFlightChange"
-			>
-				<option
-					v-for="f in flights"
-					:key="f.id"
-					:value="f.id"
-					class="py-1"
-				>
-					{{ f.dep_airport }} - {{ f.arr_airport }}
-				</option>
-			</select> -->
-			<!-- <select
-				v-model="event"
-				class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
-				@change="onEventChange"
-			>
-				<option
-					v-for="f in events"
-					:key="f.id"
-					:value="f.id"
-					class="py-1"
-				>
-					{{ f.event_name }}
-				</option>
-			</select> -->
 		</div>
+		<!-- <button @click="checkData">
+			Check
+		</button> -->
 		<div class="m-4 text-xl plot__body">
 			<div class="flex justify-center text-white plot__body__title">
 				Flight  (UAFM - UAFO)
 			</div>
 
-			<div class="m-10">
-				<!-- <canvas
-					id="events"
-					class="fixed"
-					style="width: 100vw; height: 100vh; top: 0; left: 0"
-				/> -->
-				<div
-					id="container"
-					class="relative"
-				/>
-				<div
-					v-if="isEventLoading"
-					class="loader-container"
-				>
-					<div class="spinner-3" />
+			<div class="flex">
+				<div class="m-10 w-4/5">
+					<div
+						id="container"
+						class="relative"
+					/>
+					<div
+						v-if="isEventLoading"
+						class="loader-container"
+					>
+						<div class="spinner-3" />
+					</div>
 				</div>
-			</div>
-		</div>
-		<div
-			class="fixed bottom-0 w-full"
-			style="background: #1f2327;"
-		>
-			<div
-				class="w-90 ml-5 mr-5 mb-5 text-yellow-50 w-11/12"
-			>
-				<label>Paremeters</label>
-				<multiselect
-					v-model="value"
-					:options="parameters"
-					label="title"
-					track-by="id"
-					select-label=""
-					deselect-label=""
-					:multiple="true"
-					:disabled="isEventLoading"
-					:close-on-select="false"
-					@select="onParameterSelect"
-					@remove="onParameterRemove"
-				/>
+
+				<div
+					class="w-1/5"
+					style="background: #1f2327;"
+				>
+					<div
+						class="w-90 ml-5 mr-5 mb-5 text-yellow-50 w-11/12"
+					>
+						<label class="text-gray-400">Parameters</label>
+						<!-- <multiselect
+							v-model="value"
+							:options="parameters"
+							label="title"
+							track-by="id"
+							select-label=""
+							deselect-label=""
+							:multiple="true"
+							:disabled="isEventLoading"
+							:close-on-select="false"
+							@select="onParameterSelect"
+							@remove="onParameterRemove"
+						/> -->
+
+						<ul class="">
+							<li
+								v-for="(item, i) in parameters"
+								:key="i"
+							>
+								<label
+									class="flex my-1"
+									:title="item.title"
+								>
+									<input
+										class="fdm-checkbox"
+										type="checkbox"
+										:disabled="item.$isDisabled"
+										@change="onInput($event, item)"
+									> {{ item.title }}
+								</label>
+							</li>
+						</ul>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -176,7 +168,8 @@ export default {
 			aircraftId: 0,
 			routes: [],
 			routeId: 0,
-			isLoading: false
+			isLoading: false,
+			datas: []
 		}
 	},
 	computed: {
@@ -199,6 +192,14 @@ export default {
 			}).catch(err => {
 				console.log(err)
 			})
+		},
+
+		onInput (event, item) {
+			if (event.target.checked) {
+				this.onParameterSelect(item)
+			} else {
+				this.onParameterRemove(item)
+			}
 		},
 		
 		fetchEvents (fileId) {
@@ -251,7 +252,7 @@ export default {
 				console.log(err)
 			})
 		},
-		async onParameterSelect (opt, id) {
+		async onParameterSelect (opt) {
 			this.parameters = this.parameters.map(i => {
 				if (i.id === opt.id) {
 					return { ...i, $isDisabled: true, isLoading: true }
@@ -260,6 +261,7 @@ export default {
 			let data = []
 			try {
 				data = await otherService.getParameterById(opt.id, this.flight)
+				this.datas.push(data)
 			} catch (err){
 				console.log(err)
 				this.$toastr.e(err)
@@ -276,6 +278,13 @@ export default {
 				if (i.id === opt.id) {
 					return { ...i, $isDisabled: false, isLoading: false }
 				} return i
+			})
+		},
+		checkData () {
+			this.datas[0].forEach((i,index) => {
+				if (i.timestamp != this.datas[1][index].timestamp) {
+					console.log(index, ': data0: ', i.timestamp, ' - data1: ', this.datas[1][index].timestamp)
+				}
 			})
 		},
 		makeDataset (dataset) {
@@ -532,7 +541,7 @@ export default {
 				}
 			}	
 		},
-		onParameterRemove (opt, id) {
+		onParameterRemove (opt) {
 			//check is event loading
 			// const event = this.parameters.find(i => i.id === opt.id)
 			// console.log(event.$isDisabled)
@@ -544,12 +553,15 @@ export default {
 			Highcharts.charts.splice(index, 1)
 			this.selectedParameters.splice(index, 1)
 			const evnetLines = document.getElementsByClassName('event-chart-data')
+			console.log(evnetLines)
 			const len = [ ...evnetLines ].length
-			const removingEvent = evnetLines[len - 1]
-			removingEvent.parentNode.removeChild(removingEvent)
-			if (len === 2) {
-				const mainEvent = evnetLines[0]
-				mainEvent.parentNode.removeChild(mainEvent)
+			for (let i = 0; i < this.events.length; i++) {
+				const removingEvent = evnetLines[len - 1 - i]
+				removingEvent.parentNode.removeChild(removingEvent)
+			}
+			
+			if (this.selectedParameters.length === 0) {
+				this.resetEvents('event-chart-data')
 			}
 		},
 		onMouseOver () {

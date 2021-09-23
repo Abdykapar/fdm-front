@@ -2,6 +2,7 @@
 	<div>
 		<svg
 			v-if="!active"
+			class="margin-center"
 			width="50"
 			height="50"
 			viewBox="0 0 50 50"
@@ -53,6 +54,7 @@
 		</svg>
 		<svg
 			v-else
+			class="margin-center"
 			width="50"
 			height="50"
 			viewBox="0 0 50 50"
