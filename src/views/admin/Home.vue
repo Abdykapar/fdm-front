@@ -247,6 +247,8 @@ export default {
 
 		&__title {
 			margin-bottom: 15px;
+			padding: 0 5px;
+			text-align: center;
 		}
 	}
 
