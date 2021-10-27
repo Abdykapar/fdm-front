@@ -461,7 +461,7 @@ export default {
 					type: dataset.type,
 					color: randomColor(),
 					fillOpacity: 0.3,
-					turboThreshold: 100000,
+					turboThreshold: 100001,
 					tooltip: {
 						// valueSuffix: ' ' + dataset.unit
 					}
