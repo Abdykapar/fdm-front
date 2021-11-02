@@ -70,6 +70,7 @@
 			Check
 		</button> -->
 		<div class="m-4 text-xl plot__body">
+			<button v-if="isEnableExportBtn" class="absolute border text-black bg-gray-400 px-3 py-2 text-base rounded" @click="onExport">Export</button>
 			<div class="flex justify-center text-white plot__body__title">
 				Flight  (UAFM - UAFO)
 			</div>
@@ -96,19 +97,6 @@
 						class="w-90 ml-5 mr-5 mb-5 text-yellow-50 w-11/12"
 					>
 						<label class="text-gray-400">Parameters</label>
-						<!-- <multiselect
-							v-model="value"
-							:options="parameters"
-							label="title"
-							track-by="id"
-							select-label=""
-							deselect-label=""
-							:multiple="true"
-							:disabled="isEventLoading"
-							:close-on-select="false"
-							@select="onParameterSelect"
-							@remove="onParameterRemove"
-						/> -->
 
 						<ul class="">
 							<li
@@ -124,7 +112,8 @@
 										type="checkbox"
 										:disabled="item.$isDisabled"
 										@change="onInput($event, item)"
-									> {{ item.title }}
+										:title="item.title"
+									> {{ item.title | crop }}
 								</label>
 							</li>
 						</ul>
@@ -139,13 +128,13 @@
 import { fileService } from '../../_services/file.service'
 import { otherService } from '../../_services/other.service'
 import { mapActions } from 'vuex'
-import Highcharts from 'highcharts'
+import Highcharts, { charts } from 'highcharts'
 import randomColor from 'randomcolor'
 import { eventService } from '../../_services/event.service'
 import { flightService } from '../../_services/flight.service'
 import { aircraftService } from '../../_services/aircraft.service'
 import { routeService } from '../../_services/route.service'
-
+import moment from 'moment'
 export default {
 	name: 'Plot',
 	components: {  },
@@ -172,12 +161,20 @@ export default {
 			datas: []
 		}
 	},
+	filters: {
+		crop(s) {
+			return s.length > 15 ? s.substr(0, 15) : s
+		}
+	},
 	computed: {
 		userProfile () {
 			return this.$store.state.account.user
 		},
 		isEventLoading () {
 			return this.parameters.some(i => i.isLoading)
+		},
+		isEnableExportBtn () {
+			return !!this.datas.length
 		}
 	},
 	mounted () {
@@ -219,6 +216,20 @@ export default {
 				this.aircrafts = res
 			}).catch(err => {
 				console.log(err)
+			})
+		},
+		onExport () {
+			const container = document.getElementById('container');
+			const charts = container.getElementsByClassName('chart');
+			const images = [];
+			[...charts].map((i,ind) => {
+				const el = i.getElementsByTagName('svg')
+				const svgElement = el[0]
+				const svgString = new XMLSerializer().serializeToString(svgElement);
+				images.push(svgString)
+			})
+			this.$nextTick(() => {
+				this.makePdf(images)
 			})
 		},
 		fetchRoutes () {
@@ -314,7 +325,6 @@ export default {
 				const thisChart = this.chart
 				const newX = this.options.shapes[0].points[0].x
 				const index = this.chart.annotations.indexOf(this)
-				console.log(newX)
 
 				if (e.type !== 'afterUpdate') {
 					Highcharts.each(Highcharts.charts, chart => {
@@ -348,6 +358,7 @@ export default {
 					marginLeft: 40, // Keep all charts left aligned
 					spacingTop: 20,
 					spacingBottom: 20,
+					backgroundColor: '#1f2327',
 					style: {
 						color: '#c8c9c5'
 					},
@@ -542,18 +553,12 @@ export default {
 			}	
 		},
 		onParameterRemove (opt) {
-			//check is event loading
-			// const event = this.parameters.find(i => i.id === opt.id)
-			// console.log(event.$isDisabled)
-			// if (event.$isDisabled) return
-			// Else remove event
 			const index = this.selectedParameters.findIndex(i => i.id === opt.id)
 			const chart = Highcharts.charts[index]
 			chart.container.parentNode.parentNode.removeChild(chart.container.parentNode)
 			Highcharts.charts.splice(index, 1)
 			this.selectedParameters.splice(index, 1)
 			const evnetLines = document.getElementsByClassName('event-chart-data')
-			console.log(evnetLines)
 			const len = [ ...evnetLines ].length
 			for (let i = 0; i < this.events.length; i++) {
 				const removingEvent = evnetLines[len - 1 - i]
@@ -619,6 +624,71 @@ export default {
 					})
 				}
 			}
+		},
+		makePdf (images) {
+			const imageObjects = images.map(i => {
+				return {
+					svg: i,
+					fit: [800, 600]
+				}
+			})
+			const route = this.routes.find(i => i.id === this.routeId)
+			const f = this.flights.find(i => i.id === this.flight)
+			const title = `${route.from_airport_title} - ${route.to_airport_title}`
+			const subTitle = `Flight no: ${f.flight_no}`
+			
+			const docDefinition = {
+				info: {
+					title: 'Title',
+					author: 'SigmaSoft Team',
+				},
+				compress: false,
+				pageOrientation: 'landscape',
+				pageMargins: [ 30, 10, 30, 30 ],
+				pageSize: 'A4',
+				ownerPassword: '123456',
+				permissions: {
+					printing: 'highResolution', //'lowResolution'
+					modifying: false,
+					copying: false,
+					annotating: true,
+					fillingForms: true,
+					contentAccessibility: true,
+					documentAssembly: true
+				},
+				content: [
+					{
+						text: title,
+						style: 'header'
+					},
+					{
+						text: subTitle,
+						style: 'subHeader'
+					},
+					...imageObjects
+				],
+				styles: {
+					data: {
+						fontSize: 10,
+					},
+					header: {
+						fontSize: 32,
+						bold: true,
+						margin: [ 30, 20, 30, 20],
+						alignment: 'center'
+					},
+					subHeader: {
+						fontSize: 20,
+						bold: true,
+						margin: [ 30, 20, 30, 20],
+						alignment: 'center'
+					}
+				},
+				defaultStyle: {
+					// columnGap: 20
+				}
+			}
+			pdfMake.createPdf(docDefinition).download(`flight-${moment().format('DD.MM.YYYY')}.pdf`)
 		}
 	}
 }
@@ -743,5 +813,8 @@ export default {
 
 .tooltip:hover .tooltiptext {
   visibility: visible;
+}
+.chart svg {
+	background: #1f2327;
 }
 </style>
