@@ -6,7 +6,7 @@
 				<select
 					v-model="aircraftId"
 					placeholder="Choose an aircraft"
-					class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
+					class="px-3 py-2 bg-gray-800 border rounded outline-none w-60 text-gray-400"
 					@change="onAircraftSelect"
 				>
 					<option value="0">
@@ -22,13 +22,34 @@
 					</option>
 				</select>
 			</div>
-			
+
+			<div class="flex flex-col">
+				<label class="text-gray-400">Start Date</label>
+				<div class="flex">
+					<input
+						class="w-44 px-3 py-2 bg-gray-800 border rounded outline-none text-gray-400"
+						type="date"
+						@change="onStartDateChange"
+					>
+				</div>
+			</div>
+			<div class="flex flex-col">
+				<label class="text-gray-400">End Date</label>
+				<div class="flex">
+					<input
+						class="w-44 px-3 py-2 bg-gray-800 border rounded outline-none text-gray-400"
+						type="date"
+						@change="onEndDateChange"
+					>
+				</div>
+			</div>
+
 			<div class="flex flex-col">
 				<label class="text-gray-400">Route</label>
 				<select
 					v-model="routeId"
 					placeholder="Choose a route"
-					class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
+					class="px-3 py-2 bg-gray-800 border rounded outline-none w-60 text-gray-400"
 					@change="onRouteSelect"
 				>
 					<option value="0">
@@ -49,7 +70,7 @@
 				<select
 					v-model="flight"
 					placeholder="Choose a flight"
-					class="px-3 py-2 bg-transparent border rounded outline-none w-60 text-gray-50"
+					class="px-3 py-2 bg-gray-800 border rounded outline-none w-60 text-gray-400"
 					@change="onFlightSelect"
 				>
 					<option value="0">
@@ -70,9 +91,8 @@
 			Check
 		</button> -->
 		<div class="m-4 text-xl plot__body">
-			<button v-if="isEnableExportBtn" class="absolute border text-black bg-gray-400 px-3 py-2 text-base rounded" @click="onExport">Export</button>
 			<div class="flex justify-center text-white plot__body__title">
-				Flight  (UAFM - UAFO)
+				Flight (UAFM - UAFO)
 			</div>
 
 			<div class="flex">
@@ -93,10 +113,21 @@
 					class="w-1/5"
 					style="background: #1f2327;"
 				>
-					<div
-						class="w-90 ml-5 mr-5 mb-5 text-yellow-50 w-11/12"
-					>
+					<div class="w-90 ml-5 mr-5 mb-5 text-yellow-50 w-11/12">
 						<label class="text-gray-400">Parameters</label>
+						<!-- <multiselect
+							v-model="value"
+							:options="parameters"
+							label="title"
+							track-by="id"
+							select-label=""
+							deselect-label=""
+							:multiple="true"
+							:disabled="isEventLoading"
+							:close-on-select="false"
+							@select="onParameterSelect"
+							@remove="onParameterRemove"
+						/> -->
 
 						<ul class="">
 							<li
@@ -112,8 +143,8 @@
 										type="checkbox"
 										:disabled="item.$isDisabled"
 										@change="onInput($event, item)"
-										:title="item.title"
-									> {{ item.title | crop }}
+									>
+									{{ item.title }}
 								</label>
 							</li>
 						</ul>
@@ -122,22 +153,23 @@
 			</div>
 		</div>
 	</div>
-</template> 
+</template>
 
 <script>
 import { fileService } from '../../_services/file.service'
 import { otherService } from '../../_services/other.service'
 import { mapActions } from 'vuex'
-import Highcharts, { charts } from 'highcharts'
+import Highcharts from 'highcharts'
 import randomColor from 'randomcolor'
 import { eventService } from '../../_services/event.service'
 import { flightService } from '../../_services/flight.service'
 import { aircraftService } from '../../_services/aircraft.service'
 import { routeService } from '../../_services/route.service'
 import moment from 'moment'
+
 export default {
 	name: 'Plot',
-	components: {  },
+	components: {},
 	data () {
 		return {
 			isShow: true,
@@ -148,6 +180,7 @@ export default {
 			file: '',
 			event: '',
 			events: [],
+			calendarData: {},
 			value: [],
 			parameters: [],
 			selectedParameters: [],
@@ -158,12 +191,7 @@ export default {
 			routes: [],
 			routeId: 0,
 			isLoading: false,
-			datas: []
-		}
-	},
-	filters: {
-		crop(s) {
-			return s.length > 15 ? s.substr(0, 15) : s
+			datas: [],
 		}
 	},
 	computed: {
@@ -173,9 +201,6 @@ export default {
 		isEventLoading () {
 			return this.parameters.some(i => i.isLoading)
 		},
-		isEnableExportBtn () {
-			return !!this.datas.length
-		}
 	},
 	mounted () {
 		this.fetchAircrafts()
@@ -184,10 +209,35 @@ export default {
 	methods: {
 		...mapActions('loader', [ 'setLoading' ]),
 		fetchFiles () {
-			fileService.getAll().then(res => {
-				this.files = res
-			}).catch(err => {
-				console.log(err)
+			fileService
+				.getAll()
+				.then(res => {
+					this.files = res
+				})
+				.catch(err => {
+					console.log(err)
+				})
+		},
+
+		onEndDateChange (e) {
+			this.calendarData = { ...this.calendarData, endDate: e.target.value }
+			if (this.calendarData.startDate && this.aircraftId) this.fetchRoutes()
+		},
+		onStartDateChange (e) {
+			this.calendarData = { ...this.calendarData, startDate: e.target.value }
+			if (this.calendarData.endDate && this.aircraftId) this.fetchRoutes()
+		},
+
+		onClose () {
+			this.setCalendar({
+				start: moment(
+					this.calendarData.dateRange.start,
+					'DD/MM/YYYY HH:mm:ss'
+				).format('YYYY-MM-DD HH:mm:ss'),
+				end: moment(
+					this.calendarData.dateRange.end,
+					'DD/MM/YYYY HH:mm:ss'
+				).format('YYYY-MM-DD HH:mm:ss'),
 			})
 		},
 
@@ -198,55 +248,69 @@ export default {
 				this.onParameterRemove(item)
 			}
 		},
-		
+
 		fetchEvents (fileId) {
-			eventService.getAll('', fileId).then(res => {
-				this.events = res
-			}).catch(err => console.log(err))
+			eventService
+				.getAll('', fileId)
+				.then(res => {
+					this.events = res
+				})
+				.catch(err => console.log(err))
 		},
 		fetchFlight (routeId) {
-			flightService.getAll(routeId, '', '', this.aircraftId).then(res => {
-				this.flights = res
-			}).catch(err => {
-				console.log(err)
-			})
+			flightService
+				.getAll(routeId, '', '', this.aircraftId)
+				.then(res => {
+					this.flights = res
+				})
+				.catch(err => {
+					console.log(err)
+				})
 		},
 		fetchAircrafts () {
-			aircraftService.getAll(this.userProfile.user.airline[0]).then(res => {
-				this.aircrafts = res
-			}).catch(err => {
-				console.log(err)
-			})
-		},
-		onExport () {
-			const container = document.getElementById('container');
-			const charts = container.getElementsByClassName('chart');
-			const images = [];
-			[...charts].map((i,ind) => {
-				const el = i.getElementsByTagName('svg')
-				const svgElement = el[0]
-				const svgString = new XMLSerializer().serializeToString(svgElement);
-				images.push(svgString)
-			})
-			this.$nextTick(() => {
-				this.makePdf(images)
-			})
+			aircraftService
+				.getAll(this.userProfile.user.airline[0])
+				.then(res => {
+					this.aircrafts = res
+				})
+				.catch(err => {
+					console.log(err)
+				})
 		},
 		fetchRoutes () {
-			routeService.getAll(this.aircraftId, this.userProfile.user.airline[0]).then(res => {
-				this.routes = res
-			}).catch(err => {
-				console.log(err)
-			})
+			const startDate = moment(
+				this.calendarData.startDate,
+				'YYYY-MM-DD'
+			).format('YYYY-MM-DD HH:mm:ss')
+			const endDate = moment(this.calendarData.endDate, 'YYYY-MM-DD').format(
+				'YYYY-MM-DD HH:mm:ss'
+			)
+			routeService
+				.getAll(
+					this.aircraftId,
+					this.userProfile.user.airline[0],
+					startDate,
+					endDate
+				)
+				.then(res => {
+					this.routes = res
+				})
+				.catch(err => {
+					console.log(err)
+				})
 		},
 		onAircraftSelect (event) {
-			if (event.target.value !== '0') {
+			if (
+				event.target.value !== '0' &&
+        this.calendarData.startDate &&
+        this.calendarData.endDate
+			) {
 				this.fetchRoutes()
 			}
 		},
 		onRouteSelect (event) {
 			if (event.target.value !== '0') {
-				this.fetchFlight()
+				this.fetchFlight(event.target.value)
 			}
 		},
 		onFlightSelect (e) {
@@ -257,44 +321,55 @@ export default {
 			}
 		},
 		fetchParameters () {
-			otherService.getParameters().then(res => {
-				this.parameters = res
-			}).catch(err => {
-				console.log(err)
-			})
+			otherService
+				.getParameters()
+				.then(res => {
+					this.parameters = res
+				})
+				.catch(err => {
+					console.log(err)
+				})
 		},
 		async onParameterSelect (opt) {
 			this.parameters = this.parameters.map(i => {
 				if (i.id === opt.id) {
 					return { ...i, $isDisabled: true, isLoading: true }
-				} return i
+				}
+				return i
 			})
 			let data = []
 			try {
 				data = await otherService.getParameterById(opt.id, this.flight)
 				this.datas.push(data)
-			} catch (err){
+			} catch (err) {
 				console.log(err)
 				this.$toastr.e(err)
 			}
 			this.selectedParameters.push({ name: opt.title, id: opt.id })
 			this.xData = data.map(i => i.timestamp)
-			const dataset = { 
+			const dataset = {
 				name: opt.title,
 				data: data.map(i => parseFloat(i.value)),
-				'type': 'line',
+				type: 'line',
 			}
 			this.makeDataset(dataset)
 			this.parameters = this.parameters.map(i => {
 				if (i.id === opt.id) {
 					return { ...i, $isDisabled: false, isLoading: false }
-				} return i
+				}
+				return i
 			})
 		},
 		checkData () {
-			this.datas[0].forEach((i,index) => {
+			this.datas[0].forEach((i, index) => {
 				if (i.timestamp != this.datas[1][index].timestamp) {
-					console.log(index, ': data0: ', i.timestamp, ' - data1: ', this.datas[1][index].timestamp)
+					console.log(
+						index,
+						': data0: ',
+						i.timestamp,
+						' - data1: ',
+						this.datas[1][index].timestamp
+					)
 				}
 			})
 		},
@@ -302,7 +377,7 @@ export default {
 			function getRandomColor () {
 				const letters = 'BCDEF'.split('')
 				let color = '#'
-				for (let i = 0; i < 6; i++ ) {
+				for (let i = 0; i < 6; i++) {
 					color += letters[Math.floor(Math.random() * letters.length)]
 				}
 				return color
@@ -314,7 +389,7 @@ export default {
 			const plotLine = this.events.map(i => ({
 				name: i.event_name,
 				value: i.value,
-				x: this.xData.findIndex(j => j === i.timestamp)
+				x: this.xData.findIndex(j => j === i.timestamp),
 			}))
 
 			const chartDiv = document.createElement('div')
@@ -325,162 +400,174 @@ export default {
 				const thisChart = this.chart
 				const newX = this.options.shapes[0].points[0].x
 				const index = this.chart.annotations.indexOf(this)
+				console.log(newX)
 
 				if (e.type !== 'afterUpdate') {
 					Highcharts.each(Highcharts.charts, chart => {
 						if (chart !== thisChart) {
 							chart.annotations[index].update({
-								labels: [ {
-									point: {
-										x: newX
-									}
-								} ],
-								shapes: [ {
-									points: [ {
-										x: newX,
-										xAxis: 0,
-										y: 0
-									}, {
-										x: newX,
-										xAxis: 0,
-										y: 1000
-									} ]
-								} ]
+								labels: [
+									{
+										point: {
+											x: newX,
+										},
+									},
+								],
+								shapes: [
+									{
+										points: [
+											{
+												x: newX,
+												xAxis: 0,
+												y: 0,
+											},
+											{
+												x: newX,
+												xAxis: 0,
+												y: 1000,
+											},
+										],
+									},
+								],
 							})
 						}
 					})
 				}
 			}
 
-
-			Highcharts.chart(chartDiv, {
-				chart: {
-					marginLeft: 40, // Keep all charts left aligned
-					spacingTop: 20,
-					spacingBottom: 20,
-					backgroundColor: '#1f2327',
-					style: {
-						color: '#c8c9c5'
-					},
-					events: {
-						render:  val => {
-							this.drawEvents(plotLine)
-						}
-					},
-					zoomType: 'x',
-					resetZoomButton: {
-						position: {
-							// align: 'right', // by default
-							// verticalAlign: 'top', // by default
-							x: -10,
-							y: 0
-						},
-						relativeTo: 'chart',
-						theme: {
-							zIndex: 999999999
-						}
-					}
-				},
-				point: {
-					events: {
-						mouseOut: function () {
-							this.series.chart.tooltip.hide()
-						}
-					},
-				},
-				colors: [ 'red', 'orange', 'green', 'blue', 'purple', 'brown' ],
-				title: {
-					text: dataset.name,
-					align: 'left',
-					margin: 0,
-					x: 30,
-					style: {
-						color: '#c8c9c5'
-					}
-				},
-				credits: {
-					enabled: false
-				},
-				legend: {
-					enabled: false
-				},
-				xAxis: {
-					id: 'xaxis',
-					crosshair: true,
-					events: {
-						setExtremes: this.syncExtremes
-					},
-					title: {
-						style: {
-							color: '#c8c9c5'
-						}
-					},
-					categories: this.xData,
-					labels: {
-						enabled: false,
-						style: {
-							color: '#c8c9c5'
-						}
-					},
-					plotLines: plotLine.map(i => {
-						return {
-							value: i.x,
-							width: 0,  
-							label: {
-								text: '',
-								rotation: 0,
-								useHTML: true
-							}
-						}
-					})
-				},
-				yAxis: {
-					title: {
-						text: null,
-						style: {
-							color: '#c8c9c5'
-						}
-					},
-					labels: {
+			Highcharts.chart(
+				chartDiv,
+				{
+					chart: {
+						marginLeft: 40, // Keep all charts left aligned
+						spacingTop: 20,
+						spacingBottom: 20,
 						style: {
 							color: '#c8c9c5',
-						}
-					}
-				},
-				tooltip: {
-					backgroundColor: '#fff',
-					hideDelay: 2000,
-					borderColor: '#C6EDEE',
-					borderRadius: 10,
-					borderWidth: 2,
-					formatter: function () {
-						return `<span class="uppercase text-base">${this.series.name}</span> <br> 
+						},
+						events: {
+							render: val => {
+								this.drawEvents(plotLine)
+							},
+						},
+						zoomType: 'x',
+						resetZoomButton: {
+							position: {
+								// align: 'right', // by default
+								// verticalAlign: 'top', // by default
+								x: -10,
+								y: 0,
+							},
+							relativeTo: 'chart',
+							theme: {
+								zIndex: 999999999,
+							},
+						},
+					},
+					point: {
+						events: {
+							mouseOut: function () {
+								this.series.chart.tooltip.hide()
+							},
+						},
+					},
+					colors: [ 'red', 'orange', 'green', 'blue', 'purple', 'brown' ],
+					title: {
+						text: dataset.name,
+						align: 'left',
+						margin: 0,
+						x: 30,
+						style: {
+							color: '#c8c9c5',
+						},
+					},
+					credits: {
+						enabled: false,
+					},
+					legend: {
+						enabled: false,
+					},
+					xAxis: {
+						id: 'xaxis',
+						crosshair: true,
+						events: {
+							setExtremes: this.syncExtremes,
+						},
+						title: {
+							style: {
+								color: '#c8c9c5',
+							},
+						},
+						categories: this.xData,
+						labels: {
+							enabled: false,
+							style: {
+								color: '#c8c9c5',
+							},
+						},
+						plotLines: plotLine.map(i => {
+							return {
+								value: i.x,
+								width: 0,
+								label: {
+									text: '',
+									rotation: 0,
+									useHTML: true,
+								},
+							}
+						}),
+					},
+					yAxis: {
+						title: {
+							text: null,
+							style: {
+								color: '#c8c9c5',
+							},
+						},
+						labels: {
+							style: {
+								color: '#c8c9c5',
+							},
+						},
+					},
+					tooltip: {
+						backgroundColor: '#fff',
+						hideDelay: 2000,
+						borderColor: '#C6EDEE',
+						borderRadius: 10,
+						borderWidth: 2,
+						formatter: function () {
+							return `<span class="uppercase text-base">${this.series.name}</span> <br> 
 								<span class="text-xs">Date & Time: </span> <span class="text-xs">${this.x}</span><br>
 								<span class="text-xs">Value: </span> <span class="text-xs">${this.y}</span>`
+						},
+						headerFormat: '',
+						shadow: false,
+						style: {
+							fontSize: '18px',
+							color: '#000',
+						},
+						valueDecimals: dataset.valueDecimals,
 					},
-					headerFormat: '',
-					shadow: false,
-					style: {
-						fontSize: '18px',
-						color: '#000',
-					},
-					valueDecimals: dataset.valueDecimals
+					series: [
+						{
+							data: dataset.data,
+							name: dataset.name,
+							type: dataset.type,
+							color: randomColor(),
+							fillOpacity: 0.3,
+							turboThreshold: 100001,
+							tooltip: {
+								// valueSuffix: ' ' + dataset.unit
+							},
+						},
+					],
 				},
-				series: [ {
-					data: dataset.data,
-					name: dataset.name,
-					type: dataset.type,
-					color: randomColor(),
-					fillOpacity: 0.3,
-					turboThreshold: 100001,
-					tooltip: {
-						// valueSuffix: ' ' + dataset.unit
-					}
-				} ]
-			},chart => {
-				this.drawEvents(plotLine)
-			})
-		},	
+				chart => {
+					this.drawEvents(plotLine)
+				}
+			)
+		},
 		resetEvents (className) {
 			const a = document.getElementsByClassName(className)
 			for (const i of [ ...a ]) {
@@ -498,8 +585,8 @@ export default {
 					const b = a[i].getBoundingClientRect()
 					const span = document.createElement('span')
 					span.classList = 'event-chart-data'
-					span.style.top = (b.top - c.top) - 40 +'px'
-					span.style.left = (b.left - c.left) +'px'
+					span.style.top = b.top - c.top - 40 + 'px'
+					span.style.left = b.left - c.left + 'px'
 					span.style.position = 'absolute'
 					span.style.height = '120px'
 					span.style.width = '2px'
@@ -510,8 +597,8 @@ export default {
 						const innerSpan = document.createElement('span')
 						innerSpan.style.position = 'absolute'
 						innerSpan.style.height = 'auto'
-						innerSpan.style.top = (b.top - c.top) - 40 +'px'
-						innerSpan.style.left = (b.left - c.left) +'px'
+						innerSpan.style.top = b.top - c.top - 40 + 'px'
+						innerSpan.style.left = b.left - c.left + 'px'
 						innerSpan.style.width = 'auto'
 						innerSpan.style.background = 'white'
 						innerSpan.style.color = '#6495EC'
@@ -532,7 +619,7 @@ export default {
 						innerSpan.appendChild(tooltip)
 
 						const title = document.createElement('span')
-						title.classList= 'tooltiptext__title'
+						title.classList = 'tooltiptext__title'
 						title.innerText = plotLine[i].name
 						tooltip.appendChild(title)
 
@@ -550,21 +637,29 @@ export default {
 					}
 					container.appendChild(span)
 				}
-			}	
+			}
 		},
 		onParameterRemove (opt) {
+			//check is event loading
+			// const event = this.parameters.find(i => i.id === opt.id)
+			// console.log(event.$isDisabled)
+			// if (event.$isDisabled) return
+			// Else remove event
 			const index = this.selectedParameters.findIndex(i => i.id === opt.id)
 			const chart = Highcharts.charts[index]
-			chart.container.parentNode.parentNode.removeChild(chart.container.parentNode)
+			chart.container.parentNode.parentNode.removeChild(
+				chart.container.parentNode
+			)
 			Highcharts.charts.splice(index, 1)
 			this.selectedParameters.splice(index, 1)
 			const evnetLines = document.getElementsByClassName('event-chart-data')
+			console.log(evnetLines)
 			const len = [ ...evnetLines ].length
 			for (let i = 0; i < this.events.length; i++) {
 				const removingEvent = evnetLines[len - 1 - i]
 				removingEvent.parentNode.removeChild(removingEvent)
 			}
-			
+
 			if (this.selectedParameters.length === 0) {
 				this.resetEvents('event-chart-data')
 			}
@@ -574,9 +669,9 @@ export default {
 		},
 		highChartInit () {
 			[ 'mousemove', 'touchmove', 'touchstart' ].forEach(eventType => {
-				document.getElementById('container').addEventListener(
-					eventType,
-					e => {
+				document
+					.getElementById('container')
+					.addEventListener(eventType, e => {
 						let chart
 						let point
 						let i
@@ -593,8 +688,7 @@ export default {
 								point.onMouseOver(e)
 							}
 						}
-					}
-				)
+					})
 			})
 			// Highcharts.Pointer.prototype.reset = function () {
 			// 	return undefined
@@ -605,161 +699,103 @@ export default {
 				this.series.chart.tooltip.refresh(this) // Show the tooltip
 				this.series.chart.xAxis[0].drawCrosshair(event, this) // Show the crosshair
 			}
-			this.syncExtremes =  e => {
+			this.syncExtremes = e => {
 				const thisChart = this.chart
 
-				if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
+				if (e.trigger !== 'syncExtremes') {
+					// Prevent feedback loop
 					Highcharts.each(Highcharts.charts, chart => {
 						if (chart !== thisChart) {
-							if (chart.xAxis[0].setExtremes) { // It is null while updating
-								chart.xAxis[0].setExtremes(
-									e.min,
-									e.max,
-									undefined,
-									false,
-									{ trigger: 'syncExtremes' }
-								)
+							if (chart.xAxis[0].setExtremes) {
+								// It is null while updating
+								chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {
+									trigger: 'syncExtremes',
+								})
 							}
 						}
 					})
 				}
 			}
 		},
-		makePdf (images) {
-			const imageObjects = images.map(i => {
-				return {
-					svg: i,
-					fit: [800, 600]
-				}
-			})
-			const route = this.routes.find(i => i.id === this.routeId)
-			const f = this.flights.find(i => i.id === this.flight)
-			const title = `${route.from_airport_title} - ${route.to_airport_title}`
-			const subTitle = `Flight no: ${f.flight_no}`
-			
-			const docDefinition = {
-				info: {
-					title: 'Title',
-					author: 'SigmaSoft Team',
-				},
-				compress: false,
-				pageOrientation: 'landscape',
-				pageMargins: [ 30, 10, 30, 30 ],
-				pageSize: 'A4',
-				ownerPassword: '123456',
-				permissions: {
-					printing: 'highResolution', //'lowResolution'
-					modifying: false,
-					copying: false,
-					annotating: true,
-					fillingForms: true,
-					contentAccessibility: true,
-					documentAssembly: true
-				},
-				content: [
-					{
-						text: title,
-						style: 'header'
-					},
-					{
-						text: subTitle,
-						style: 'subHeader'
-					},
-					...imageObjects
-				],
-				styles: {
-					data: {
-						fontSize: 10,
-					},
-					header: {
-						fontSize: 32,
-						bold: true,
-						margin: [ 30, 20, 30, 20],
-						alignment: 'center'
-					},
-					subHeader: {
-						fontSize: 20,
-						bold: true,
-						margin: [ 30, 20, 30, 20],
-						alignment: 'center'
-					}
-				},
-				defaultStyle: {
-					// columnGap: 20
-				}
-			}
-			pdfMake.createPdf(docDefinition).download(`flight-${moment().format('DD.MM.YYYY')}.pdf`)
-		}
-	}
+	},
 }
 </script>
 
 <style lang="scss">
-	.spinner-3 {
-		width:50px;
-		height:50px;
-		border-radius:50%;
-		background:conic-gradient(#0000 10%,#25b09b);
-		-webkit-mask:radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
-		animation:s3 1s infinite linear;
-	}
-	@keyframes s3 {to{transform: rotate(1turn)}}
-	.loader-container {
-		display: flex;
-		justify-content: center;
-		margin-bottom: 140px;
-	}
-	.chart-tooltip {
-		display: block;
-		width: 3px;
-		height: 10000px;
-		// border-radius: 10px;
-		background: cornsilk;
-	}
-	.multiselect__tags {
-		background: transparent;
-		border-color:rgb(118, 118, 118);
-		input {
-			background: transparent;
-		}
+.date-choose {
+  display: flex;
+}
+.spinner-3 {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: conic-gradient(#0000 10%, #25b09b);
+  --webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+  animation: s3 1s infinite linear;
+}
+@keyframes s3 {
+  to {
+    transform: rotate(1turn);
+  }
+}
+.loader-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 140px;
+}
+.chart-tooltip {
+  display: block;
+  width: 3px;
+  height: 10000px;
+  // border-radius: 10px;
+  background: cornsilk;
+}
+.multiselect__tags {
+  background: transparent;
+  border-color: rgb(118, 118, 118);
+  input {
+    background: transparent;
+  }
 
-		.multiselect__single {
-			background: transparent;
-			color: white;
-		}
-	}
-    .plot {
-        &__head {
-            display: flex;
-            justify-content: center;
-			align-items: center;
-            gap: 2rem;
-			color: #fff;
+  .multiselect__single {
+    background: transparent;
+    color: white;
+  }
+}
+.plot {
+  &__head {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    color: #fff;
 
-			select {
-				border-color:rgb(118, 118, 118);
-			}
-        }
+    select,
+    input {
+      border-color: rgb(118, 118, 118);
     }
-.highcharts-figure, .highcharts-data-table table {
-  min-width: 320px; 
+  }
+}
+.highcharts-figure,
+.highcharts-data-table table {
+  min-width: 320px;
   max-width: 800px;
   margin: 1em auto;
 }
 
 .chart {
   height: 120px;
-//   width: 42vw;
+  //   width: 42vw;
 }
 
 .highcharts-data-table table {
-	font-family: Verdana, sans-serif;
-	border-collapse: collapse;
-	border: 1px solid #c8c9c5;
-	margin: 10px auto;
-	text-align: center;
-	width: 100%;
-	max-width: 500px;
+  font-family: Verdana, sans-serif;
+  border-collapse: collapse;
+  border: 1px solid #c8c9c5;
+  margin: 10px auto;
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
 }
 .highcharts-data-table caption {
   padding: 1em 0;
@@ -767,32 +803,35 @@ export default {
   color: #555;
 }
 .highcharts-data-table th {
-	font-weight: 600;
+  font-weight: 600;
   padding: 0.5em;
 }
-.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+.highcharts-data-table td,
+.highcharts-data-table th,
+.highcharts-data-table caption {
   padding: 0.5em;
 }
-.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+.highcharts-data-table thead tr,
+.highcharts-data-table tr:nth-child(even) {
   background: #3f3a3a;
 }
 .highcharts-data-table tr:hover {
   background: #303336;
 }
 .highcharts-background {
-	fill: rgba(255, 255, 255, 0.02);
-	// fill: rgba($color: #fff, $alpha: 1);
+  fill: rgba(255, 255, 255, 0.02);
+  // fill: rgba($color: #fff, $alpha: 1);
 }
 #events {
-	pointer-events: none;
-	background: rgba(#fff, 0.6);
+  pointer-events: none;
+  background: rgba(#fff, 0.6);
 }
 #container {
-	margin-bottom: 110px;
+  margin-bottom: 110px;
 }
 
 .tooltip .tooltiptext {
-	visibility: hidden;
+  visibility: hidden;
   min-width: 200px;
   background-color: #4aa96c;
   color: #fff;
@@ -807,14 +846,11 @@ export default {
   right: 2px;
 
   &__title {
-	  font-weight: bold;
+    font-weight: bold;
   }
 }
 
 .tooltip:hover .tooltiptext {
   visibility: visible;
-}
-.chart svg {
-	background: #1f2327;
 }
 </style>
