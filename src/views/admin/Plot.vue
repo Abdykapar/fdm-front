@@ -25,23 +25,19 @@
 
 			<div class="flex flex-col">
 				<label class="text-gray-400">Start Date</label>
-				<div class="flex">
-					<input
-						class="w-44 px-3 py-2 bg-gray-800 border rounded outline-none text-gray-400"
-						type="date"
-						@change="onStartDateChange"
-					>
-				</div>
+				<input
+					class="w-44 px-3 py-2 bg-gray-800 border rounded outline-none text-gray-400"
+					type="date"
+					@change="onStartDateChange"
+				>
 			</div>
 			<div class="flex flex-col">
 				<label class="text-gray-400">End Date</label>
-				<div class="flex">
-					<input
-						class="w-44 px-3 py-2 bg-gray-800 border rounded outline-none text-gray-400"
-						type="date"
-						@change="onEndDateChange"
-					>
-				</div>
+				<input
+					class="w-44 px-3 py-2 bg-gray-800 border rounded outline-none text-gray-400"
+					type="date"
+					@change="onEndDateChange"
+				>
 			</div>
 
 			<div class="flex flex-col">
