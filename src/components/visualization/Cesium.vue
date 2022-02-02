@@ -164,6 +164,7 @@ export default {
 				this.events = res
 				return otherService.getFileCoordinates(flightId)
 			}).then(res => {
+				console.log(res.map(i => ({ long: i.longitude, lat: i.latitude })))
 				this.flightData = res.map(i => {
 					const e = this.events.find(j => j.timestamp === i.timestamp)
 					if (e) return { ...i, isEvent: true, event_name: e.event_name }
@@ -179,6 +180,7 @@ export default {
 			})
 		},
 		init () {
+			console.log('init')
 			// this.audio.play()
 			const dataLength = this.flightData.length
 			const start = Cesium.JulianDate.fromDate(new Date(this.flightData[0].timestamp))
