@@ -164,7 +164,6 @@ export default {
 				this.events = res
 				return otherService.getFileCoordinates(flightId)
 			}).then(res => {
-				console.log(res.map(i => ({ long: i.longitude, lat: i.latitude })))
 				this.flightData = res.map(i => {
 					const e = this.events.find(j => j.timestamp === i.timestamp)
 					if (e) return { ...i, isEvent: true, event_name: e.event_name }
@@ -180,7 +179,6 @@ export default {
 			})
 		},
 		init () {
-			console.log('init')
 			// this.audio.play()
 			const dataLength = this.flightData.length
 			const start = Cesium.JulianDate.fromDate(new Date(this.flightData[0].timestamp))
@@ -249,11 +247,12 @@ export default {
 
 			}
 			const loadModel  = async () => {
+				const airplaneUri = await Cesium.IonResource.fromAssetId(355099)
 				const airplaneEntity = this.viewer.entities.add({
 					availability: new Cesium.TimeIntervalCollection([ new Cesium.TimeInterval({ start: start, stop: stop }) ]),
 					position: positionProperty,
 					// Attach the 3D model instead of the green point.
-					model: { uri: '/airbus200/scene.gltf', scale: 1.4 },
+					model: { uri: airplaneUri, scale: 1.4 },
 					// Automatically compute the orientation from the position.
 					orientation: new Cesium.VelocityOrientationProperty(positionProperty),
 					path: new Cesium.PathGraphics({ width: 1 })
