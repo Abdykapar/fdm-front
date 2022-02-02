@@ -355,7 +355,7 @@ export default {
 		},
 		drawCircle (svg, parent, attributes) {
 			const circle = document.createElementNS(svg.namespaceURI, 'circle')
-			for (const [key, value] of Object.entries(attributes)) {
+			for (const [ key, value ] of Object.entries(attributes)) {
 				circle.setAttribute(key, value)
 			}
 			parent.appendChild(circle)
@@ -537,7 +537,7 @@ export default {
 						this.createText(svg, element.x, element.y, g, element.text, element.fs, element.textId)
 					} else this.makeSvgElement(svg, element, group)
 				}
-			});
+			})
 		},
 
 		makeSvgElement (centerSvg, item, group, y = 280) {
@@ -724,7 +724,7 @@ export default {
 
 			svg.appendChild(group)
 
-			const bigTexts = ['N', '3', '6', 'E', '12', '15', 'S', '21', '24', 'W', '30', '33']
+			const bigTexts = [ 'N', '3', '6', 'E', '12', '15', 'S', '21', '24', 'W', '30', '33' ]
 			let count = 0
 
 			for (let i = 0; i < 72; i++) {
@@ -771,7 +771,7 @@ export default {
 		},
 
 		polarToCartesian (centerX, centerY, radius, angleInDegrees) {
-			const angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+			const angleInRadians = (angleInDegrees-90) * Math.PI / 180.0
 		  
 			return {
 			  x: centerX + (radius * Math.cos(angleInRadians)),
