@@ -140,12 +140,12 @@ export default {
 		},
 	},
 	mounted () {
-		// cesiumExample()
-		Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
-		// this.audio = new Audio('adi.mp3')
-		this.viewer = new Cesium.Viewer('cesium', {
-			terrainProvider: Cesium.createWorldTerrain()
-		})
+		cesiumExample()
+		// Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
+		// // this.audio = new Audio('adi.mp3')
+		// this.viewer = new Cesium.Viewer('cesium', {
+		// 	terrainProvider: Cesium.createWorldTerrain()
+		// })
 		// const osmBuildings = this.viewer.scene.primitives.add(Cesium.createOsmBuildings())
 	
 		this.makeCanvas(0)
@@ -172,8 +172,8 @@ export default {
 					return i
 				})
 				// this.audio.currentTime = 0
-				if (this.flightData.length)
-				{this.init()}
+				// if (this.flightData.length)
+				// {this.init()}
 				this.setLoading(false)
 			}).catch(err => {
 				this.setLoading(false)
