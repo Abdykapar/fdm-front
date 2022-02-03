@@ -140,12 +140,12 @@ export default {
 		},
 	},
 	mounted () {
-		cesiumExample()
-		// Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
-		// this.audio = new Audio('adi.mp3')
-		// this.viewer = new Cesium.Viewer('cesium', {
-		// 	terrainProvider: Cesium.createWorldTerrain()
-		// })
+		// cesiumExample()
+		Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
+		this.audio = new Audio('adi.mp3')
+		this.viewer = new Cesium.Viewer('cesium', {
+			terrainProvider: Cesium.createWorldTerrain()
+		})
 		// const osmBuildings = this.viewer.scene.primitives.add(Cesium.createOsmBuildings())
 	
 		this.makeCanvas(0)
@@ -172,9 +172,8 @@ export default {
 					return i
 				})
 				this.audio.currentTime = 0
-				console.log(this.flightData)
-				// if (this.flightData.length)
-				// {this.init()}
+				if (this.flightData.length)
+				{this.init()}
 				this.setLoading(false)
 			}).catch(err => {
 				this.setLoading(false)
@@ -250,12 +249,12 @@ export default {
 
 			}
 			const loadModel  = async () => {
-				const airplaneUri = await Cesium.IonResource.fromAssetId(355099)
+				// const airplaneUri = await Cesium.IonResource.fromAssetId(355099)
 				const airplaneEntity = this.viewer.entities.add({
 					availability: new Cesium.TimeIntervalCollection([ new Cesium.TimeInterval({ start: start, stop: stop }) ]),
 					position: positionProperty,
 					// Attach the 3D model instead of the green point.
-					model: { uri: airplaneUri, scale: 1.4 },
+					model: { uri: '/airbus200/scene.gltf', scale: 1.4 },
 					// Automatically compute the orientation from the position.
 					orientation: new Cesium.VelocityOrientationProperty(positionProperty),
 					path: new Cesium.PathGraphics({ width: 1 })
@@ -408,6 +407,8 @@ export default {
 					}
 
 				}
+
+				console.log('Entity ', airplaneEntity)
 
 				this.viewer.trackedEntity = airplaneEntity
 			}
