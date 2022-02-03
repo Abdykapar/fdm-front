@@ -142,7 +142,7 @@ export default {
 	mounted () {
 		// cesiumExample()
 		Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
-		this.audio = new Audio('adi.mp3')
+		// this.audio = new Audio('adi.mp3')
 		this.viewer = new Cesium.Viewer('cesium', {
 			terrainProvider: Cesium.createWorldTerrain()
 		})
@@ -151,8 +151,8 @@ export default {
 		this.makeCanvas(0)
 	},
 	beforeDestroy () {
-		this.audio.pause()
-		this.audio.currentTime = 0
+		// this.audio.pause()
+		// this.audio.currentTime = 0
 		this.setFileId(0)
 	},
 	methods: {
@@ -160,8 +160,8 @@ export default {
 		...mapActions('file', [ 'setFileId' ]),
 		fetchData (flightId) {
 			this.setLoading(true)
-			if (this.audio)
-			{this.audio.pause()}
+			// if (this.audio)
+			// {this.audio.pause()}
 			eventService.getAll(flightId).then(res => {
 				this.events = res
 				return otherService.getFileCoordinates(flightId)
@@ -171,7 +171,7 @@ export default {
 					if (e) return { ...i, isEvent: true, event_name: e.event_name }
 					return i
 				})
-				this.audio.currentTime = 0
+				// this.audio.currentTime = 0
 				if (this.flightData.length)
 				{this.init()}
 				this.setLoading(false)
