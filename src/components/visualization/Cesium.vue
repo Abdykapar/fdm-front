@@ -102,6 +102,7 @@ import moment from 'moment'
 import _ from 'lodash'
 import * as $ from 'jquery'
 import { eventService } from '../../_services/event.service'
+import { cesiumExample } from '@/_helpers/cesium-example'
 
 export default {
 	name: 'Cesium',
@@ -139,12 +140,13 @@ export default {
 		},
 	},
 	mounted () {
-		Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
-		this.audio = new Audio('adi.mp3')
-		this.viewer = new Cesium.Viewer('cesium', {
-			terrainProvider: Cesium.createWorldTerrain()
-		})
-		const osmBuildings = this.viewer.scene.primitives.add(Cesium.createOsmBuildings())
+		cesiumExample()
+		// Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
+		// this.audio = new Audio('adi.mp3')
+		// this.viewer = new Cesium.Viewer('cesium', {
+		// 	terrainProvider: Cesium.createWorldTerrain()
+		// })
+		// const osmBuildings = this.viewer.scene.primitives.add(Cesium.createOsmBuildings())
 	
 		this.makeCanvas(0)
 	},
@@ -170,8 +172,9 @@ export default {
 					return i
 				})
 				this.audio.currentTime = 0
-				if (this.flightData.length)
-				{this.init()}
+				console.log(this.flightData)
+				// if (this.flightData.length)
+				// {this.init()}
 				this.setLoading(false)
 			}).catch(err => {
 				this.setLoading(false)
@@ -189,19 +192,19 @@ export default {
 			this.viewer.clock.currentTime = Cesium.JulianDate.fromDate(new Date(this.flightData[quarterTime].timestamp))
 			this.viewer.timeline.zoomTo(start, stop)
 			// Speed up the playback speed 10x.
-			this.viewer.clock.multiplier = 1
+			this.viewer.clock.multiplier = 10
 			// Start playing the scene.
 			this.viewer.clock.shouldAnimate = true
 
-			Cesium.knockout.getObservable(this.viewer.clockViewModel,
-				'shouldAnimate').subscribe(isAnimating => {
-				if (isAnimating) {
-					// this.audio.play()
-				} else {
-					this.audio.pause()
-					console.log('Cesium clock is paused.')
-				}
-			})
+			// Cesium.knockout.getObservable(this.viewer.clockViewModel,
+			// 	'shouldAnimate').subscribe(isAnimating => {
+			// 	if (isAnimating) {
+			// 		// this.audio.play()
+			// 	} else {
+			// 		this.audio.pause()
+			// 		console.log('Cesium clock is paused.')
+			// 	}
+			// })
 
 			// The SampledPositionedProperty stores the position and timestamp for each sample along the radar sample series.
 			const positionProperty = new Cesium.SampledPositionProperty()
@@ -258,12 +261,12 @@ export default {
 					path: new Cesium.PathGraphics({ width: 1 })
 				})
 
-				const box = new Cesium.BoxGeometry({
-					vertexFormat : Cesium.VertexFormat.POSITION_ONLY,
-					maximum : new Cesium.Cartesian3(250000.0, 250000.0, 250000.0),
-					minimum : new Cesium.Cartesian3(-250000.0, -250000.0, -250000.0)
-				})
-				const geometry = Cesium.BoxGeometry.createGeometry(box)
+				// const box = new Cesium.BoxGeometry({
+				// 	vertexFormat : Cesium.VertexFormat.POSITION_ONLY,
+				// 	maximum : new Cesium.Cartesian3(250000.0, 250000.0, 250000.0),
+				// 	minimum : new Cesium.Cartesian3(-250000.0, -250000.0, -250000.0)
+				// })
+				// const geometry = Cesium.BoxGeometry.createGeometry(box)
 				
 				this.viewer.clock.onTick.addEventListener(clock => {
 					onTimeChange(clock)
