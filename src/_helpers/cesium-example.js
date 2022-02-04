@@ -3,23 +3,29 @@ import * as Cesium from 'cesium'
 export const cesiumExample = () => {
 	Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
 
-	// STEP 4 CODE (replaces steps 2 and 3)
-	// Keep your `Cesium.Ion.defaultAccessToken = 'your_token_here'` line from before here. 
-	const viewer = new Cesium.Viewer('cesium', {
-		terrainProvider: Cesium.createWorldTerrain()
+	const viewer = new Cesium.Viewer('cesiumContainer')
+
+	const wyoming = viewer.entities.add({
+		polygon : {
+			hierarchy : Cesium.Cartesian3.fromDegreesArray([
+				-109.080842,45.002073,
+				-105.91517,45.002073,
+				-104.058488,44.996596,
+				-104.053011,43.002989,
+				-104.053011,41.003906,
+				-105.728954,40.998429,
+				-107.919731,41.003906,
+				-109.04798,40.998429,
+				-111.047063,40.998429,
+				-111.047063,42.000709,
+				-111.047063,44.476286,
+				-111.05254,45.002073 ]),
+			height : 0,
+			material : Cesium.Color.RED.withAlpha(0.5),
+			outline : true,
+			outlineColor : Cesium.Color.BLACK
+		}
 	})
 
-	viewer.entities.suspendEvents()
-	
-	const dataPoint = { longitude: -122.38985, latitude: 37.61864, height: -27.32 }
-	// Mark this location with a red point.
-	const pointEntity = viewer.entities.add({
-		description: `First data point at (${dataPoint.longitude}, ${dataPoint.latitude})`,
-		position: Cesium.Cartesian3.fromDegrees(dataPoint.longitude, dataPoint.latitude, dataPoint.height),
-		point: { pixelSize: 10, color: Cesium.Color.RED }
-	})
-
-	viewer.entities.resumeEvents()
-	// // Fly the camera to this point.
-	viewer.flyTo(pointEntity)
+	viewer.zoomTo(wyoming)
 }

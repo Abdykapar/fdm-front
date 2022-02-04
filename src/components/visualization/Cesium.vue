@@ -1,6 +1,6 @@
 <template>
 	<div
-		id="cesium"
+		id="cesiumContainer"
 		:class="{ minimize : minimize }"
 		class="relative"
 	>
@@ -143,7 +143,7 @@ export default {
 		cesiumExample()
 		// Cesium.Ion.defaultAccessToken = process.env.VUE_APP_CESIUM_TOKEN
 		// // this.audio = new Audio('adi.mp3')
-		// this.viewer = new Cesium.Viewer('cesium', {
+		// this.viewer = new Cesium.Viewer('cesiumContainer', {
 		// 	terrainProvider: Cesium.createWorldTerrain()
 		// })
 		// const osmBuildings = this.viewer.scene.primitives.add(Cesium.createOsmBuildings())
