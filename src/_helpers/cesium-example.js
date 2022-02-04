@@ -8,6 +8,8 @@ export const cesiumExample = () => {
 	const viewer = new Cesium.Viewer('cesium', {
 		terrainProvider: Cesium.createWorldTerrain()
 	})
+
+	viewer.entities.suspendEvents()
 	
 	const dataPoint = { longitude: -122.38985, latitude: 37.61864, height: -27.32 }
 	// Mark this location with a red point.
@@ -16,6 +18,8 @@ export const cesiumExample = () => {
 		position: Cesium.Cartesian3.fromDegrees(dataPoint.longitude, dataPoint.latitude, dataPoint.height),
 		point: { pixelSize: 10, color: Cesium.Color.RED }
 	})
-	// Fly the camera to this point.
+
+	viewer.entities.resumeEvents()
+	// // Fly the camera to this point.
 	viewer.flyTo(pointEntity)
 }
